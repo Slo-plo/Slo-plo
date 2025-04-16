@@ -1,3 +1,11 @@
+---
+name: Bug Report
+about: 버그를 제보할 때 사용하는 템플릿입니다.
+title: "[Bug] "
+labels: bug
+assignees: ''
+---
+
 ## 버그 설명 / 기능 설명
 
 <!-- 이슈에서 다루는 문제나 기능에 대해 간략히 설명하세요. -->

@@ -1,3 +1,11 @@
+---
+name: Feature Request
+about: 새로운 기능을 제안하거나 개선 아이디어를 공유하려면 이 템플릿을 사용하세요.
+title: "[Feat] "
+labels: feature
+assignees: ''
+---
+
 ## 기능 설명
 
 <!-- 기능이 무엇을 하는지 간략히 설명하세요. -->
