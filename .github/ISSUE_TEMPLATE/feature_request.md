@@ -1,6 +1,6 @@
 ---
 name: Feature Request
-about: 새로운 기능을 제안하거나 개선 아이디어를 공유하려면 이 템플릿을 사용하세요.
+about: 새로운 기능을 개발할 때 사용하는 이슈입니다.
 title: "[Feat] "
 labels: feature
 assignees: ''
@@ -20,9 +20,9 @@ assignees: ''
 
 <!-- 기능을 구현하기 위한 작업 항목을 TODO 형식으로 나열하세요. -->
 
-- [ ]  [ ]
-- [ ]  [ ]
-- [ ]  [ ]
+- [ ]
+- [ ]
+- [ ]
 
 ## 기타
 

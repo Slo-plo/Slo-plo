@@ -1,6 +1,6 @@
 ---
 name: Bug Report
-about: 버그를 제보할 때 사용하는 템플릿입니다.
+about: 버그를 해결할 때 사용하는 템플릿입니다.
 title: "[Bug] "
 labels: bug
 assignees: ''
