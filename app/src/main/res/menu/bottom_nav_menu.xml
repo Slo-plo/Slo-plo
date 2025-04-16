@@ -1,0 +1,14 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/journalFragment"
+        android:icon="@drawable/ic_nav_journal"
+        android:title="일지" />
+    <item
+        android:id="@+id/homeFragment"
+        android:icon="@drawable/ic_nav_home"
+        android:title="홈" />
+    <item
+        android:id="@+id/volunteerFragment"
+        android:icon="@drawable/ic_nav_volunteer"
+        android:title="외부봉사" />
+</menu>
