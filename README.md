@@ -70,10 +70,6 @@ git commit -m "fix: API 응답 오류 수정 #5"
    - `txt_login_error_message`: 로그인 화면에서 오류 메시지 텍스트
    - `txt_home_welcome_message`: 홈 화면에서 환영 메시지 텍스트
    - `btn_submit_text`: 버튼에 표시될 텍스트
-
-3. 레이아웃:
-   - `layout_activity_login`: 로그인 화면에 해당하는 레이아웃 파일
-   - `layout_fragment_home`: 홈 화면에 해당하는 프래그먼트 레이아웃 파일
 ```
 
 #### 2. Common Resources
