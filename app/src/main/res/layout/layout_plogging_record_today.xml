@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:id="@+id/layout_plogging_record_trash"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" >
+
+        <TextView
+            android:id="@+id/tv_value_record_trash"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/noto_sans_kr_semi_bold"
+            android:includeFontPadding="false"
+            android:text="10"
+            android:textSize="35sp" />
+
+        <TextView
+            android:id="@+id/tv_unit_record_trash"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/noto_sans_kr_semi_bold"
+            android:includeFontPadding="false"
+            android:text="개"
+            android:textSize="12sp" />
+
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/noto_sans_kr_medium"
+        android:includeFontPadding="false"
+        android:text="수거한 쓰레기"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="@+id/layout_plogging_record_trash"
+        app:layout_constraintStart_toStartOf="@+id/layout_plogging_record_trash"
+        app:layout_constraintTop_toBottomOf="@+id/layout_plogging_record_trash" />
+
+    <LinearLayout
+        android:id="@+id/layout_plogging_record_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" >
+
+        <TextView
+            android:id="@+id/tv_value_record_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/noto_sans_kr_semi_bold"
+            android:includeFontPadding="false"
+            android:text="10"
+            android:textSize="35sp" />
+
+        <TextView
+            android:id="@+id/tv_unit_record_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/noto_sans_kr_semi_bold"
+            android:includeFontPadding="false"
+            android:text="분"
+            android:textSize="12sp" />
+
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/noto_sans_kr_medium"
+        android:includeFontPadding="false"
+        android:text="총 시간"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="@+id/layout_plogging_record_time"
+        app:layout_constraintStart_toStartOf="@+id/layout_plogging_record_time"
+        app:layout_constraintTop_toBottomOf="@+id/layout_plogging_record_time" />
+
+    <LinearLayout
+        android:id="@+id/layout_plogging_record_dist"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" >
+
+        <TextView
+            android:id="@+id/tv_value_record_dist"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/noto_sans_kr_semi_bold"
+            android:includeFontPadding="false"
+            android:text="0.1"
+            android:textSize="35sp" />
+
+        <TextView
+            android:id="@+id/tv_unit_record_dist"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/noto_sans_kr_semi_bold"
+            android:includeFontPadding="false"
+            android:text="km"
+            android:textSize="12sp" />
+
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/noto_sans_kr_medium"
+        android:includeFontPadding="false"
+        android:text="이동 거리"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="@+id/layout_plogging_record_dist"
+        app:layout_constraintStart_toStartOf="@+id/layout_plogging_record_dist"
+        app:layout_constraintTop_toBottomOf="@+id/layout_plogging_record_dist" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
