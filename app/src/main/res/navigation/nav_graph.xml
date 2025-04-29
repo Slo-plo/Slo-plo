@@ -11,10 +11,20 @@
     <fragment
         android:id="@+id/homeFragment"
         android:name="com.example.slo_plo.HomeFragment"
-        android:label="플로깅" />
+        android:label="플로깅">
+        <!-- HomeFragment -> PloggingFragment -->
+        <action
+            android:id="@+id/action_homeFragment_to_ploggingFragment"
+            app:destination="@id/ploggingFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/volunteerFragment"
         android:name="com.example.slo_plo.VolunteerFragment"
         android:label="외부봉사" />
+
+    <fragment
+        android:id="@+id/ploggingFragment"
+        android:name="com.example.slo_plo.PloggingFragment"
+        android:label="플로깅 활동" />
 </navigation>
