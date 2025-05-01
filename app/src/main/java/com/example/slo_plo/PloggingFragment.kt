@@ -148,24 +148,6 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    private fun checkLocationPermission() {
-        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
-            != PackageManager.PERMISSION_GRANTED ||
-            ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION)
-            != PackageManager.PERMISSION_GRANTED) {
-            // 권한이 없으면 요청
-            locationPermissionLauncher.launch(
-                arrayOf(
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-                )
-            )
-        } else {
-            // 권한이 있으면 위치 가져오기
-            getDeviceLocation()
-        }
-    }
-
     private fun getDeviceLocation() {
         Log.d("PloggingFragment", "getDeviceLocation 호출됨")
 
