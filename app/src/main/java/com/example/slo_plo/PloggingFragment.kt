@@ -49,13 +49,13 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
     ) { result ->
         when (result.resultCode) {
             Activity.RESULT_OK -> {
-                Log.d("asdf", "위치 서비스가 활성화되었습니다.")
+                Log.d("PloggingFragment", "위치 서비스가 활성화")
                 Toast.makeText(requireContext(), "위치 서비스가 활성화되었습니다.", Toast.LENGTH_SHORT).show()
                 // 위치 서비스가 활성화되면 바로 위치 가져오기 시도
                 getDeviceLocation()
             }
             Activity.RESULT_CANCELED -> {
-                Log.d("asdf", "위치 서비스가 꺼져 있습니다.")
+                Log.d("PloggingFragment", "위치 서비스가 꺼져 있음")
                 Toast.makeText(requireContext(), "플로깅 기능을 사용하려면 위치 서비스를 켜야 합니다.", Toast.LENGTH_SHORT).show()
                 finishFragment()
             }
@@ -138,11 +138,11 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
         task.addOnFailureListener { exception ->
             if (exception is ResolvableApiException) {
                 try {
-                    // 최신 방식으로 위치 설정 다이얼로그 호출
+                    // 위치 설정 다이얼로그 호출
                     val intentSenderRequest = IntentSenderRequest.Builder(exception.resolution).build()
                     locationSettingsLauncher.launch(intentSenderRequest)
                 } catch (sendEx: Exception) {
-                    Log.e("asdf", "Failed to resolve location settings", sendEx)
+                    Log.e("PloggingFragment", "Failed to resolve location settings", sendEx)
                 }
             }
         }
@@ -153,7 +153,7 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
             != PackageManager.PERMISSION_GRANTED ||
             ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION)
             != PackageManager.PERMISSION_GRANTED) {
-            // 권한이 없으면 최신 방식으로 요청
+            // 권한이 없으면 요청
             locationPermissionLauncher.launch(
                 arrayOf(
                     Manifest.permission.ACCESS_FINE_LOCATION,
@@ -167,7 +167,7 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun getDeviceLocation() {
-        Log.d("asdf", "getDeviceLocation 호출됨")
+        Log.d("PloggingFragment", "getDeviceLocation 호출됨")
 
         // 위치 권한 확인
         if (ActivityCompat.checkSelfPermission(
@@ -178,7 +178,7 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
                 Manifest.permission.ACCESS_COARSE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED
         ) {
-            Log.d("asdf", "위치 권한이 없음")
+            Log.d("PloggingFragment", "위치 권한이 없음")
             // 권한이 없으면 요청
             locationPermissionLauncher.launch(
                 arrayOf(
@@ -191,17 +191,17 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
 
         // 위치 서비스가 켜져 있는지 확인
         if (!isLocationEnabled()) {
-            Log.d("asdf", "위치 서비스가 꺼져 있음")
+            Log.d("PloggingFragment", "위치 서비스가 꺼져 있음")
             promptToEnableLocation()
             return
         }
 
-        Log.d("asdf", "위치 정보 요청 시작")
+        Log.d("PloggingFragment", "위치 정보 요청 시작")
         // 권한이 승인된 상태에서 위치 정보 가져오기
         fusedLocationClient.lastLocation
             .addOnSuccessListener { location: Location? ->
                 if (location != null) {
-                    Log.d("asdf", "위치 정보 가져옴: ${location.latitude}, ${location.longitude}")
+                    Log.d("PloggingFragment", "위치 정보 가져옴: ${location.latitude}, ${location.longitude}")
                     val latLng = LatLng(location.latitude, location.longitude)
 
                     // 네이버 맵에 마커 추가
@@ -218,7 +218,7 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
                     // 위치 추적 모드 활성화
                     naverMap.locationTrackingMode = LocationTrackingMode.Follow
                 } else {
-                    Log.d("asdf", "위치 정보가 null임")
+                    Log.d("PloggingFragment", "위치 정보가 null임")
                     Toast.makeText(requireContext(), "위치 정보를 다시 가져옵니다.", Toast.LENGTH_SHORT).show()
 
                     // 위치 정보가 null이면 새로운 위치 요청
@@ -226,7 +226,7 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
                 }
             }
             .addOnFailureListener { e ->
-                Log.e("asdf", "위치 정보 가져오기 실패", e)
+                Log.e("PloggingFragment", "위치 정보 가져오기 실패", e)
                 Toast.makeText(requireContext(), "위치 정보를 가져올 수 없습니다. 다시 시도합니다.", Toast.LENGTH_SHORT).show()
 
                 // 실패 시 새로운 위치 요청
@@ -258,7 +258,7 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
             override fun onLocationResult(locationResult: LocationResult) {
                 for (location in locationResult.locations) {
                     if (location != null) {
-                        Log.d("asdf", "새 위치 정보 가져옴: ${location.latitude}, ${location.longitude}")
+                        Log.d("PloggingFragment", "새 위치 정보 가져옴: ${location.latitude}, ${location.longitude}")
                         val latLng = LatLng(location.latitude, location.longitude)
 
                         // 네이버 맵에 마커 추가
