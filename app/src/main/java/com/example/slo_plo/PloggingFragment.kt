@@ -33,6 +33,7 @@ import com.google.android.gms.location.LocationSettingsRequest
 import com.google.android.gms.location.SettingsClient
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
+import com.naver.maps.map.CameraPosition
 import com.naver.maps.map.LocationTrackingMode
 
 class PloggingFragment : Fragment(), OnMapReadyCallback {
@@ -190,11 +191,27 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
                     Log.d("PloggingFragment", "위치 정보 가져옴: ${location.latitude}, ${location.longitude}")
                     val latLng = LatLng(location.latitude, location.longitude)
 
+                    // 사용자의 방향(bearing)을 로그에 찍기
+                    Log.d("PloggingFragment", "사용자 방향: ${location.bearing}°")
+
                     // 지도 위치를 사용자의 위치로 이동
                     naverMap.moveCamera(CameraUpdate.scrollTo(latLng))
 
                     // 지도 줌 레벨 설정
                     naverMap.moveCamera(CameraUpdate.zoomTo(20.0))
+
+                    // 현재 사용자의 베어링을 가져와서 카메라에 적용
+                    val bearing = location.bearing // 사용자의 방향 값
+
+                    // CameraPosition 생성
+                    val cameraPosition = CameraPosition(
+                        latLng,         // 위치
+                        20.0,           // 줌 레벨
+                        0.0,            // 기울기
+                        bearing.toDouble() // 회전 각도
+                    )
+
+                    naverMap.moveCamera(CameraUpdate.toCameraPosition(cameraPosition)) // 지도 회전
 
                     // 위치 추적 모드 활성화
                     naverMap.locationTrackingMode = LocationTrackingMode.Follow
@@ -244,6 +261,9 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
                         Log.d("PloggingFragment", "새 위치 정보 가져옴: ${location.latitude}, ${location.longitude}")
                         val latLng = LatLng(location.latitude, location.longitude)
 
+                        // 사용자의 방향(bearing)을 로그에 찍기
+                        Log.d("PloggingFragment", "사용자 방향: ${location.bearing}°")
+
                         // 마커 갱신
                         if (locationMarker != null) {
                             locationMarker?.position = latLng
@@ -255,6 +275,19 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
 
                         // 지도 위치를 사용자의 위치로 이동
                         naverMap.moveCamera(CameraUpdate.scrollTo(latLng))
+
+                        // 현재 사용자의 베어링을 가져와서 카메라에 적용
+                        val bearing = location.bearing // 사용자의 방향 값
+
+                        // CameraPosition 생성
+                        val cameraPosition = CameraPosition(
+                            latLng,         // 위치
+                            20.0,           // 줌 레벨
+                            0.0,            // 기울기
+                            bearing.toDouble() // 회전 각도
+                        )
+
+                        naverMap.moveCamera(CameraUpdate.toCameraPosition(cameraPosition)) // 지도 회전
 
                         // 지도 줌 레벨 설정
                         naverMap.moveCamera(CameraUpdate.zoomTo(20.0))
