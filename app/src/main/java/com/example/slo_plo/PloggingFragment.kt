@@ -75,6 +75,10 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
+    // 마커 선언
+    private var locationMarker: Marker? = null
+    private var locationCallback: LocationCallback? = null
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
@@ -186,11 +190,6 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
                     Log.d("PloggingFragment", "위치 정보 가져옴: ${location.latitude}, ${location.longitude}")
                     val latLng = LatLng(location.latitude, location.longitude)
 
-                    // 네이버 맵에 마커 추가
-                    val marker = Marker()
-                    marker.position = latLng
-                    marker.map = naverMap
-
                     // 지도 위치를 사용자의 위치로 이동
                     naverMap.moveCamera(CameraUpdate.scrollTo(latLng))
 
@@ -199,6 +198,9 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
 
                     // 위치 추적 모드 활성화
                     naverMap.locationTrackingMode = LocationTrackingMode.Follow
+
+                    // 위치 업데이트 시작
+                    requestNewLocation()
                 } else {
                     Log.d("PloggingFragment", "위치 정보가 null임")
                     Toast.makeText(requireContext(), "위치 정보를 다시 가져옵니다.", Toast.LENGTH_SHORT).show()
@@ -231,22 +233,25 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
 
         val locationRequest = LocationRequest.create().apply {
             priority = LocationRequest.PRIORITY_HIGH_ACCURACY
-            interval = 10000  // 10초
-            fastestInterval = 5000  // 5초
-            numUpdates = 1  // 1번만 업데이트
+            interval = 5000  // 5초마다 위치 업데이트
+            fastestInterval = 2000  // 최소 2초마다 업데이트
         }
 
-        val locationCallback = object : LocationCallback() {
+        locationCallback = object : LocationCallback() {
             override fun onLocationResult(locationResult: LocationResult) {
                 for (location in locationResult.locations) {
                     if (location != null) {
                         Log.d("PloggingFragment", "새 위치 정보 가져옴: ${location.latitude}, ${location.longitude}")
                         val latLng = LatLng(location.latitude, location.longitude)
 
-                        // 네이버 맵에 마커 추가
-                        val marker = Marker()
-                        marker.position = latLng
-                        marker.map = naverMap
+                        // 마커 갱신
+                        if (locationMarker != null) {
+                            locationMarker?.position = latLng
+                        } else {
+                            locationMarker = Marker()
+                            locationMarker?.position = latLng
+                            locationMarker?.map = naverMap
+                        }
 
                         // 지도 위치를 사용자의 위치로 이동
                         naverMap.moveCamera(CameraUpdate.scrollTo(latLng))
@@ -256,10 +261,6 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
 
                         // 위치 추적 모드 활성화
                         naverMap.locationTrackingMode = LocationTrackingMode.Follow
-
-                        // 콜백 제거
-                        fusedLocationClient.removeLocationUpdates(this)
-                        return
                     }
                 }
             }
@@ -267,7 +268,7 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
 
         fusedLocationClient.requestLocationUpdates(
             locationRequest,
-            locationCallback,
+            locationCallback!!,
             Looper.getMainLooper()
         )
     }
