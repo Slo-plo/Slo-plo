@@ -194,7 +194,7 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
                     naverMap.moveCamera(CameraUpdate.scrollTo(latLng))
 
                     // 지도 줌 레벨 설정
-                    naverMap.moveCamera(CameraUpdate.zoomTo(15.0))
+                    naverMap.moveCamera(CameraUpdate.zoomTo(20.0))
 
                     // 위치 추적 모드 활성화
                     naverMap.locationTrackingMode = LocationTrackingMode.Follow
@@ -257,7 +257,7 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
                         naverMap.moveCamera(CameraUpdate.scrollTo(latLng))
 
                         // 지도 줌 레벨 설정
-                        naverMap.moveCamera(CameraUpdate.zoomTo(15.0))
+                        naverMap.moveCamera(CameraUpdate.zoomTo(20.0))
 
                         // 위치 추적 모드 활성화
                         naverMap.locationTrackingMode = LocationTrackingMode.Follow
