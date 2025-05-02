@@ -33,6 +33,7 @@ import com.google.android.gms.location.LocationSettingsRequest
 import com.google.android.gms.location.SettingsClient
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
+import com.naver.maps.map.CameraPosition
 import com.naver.maps.map.LocationTrackingMode
 
 class PloggingFragment : Fragment(), OnMapReadyCallback {
@@ -74,6 +75,10 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
             finishFragment()
         }
     }
+
+    // 마커 선언
+    private var locationMarker: Marker? = null
+    private var locationCallback: LocationCallback? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -186,19 +191,33 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
                     Log.d("PloggingFragment", "위치 정보 가져옴: ${location.latitude}, ${location.longitude}")
                     val latLng = LatLng(location.latitude, location.longitude)
 
-                    // 네이버 맵에 마커 추가
-                    val marker = Marker()
-                    marker.position = latLng
-                    marker.map = naverMap
+                    // 사용자의 방향(bearing)을 로그에 찍기
+                    Log.d("PloggingFragment", "사용자 방향: ${location.bearing}°")
 
                     // 지도 위치를 사용자의 위치로 이동
                     naverMap.moveCamera(CameraUpdate.scrollTo(latLng))
 
                     // 지도 줌 레벨 설정
-                    naverMap.moveCamera(CameraUpdate.zoomTo(15.0))
+                    naverMap.moveCamera(CameraUpdate.zoomTo(20.0))
+
+                    // 현재 사용자의 베어링을 가져와서 카메라에 적용
+                    val bearing = location.bearing // 사용자의 방향 값
+
+                    // CameraPosition 생성
+                    val cameraPosition = CameraPosition(
+                        latLng,         // 위치
+                        20.0,           // 줌 레벨
+                        0.0,            // 기울기
+                        bearing.toDouble() // 회전 각도
+                    )
+
+                    naverMap.moveCamera(CameraUpdate.toCameraPosition(cameraPosition)) // 지도 회전
 
                     // 위치 추적 모드 활성화
                     naverMap.locationTrackingMode = LocationTrackingMode.Follow
+
+                    // 위치 업데이트 시작
+                    requestNewLocation()
                 } else {
                     Log.d("PloggingFragment", "위치 정보가 null임")
                     Toast.makeText(requireContext(), "위치 정보를 다시 가져옵니다.", Toast.LENGTH_SHORT).show()
@@ -231,35 +250,50 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
 
         val locationRequest = LocationRequest.create().apply {
             priority = LocationRequest.PRIORITY_HIGH_ACCURACY
-            interval = 10000  // 10초
-            fastestInterval = 5000  // 5초
-            numUpdates = 1  // 1번만 업데이트
+            interval = 5000  // 5초마다 위치 업데이트
+            fastestInterval = 2000  // 최소 2초마다 업데이트
         }
 
-        val locationCallback = object : LocationCallback() {
+        locationCallback = object : LocationCallback() {
             override fun onLocationResult(locationResult: LocationResult) {
                 for (location in locationResult.locations) {
                     if (location != null) {
                         Log.d("PloggingFragment", "새 위치 정보 가져옴: ${location.latitude}, ${location.longitude}")
                         val latLng = LatLng(location.latitude, location.longitude)
 
-                        // 네이버 맵에 마커 추가
-                        val marker = Marker()
-                        marker.position = latLng
-                        marker.map = naverMap
+                        // 사용자의 방향(bearing)을 로그에 찍기
+                        Log.d("PloggingFragment", "사용자 방향: ${location.bearing}°")
+
+                        // 마커 갱신
+                        if (locationMarker != null) {
+                            locationMarker?.position = latLng
+                        } else {
+                            locationMarker = Marker()
+                            locationMarker?.position = latLng
+                            locationMarker?.map = naverMap
+                        }
 
                         // 지도 위치를 사용자의 위치로 이동
                         naverMap.moveCamera(CameraUpdate.scrollTo(latLng))
 
+                        // 현재 사용자의 베어링을 가져와서 카메라에 적용
+                        val bearing = location.bearing // 사용자의 방향 값
+
+                        // CameraPosition 생성
+                        val cameraPosition = CameraPosition(
+                            latLng,         // 위치
+                            20.0,           // 줌 레벨
+                            0.0,            // 기울기
+                            bearing.toDouble() // 회전 각도
+                        )
+
+                        naverMap.moveCamera(CameraUpdate.toCameraPosition(cameraPosition)) // 지도 회전
+
                         // 지도 줌 레벨 설정
-                        naverMap.moveCamera(CameraUpdate.zoomTo(15.0))
+                        naverMap.moveCamera(CameraUpdate.zoomTo(20.0))
 
                         // 위치 추적 모드 활성화
                         naverMap.locationTrackingMode = LocationTrackingMode.Follow
-
-                        // 콜백 제거
-                        fusedLocationClient.removeLocationUpdates(this)
-                        return
                     }
                 }
             }
@@ -267,7 +301,7 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
 
         fusedLocationClient.requestLocationUpdates(
             locationRequest,
-            locationCallback,
+            locationCallback!!,
             Looper.getMainLooper()
         )
     }
