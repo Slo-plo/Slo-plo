@@ -2,6 +2,7 @@ package com.example.slo_plo
 
 import android.Manifest
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.Context
 import android.content.pm.PackageManager
 import android.location.Location
@@ -13,6 +14,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.addCallback
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
@@ -93,11 +95,22 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
         val mapFragment = childFragmentManager.findFragmentById(R.id.fragment_plogging_map) as MapFragment
         mapFragment.getMapAsync(this)  // 맵 준비가 완료되면 콜백을 호출
 
+        binding.btnPloggingEnd.setOnClickListener {
+            showDialogForEnd()
+        }
+
+        binding.btnPloggingCancel.setOnClickListener {
+            showDialogForCancel()
+        }
+
         return binding.root
     }
 
     override fun onMapReady(naverMap: NaverMap) {
         this.naverMap = naverMap
+        naverMap.uiSettings.isCompassEnabled = false
+        naverMap.uiSettings.isScaleBarEnabled = false
+        naverMap.uiSettings.isZoomControlEnabled = false
 
         // 먼저 위치 권한 확인
         if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
@@ -311,8 +324,47 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
         _binding = null
     }
 
-    // 위치 서비스가 꺼져 있으면 플로깅 프래그먼트 종료
+    // 프래그먼트 종료
     private fun finishFragment() {
-        requireActivity().onBackPressed()  // 프래그먼트 종료
+        parentFragmentManager.popBackStack()  // 프래그먼트 종료
+    }
+
+    private fun showDialogForEnd() {
+        val dialogBuilder = AlertDialog.Builder(requireContext())
+        dialogBuilder.setTitle("플로깅 종료")
+            .setMessage("플로깅을 종료하고 일지를 작성하시겠습니까?")
+            .setPositiveButton("예") { dialog, _ ->
+                // Todo: 일지 화면으로 이동하면서 플로깅 기록 보내기
+                dialog.dismiss()
+            }
+            .setNegativeButton("아니오") { dialog, _ ->
+                dialog.dismiss()
+            }
+        val alertDialog = dialogBuilder.create()
+        alertDialog.show()
+    }
+
+    private fun showDialogForCancel() {
+        val dialogBuilder = AlertDialog.Builder(requireContext())
+        dialogBuilder.setTitle("플로깅 취소")
+            .setMessage("플로깅을 취소하고 홈화면으로 돌아가시겠습니까?")
+            .setPositiveButton("예") { dialog, _ ->
+                dialog.dismiss()  // 다이얼로그 먼저 닫기
+                finishFragment()
+            }
+            .setNegativeButton("아니오") { dialog, _ ->
+                dialog.dismiss()  // 다이얼로그 닫기
+            }
+        val alertDialog = dialogBuilder.create()
+        alertDialog.show()
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        // 뒤로가기 버튼 클릭 이벤트를 감지하여 다이얼로그 띄우기
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
+            showDialogForCancel()
+        }
     }
 }

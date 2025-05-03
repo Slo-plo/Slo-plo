@@ -13,4 +13,80 @@
         android:layout_height="match_parent"
         android:name="com.naver.maps.map.MapFragment" />
 
+    <!-- 뒤로가기 버튼 -->
+    <ImageView
+        android:id="@+id/btn_plogging_cancel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_arrow_back"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_margin="20dp"/>
+
+    <ImageView
+        android:id="@+id/iv_plogging_record"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:src="@drawable/bg_square_white_grey_10"
+        android:layout_marginHorizontal="15dp"
+        app:layout_constraintBottom_toBottomOf="@+id/tv_plogging_distance"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/tv_plogging_time" />
+
+    <!-- 시간 텍스트 -->
+    <TextView
+        android:id="@+id/tv_plogging_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/noto_sans_kr_medium"
+        android:includeFontPadding="false"
+        android:text="시간 - 00:00"
+        android:textSize="16sp"
+        android:layout_marginTop="40dp"
+        app:layout_constraintEnd_toEndOf="@+id/iv_plogging_record"
+        app:layout_constraintStart_toStartOf="@+id/iv_plogging_record"
+        app:layout_constraintTop_toBottomOf="@id/btn_plogging_cancel" />
+
+    <!-- 이동거리 텍스트 -->
+    <TextView
+        android:id="@+id/tv_plogging_distance"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/noto_sans_kr_medium"
+        android:includeFontPadding="false"
+        android:text="이동 거리 - 0m"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="@+id/iv_plogging_record"
+        app:layout_constraintStart_toStartOf="@+id/iv_plogging_record"
+        app:layout_constraintTop_toBottomOf="@id/tv_plogging_time" />
+
+    <!-- 플로깅 종료하기 버튼 -->
+    <FrameLayout
+        android:id="@+id/btn_plogging_end"
+        android:layout_width="180dp"
+        android:layout_height="55dp"
+        android:layout_marginBottom="30dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ImageView
+            android:id="@+id/iv_plogging_end_button"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/bg_square_sub_color_15"/>
+
+        <TextView
+            android:id="@+id/tv_plogging_end_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:textColor="@color/white"
+            android:fontFamily="@font/noto_sans_kr_semi_bold"
+            android:gravity="center"
+            android:includeFontPadding="false"
+            android:text="플로깅 종료"
+            android:textSize="18sp" />
+    </FrameLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
