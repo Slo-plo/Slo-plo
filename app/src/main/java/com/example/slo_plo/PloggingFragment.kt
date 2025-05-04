@@ -37,14 +37,21 @@ import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.naver.maps.map.CameraPosition
 import com.naver.maps.map.LocationTrackingMode
+import java.util.Locale
+import java.util.Timer
+import java.util.TimerTask
 
 class PloggingFragment : Fragment(), OnMapReadyCallback {
 
     private var _binding: FragmentPloggingBinding? = null
     private val binding get() = _binding!!
+
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var naverMap: NaverMap
     private lateinit var settingsClient: SettingsClient
+
+    private var startTime: Long = 0
+    private var timer: Timer? = null
 
     // 위치 설정 결과를 받기 위한 런처 추가
     private val locationSettingsLauncher = registerForActivityResult(
@@ -231,6 +238,9 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
 
                     // 위치 업데이트 시작
                     requestNewLocation()
+
+                    // 플로깅 기록 시작
+                    startRecord()
                 } else {
                     Log.d("PloggingFragment", "위치 정보가 null임")
                     Toast.makeText(requireContext(), "위치 정보를 다시 가져옵니다.", Toast.LENGTH_SHORT).show()
@@ -319,6 +329,32 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
         )
     }
 
+    private fun startRecord() {
+        startTime = System.currentTimeMillis()
+        binding.tvPloggingTime.text = "시간 - 00 : 00"
+
+        timer = Timer()
+        timer?.schedule(object : TimerTask() {
+            override fun run() {
+                requireActivity().runOnUiThread {
+                    updateRecordData()
+                }
+            }
+        }, 0, 1000)
+    }
+
+    private fun stopRecord() {
+        timer?.cancel()
+        timer = null
+    }
+
+    private fun updateRecordData() {
+        val elapsedTime = (System.currentTimeMillis() - startTime) / 1000
+        val minutes = elapsedTime / 60
+        val seconds = elapsedTime % 60
+        binding.tvPloggingTime.text = String.format(Locale.KOREA, "시간 - %02d : %02d", minutes, seconds)
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
@@ -335,6 +371,7 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
             .setMessage("플로깅을 종료하고 일지를 작성하시겠습니까?")
             .setPositiveButton("예") { dialog, _ ->
                 // Todo: 일지 화면으로 이동하면서 플로깅 기록 보내기
+                stopRecord()
                 dialog.dismiss()
             }
             .setNegativeButton("아니오") { dialog, _ ->
@@ -349,6 +386,7 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
         dialogBuilder.setTitle("플로깅 취소")
             .setMessage("플로깅을 취소하고 홈화면으로 돌아가시겠습니까?")
             .setPositiveButton("예") { dialog, _ ->
+                stopRecord()
                 dialog.dismiss()  // 다이얼로그 먼저 닫기
                 finishFragment()
             }
