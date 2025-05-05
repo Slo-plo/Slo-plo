@@ -53,6 +53,9 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
     private var startTime: Long = 0
     private var timer: Timer? = null
 
+    private var totalDistance: Float = 0f
+    private var prevLocation: Location? = null
+
     // 위치 설정 결과를 받기 위한 런처 추가
     private val locationSettingsLauncher = registerForActivityResult(
         ActivityResultContracts.StartIntentSenderForResult()
@@ -284,6 +287,8 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
                         Log.d("PloggingFragment", "새 위치 정보 가져옴: ${location.latitude}, ${location.longitude}")
                         val latLng = LatLng(location.latitude, location.longitude)
 
+                        updateRecordDist(location)
+
                         // 사용자의 방향(bearing)을 로그에 찍기
                         Log.d("PloggingFragment", "사용자 방향: ${location.bearing}°")
 
@@ -329,6 +334,23 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
         )
     }
 
+    // 이동 거리 계산
+    private fun updateRecordDist(location: Location) {
+        prevLocation?.let { prevLoc ->
+            val distance = prevLoc.distanceTo(location)
+            totalDistance += distance
+
+            val displayDistance = if (totalDistance < 1000) {
+                "${totalDistance.toInt()} m"
+            } else {
+                String.format(Locale.KOREA, "%.1f km", totalDistance / 1000)
+            }
+
+            binding.tvPloggingDistance.text = "이동 거리 - $displayDistance"
+        }
+        prevLocation = location
+    }
+
     private fun startRecord() {
         startTime = System.currentTimeMillis()
         binding.tvPloggingTime.text = "시간 - 00 : 00"
@@ -341,6 +363,12 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
                 }
             }
         }, 0, 1000)
+    }
+
+    private fun stopLocationUpdates() {
+        locationCallback?.let {
+            fusedLocationClient.removeLocationUpdates(it)
+        }
     }
 
     private fun stopRecord() {
@@ -362,6 +390,7 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
 
     // 프래그먼트 종료
     private fun finishFragment() {
+        stopLocationUpdates()
         parentFragmentManager.popBackStack()  // 프래그먼트 종료
     }
 
