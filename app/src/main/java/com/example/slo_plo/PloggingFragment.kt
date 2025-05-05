@@ -390,6 +390,7 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
 
     // 프래그먼트 종료
     private fun finishFragment() {
+        stopRecordTime()
         stopLocationUpdates()
         parentFragmentManager.popBackStack()  // 프래그먼트 종료
     }
@@ -401,6 +402,7 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
             .setPositiveButton("예") { dialog, _ ->
                 // Todo: 일지 화면으로 이동하면서 플로깅 기록 보내기
                 stopRecordTime()
+                stopLocationUpdates()
                 dialog.dismiss()
             }
             .setNegativeButton("아니오") { dialog, _ ->
@@ -415,7 +417,6 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
         dialogBuilder.setTitle("플로깅 취소")
             .setMessage("플로깅을 취소하고 홈화면으로 돌아가시겠습니까?")
             .setPositiveButton("예") { dialog, _ ->
-                stopRecordTime()
                 dialog.dismiss()  // 다이얼로그 먼저 닫기
                 finishFragment()
             }
