@@ -50,6 +50,9 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
     private lateinit var naverMap: NaverMap
     private lateinit var settingsClient: SettingsClient
 
+    private var locationMarker: Marker? = null
+    private var locationCallback: LocationCallback? = null
+
     private var startTime: Long = 0
     private var timer: Timer? = null
 
@@ -88,10 +91,6 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    // 마커 선언
-    private var locationMarker: Marker? = null
-    private var locationCallback: LocationCallback? = null
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
@@ -101,9 +100,9 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext())
         settingsClient = LocationServices.getSettingsClient(requireContext())
 
-        // 네이버 맵 초기화
+        // 맵 프래그먼트를 초기화하고 콜백 연결
         val mapFragment = childFragmentManager.findFragmentById(R.id.fragment_plogging_map) as MapFragment
-        mapFragment.getMapAsync(this)  // 맵 준비가 완료되면 콜백을 호출
+        mapFragment.getMapAsync(this)
 
         binding.btnPloggingEnd.setOnClickListener {
             showDialogForEnd()
@@ -122,12 +121,11 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
         naverMap.uiSettings.isScaleBarEnabled = false
         naverMap.uiSettings.isZoomControlEnabled = false
 
-        // 먼저 위치 권한 확인
+        // 권한 확인 후 위치 서비스 확인 및 위치 요청
         if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
             != PackageManager.PERMISSION_GRANTED ||
             ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION)
             != PackageManager.PERMISSION_GRANTED) {
-            // 권한이 없으면 권한 요청
             locationPermissionLauncher.launch(
                 arrayOf(
                     Manifest.permission.ACCESS_FINE_LOCATION,
@@ -135,12 +133,9 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
                 )
             )
         } else {
-            // 권한이 있으면 위치 서비스 확인
             if (!isLocationEnabled()) {
-                // 위치 서비스가 꺼져 있으면 다이얼로그 띄우기
                 promptToEnableLocation()
             } else {
-                // 권한도 있고 위치 서비스도 켜져 있으면 위치 가져오기
                 getDeviceLocation()
             }
         }
@@ -151,6 +146,7 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
         return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
     }
 
+    // 위치가 꺼져있으면 설정 다이얼로그를 띄워 사용자에게 요청
     private fun promptToEnableLocation() {
         val locationRequest = LocationRequest.create()
         locationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
@@ -159,14 +155,12 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
         val task = settingsClient.checkLocationSettings(builder.build())
 
         task.addOnSuccessListener {
-            // 위치 서비스가 이미 켜져 있으면, 위치 정보 가져오기
             getDeviceLocation()
         }
 
         task.addOnFailureListener { exception ->
             if (exception is ResolvableApiException) {
                 try {
-                    // 위치 설정 다이얼로그 호출
                     val intentSenderRequest = IntentSenderRequest.Builder(exception.resolution).build()
                     locationSettingsLauncher.launch(intentSenderRequest)
                 } catch (sendEx: Exception) {
@@ -176,10 +170,10 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
+    // 위치 정보 획득 시 초기 지도 위치 설정 및 위치 추적 시작
     private fun getDeviceLocation() {
         Log.d("PloggingFragment", "getDeviceLocation 호출됨")
 
-        // 위치 권한 확인
         if (ActivityCompat.checkSelfPermission(
                 requireContext(),
                 Manifest.permission.ACCESS_FINE_LOCATION
@@ -189,7 +183,6 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
             ) != PackageManager.PERMISSION_GRANTED
         ) {
             Log.d("PloggingFragment", "위치 권한이 없음")
-            // 권한이 없으면 요청
             locationPermissionLauncher.launch(
                 arrayOf(
                     Manifest.permission.ACCESS_FINE_LOCATION,
@@ -199,7 +192,6 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
             return
         }
 
-        // 위치 서비스가 켜져 있는지 확인
         if (!isLocationEnabled()) {
             Log.d("PloggingFragment", "위치 서비스가 꺼져 있음")
             promptToEnableLocation()
@@ -214,7 +206,6 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
                     Log.d("PloggingFragment", "위치 정보 가져옴: ${location.latitude}, ${location.longitude}")
                     val latLng = LatLng(location.latitude, location.longitude)
 
-                    // 사용자의 방향(bearing)을 로그에 찍기
                     Log.d("PloggingFragment", "사용자 방향: ${location.bearing}°")
 
                     // 지도 위치를 사용자의 위치로 이동
@@ -242,7 +233,7 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
                     // 위치 업데이트 시작
                     requestNewLocation()
 
-                    // 플로깅 기록 시작
+                    // 플로깅 시간 측정 시작
                     startRecordTime()
                 } else {
                     Log.d("PloggingFragment", "위치 정보가 null임")
@@ -261,7 +252,7 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
             }
     }
 
-    // 새로운 위치 요청 함수 추가
+    // 위치가 주기적으로 갱신될 때 호출되는 콜백 설정 및 거리 계산, 지도 이동 처리
     private fun requestNewLocation() {
         if (ActivityCompat.checkSelfPermission(
                 requireContext(),
@@ -289,7 +280,6 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
 
                         updateRecordDist(location)
 
-                        // 사용자의 방향(bearing)을 로그에 찍기
                         Log.d("PloggingFragment", "사용자 방향: ${location.bearing}°")
 
                         // 마커 갱신
@@ -301,26 +291,20 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
                             locationMarker?.map = naverMap
                         }
 
-                        // 지도 위치를 사용자의 위치로 이동
                         naverMap.moveCamera(CameraUpdate.scrollTo(latLng))
 
-                        // 현재 사용자의 베어링을 가져와서 카메라에 적용
-                        val bearing = location.bearing // 사용자의 방향 값
+                        val bearing = location.bearing
 
-                        // CameraPosition 생성
                         val cameraPosition = CameraPosition(
-                            latLng,         // 위치
-                            20.0,           // 줌 레벨
-                            0.0,            // 기울기
-                            bearing.toDouble() // 회전 각도
+                            latLng,
+                            20.0,
+                            0.0,
+                            bearing.toDouble()
                         )
 
                         naverMap.moveCamera(CameraUpdate.toCameraPosition(cameraPosition)) // 지도 회전
-
-                        // 지도 줌 레벨 설정
                         naverMap.moveCamera(CameraUpdate.zoomTo(20.0))
 
-                        // 위치 추적 모드 활성화
                         naverMap.locationTrackingMode = LocationTrackingMode.Follow
                     }
                 }
@@ -334,7 +318,7 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
         )
     }
 
-    // 이동 거리 계산
+    // 이전 위치와 현재 위치 사이의 거리를 계산하고 UI에 갱신
     private fun updateRecordDist(location: Location) {
         prevLocation?.let { prevLoc ->
             val distance = prevLoc.distanceTo(location)
@@ -351,6 +335,7 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
         prevLocation = location
     }
 
+    // 타이머 시작 및 시간 표시 갱신
     private fun startRecordTime() {
         startTime = System.currentTimeMillis()
         binding.tvPloggingTime.text = "시간 - 00 : 00"
@@ -365,17 +350,20 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
         }, 0, 1000)
     }
 
+    // 타이머 중지
     private fun stopLocationUpdates() {
         locationCallback?.let {
             fusedLocationClient.removeLocationUpdates(it)
         }
     }
 
+    // 위치 추적 콜백 제거
     private fun stopRecordTime() {
         timer?.cancel()
         timer = null
     }
 
+    // 경과 시간을 계산하여 UI에 시간 표시 갱신
     private fun updateRecordTime() {
         val elapsedTime = (System.currentTimeMillis() - startTime) / 1000
         val minutes = elapsedTime / 60
@@ -395,6 +383,7 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
         parentFragmentManager.popBackStack()  // 프래그먼트 종료
     }
 
+    // 플로깅 종료 다이얼로그 표시
     private fun showDialogForEnd() {
         val dialogBuilder = AlertDialog.Builder(requireContext())
         dialogBuilder.setTitle("플로깅 종료")
@@ -412,6 +401,7 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
         alertDialog.show()
     }
 
+    // 플로깅 취소 다이얼로그 표시
     private fun showDialogForCancel() {
         val dialogBuilder = AlertDialog.Builder(requireContext())
         dialogBuilder.setTitle("플로깅 취소")
