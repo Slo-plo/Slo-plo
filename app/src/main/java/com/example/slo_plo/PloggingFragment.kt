@@ -243,7 +243,7 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
                     requestNewLocation()
 
                     // 플로깅 기록 시작
-                    startRecord()
+                    startRecordTime()
                 } else {
                     Log.d("PloggingFragment", "위치 정보가 null임")
                     Toast.makeText(requireContext(), "위치 정보를 다시 가져옵니다.", Toast.LENGTH_SHORT).show()
@@ -351,7 +351,7 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
         prevLocation = location
     }
 
-    private fun startRecord() {
+    private fun startRecordTime() {
         startTime = System.currentTimeMillis()
         binding.tvPloggingTime.text = "시간 - 00 : 00"
 
@@ -359,7 +359,7 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
         timer?.schedule(object : TimerTask() {
             override fun run() {
                 requireActivity().runOnUiThread {
-                    updateRecordData()
+                    updateRecordTime()
                 }
             }
         }, 0, 1000)
@@ -371,12 +371,12 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    private fun stopRecord() {
+    private fun stopRecordTime() {
         timer?.cancel()
         timer = null
     }
 
-    private fun updateRecordData() {
+    private fun updateRecordTime() {
         val elapsedTime = (System.currentTimeMillis() - startTime) / 1000
         val minutes = elapsedTime / 60
         val seconds = elapsedTime % 60
@@ -400,7 +400,7 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
             .setMessage("플로깅을 종료하고 일지를 작성하시겠습니까?")
             .setPositiveButton("예") { dialog, _ ->
                 // Todo: 일지 화면으로 이동하면서 플로깅 기록 보내기
-                stopRecord()
+                stopRecordTime()
                 dialog.dismiss()
             }
             .setNegativeButton("아니오") { dialog, _ ->
@@ -415,7 +415,7 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
         dialogBuilder.setTitle("플로깅 취소")
             .setMessage("플로깅을 취소하고 홈화면으로 돌아가시겠습니까?")
             .setPositiveButton("예") { dialog, _ ->
-                stopRecord()
+                stopRecordTime()
                 dialog.dismiss()  // 다이얼로그 먼저 닫기
                 finishFragment()
             }
