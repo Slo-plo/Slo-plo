@@ -5,6 +5,7 @@ import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
 import android.content.pm.PackageManager
+import android.location.Geocoder
 import android.location.Location
 import android.location.LocationManager
 import android.os.Bundle
@@ -415,6 +416,7 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun getAddressFromLatLng(lat: Double, lng: Double, callback: (String?, Exception?) -> Unit) {
+        /*
         val clientId = BuildConfig.NAVER_GEO_CLIENT_ID
         val clientSecret = BuildConfig.NAVER_GEO_CLIENT_SECRET
         val url = "https://naveropenapi.apigw.ntruss.com/map-reversegeocode/v2/gc?coords=$lng,$lat&orders=roadaddr&output=json"
@@ -488,7 +490,27 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
                 }
             }
         })
+        */
+
+        // 임시 대체: 안드로이드 내장 Geocoder 사용
+        val geocoder = Geocoder(requireContext(), Locale.KOREA)
+        try {
+            val addresses = geocoder.getFromLocation(lat, lng, 1)
+            val address = addresses?.firstOrNull()?.getAddressLine(0)
+
+            if (address != null) {
+                Log.d("GeocoderAPI", "변환된 주소: $address")
+                callback(address, null)
+            } else {
+                Log.w("GeocoderAPI", "주소 없음 (null)")
+                callback("주소 없음", null)
+            }
+        } catch (e: IOException) {
+            Log.e("GeocoderAPI", "Geocoder 실패: ${e.message}", e)
+            callback(null, e)
+        }
     }
+
 
     override fun onDestroyView() {
         super.onDestroyView()
