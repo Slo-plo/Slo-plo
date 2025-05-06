@@ -533,6 +533,25 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
                 // Todo: 일지 화면으로 이동하면서 플로깅 기록 보내기
                 stopRecordTime()
                 stopLocationUpdates()
+
+                // 종료 지점 주소 변환
+                val currentLocation = prevLocation
+                if (currentLocation != null) {
+                    getAddressFromLatLng(
+                        currentLocation.latitude,
+                        currentLocation.longitude
+                    ) { address, error ->
+                        if (error != null) {
+                            Log.e("종료 주소 오류", error.message ?: "알 수 없음")
+                        } else {
+                            Log.d("종료 주소", address ?: "없음")
+                            endAddress = address ?: "주소 없음"
+                        }
+                    }
+                } else {
+                    Log.w("종료 주소 오류", "종료 시 위치 정보 없음")
+                }
+
                 dialog.dismiss()
             }
             .setNegativeButton("아니오") { dialog, _ ->
