@@ -5,6 +5,7 @@ import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
 import android.content.pm.PackageManager
+import android.location.Geocoder
 import android.location.Location
 import android.location.LocationManager
 import android.os.Bundle
@@ -20,6 +21,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import com.example.slo_plo.databinding.DialogPloggingSummaryBinding
 import com.example.slo_plo.databinding.FragmentPloggingBinding
 import com.naver.maps.map.CameraUpdate
 import com.naver.maps.map.MapFragment
@@ -37,6 +39,14 @@ import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.naver.maps.map.CameraPosition
 import com.naver.maps.map.LocationTrackingMode
+import com.naver.maps.map.overlay.OverlayImage
+import okhttp3.Call
+import okhttp3.Callback
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.Response
+import org.json.JSONObject
+import java.io.IOException
 import java.util.Locale
 import java.util.Timer
 import java.util.TimerTask
@@ -58,6 +68,11 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
 
     private var totalDistance: Float = 0f
     private var prevLocation: Location? = null
+
+    private var startMarker: Marker? = null
+
+    private var startAddress: String = ""
+    private var endAddress: String = ""
 
     // 위치 설정 결과를 받기 위한 런처 추가
     private val locationSettingsLauncher = registerForActivityResult(
@@ -230,6 +245,19 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
                     // 위치 추적 모드 활성화
                     naverMap.locationTrackingMode = LocationTrackingMode.Follow
 
+                    // 시작 지점 마커
+                    showStartMarker(latLng)
+
+                    // 시작 지점 주소 변환
+                    getAddressFromLatLng(location.latitude, location.longitude) { address, error ->
+                        if (error != null) {
+                            Log.e("시작 주소 오류", error.message ?: "알 수 없음")
+                        } else {
+                            Log.d("시작 주소", address ?: "없음")
+                            startAddress = address ?: "주소 없음"
+                        }
+                    }
+
                     // 위치 업데이트 시작
                     requestNewLocation()
 
@@ -371,6 +399,120 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
         binding.tvPloggingTime.text = String.format(Locale.KOREA, "시간 - %02d : %02d", minutes, seconds)
     }
 
+    // 시작 지점 마커 표시 함수
+    private fun showStartMarker(latLng: LatLng) {
+        if (startMarker == null) {
+            startMarker = Marker().apply {
+                position = latLng
+                icon = OverlayImage.fromResource(R.drawable.ic_start_marker)
+                captionText = "start"
+                map = naverMap
+            }
+        }
+    }
+
+    // 싱글톤으로 OkHttpClient 관리
+    private val okHttpClient by lazy {
+        OkHttpClient()
+    }
+
+    private fun getAddressFromLatLng(lat: Double, lng: Double, callback: (String?, Exception?) -> Unit) {
+        /*
+        val clientId = BuildConfig.NAVER_GEO_CLIENT_ID
+        val clientSecret = BuildConfig.NAVER_GEO_CLIENT_SECRET
+        val url = "https://naveropenapi.apigw.ntruss.com/map-reversegeocode/v2/gc?coords=$lng,$lat&orders=roadaddr&output=json"
+
+        val request = Request.Builder()
+            .url(url)
+            .addHeader("X-NCP-APIGW-API-KEY-ID", clientId)
+            .addHeader("X-NCP-APIGW-API-KEY", clientSecret)
+            .build()
+
+        okHttpClient.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                Log.e("GeoAPI", "주소 요청 실패", e)
+                requireActivity().runOnUiThread {
+                    callback(null, e)
+                }
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                try {
+                    val responseBody = response.body?.string()
+                    Log.d("GeoAPI", "응답 본문: $responseBody")
+
+                    if (responseBody == null) {
+                        requireActivity().runOnUiThread {
+                            callback(null, Exception("응답 본문이 비어있습니다"))
+                        }
+                        return
+                    }
+
+                    val json = JSONObject(responseBody)
+                    val results = json.getJSONArray("results")
+
+                    if (results.length() == 0) {
+                        requireActivity().runOnUiThread {
+                            callback("주소 없음", null)
+                        }
+                        return
+                    }
+
+                    val result = results.optJSONObject(0)
+                    val region = result?.optJSONObject("region")
+                    val land = result?.optJSONObject("land")
+
+                    val area1 = region?.optJSONObject("area1")?.optString("name") ?: ""
+                    val area2 = region?.optJSONObject("area2")?.optString("name") ?: ""
+                    val area3 = region?.optJSONObject("area3")?.optString("name") ?: ""
+                    val area4 = region?.optJSONObject("area4")?.optString("name") ?: ""
+
+                    val roadName = land?.optString("name") ?: ""
+                    val buildingName = land?.optJSONObject("addition0")?.optString("value") ?: ""
+
+                    val fullAddress = buildString {
+                        append(area1)
+                        if (area2.isNotEmpty()) append(" $area2")
+                        if (area3.isNotEmpty()) append(" $area3")
+                        if (area4.isNotEmpty()) append(" $area4")
+                        if (roadName.isNotEmpty()) append(" $roadName")
+                        if (buildingName.isNotEmpty()) append(" ($buildingName)")
+                    }
+
+                    requireActivity().runOnUiThread {
+                        callback(fullAddress.trim(), null)
+                    }
+
+                } catch (e: Exception) {
+                    Log.e("GeoAPI", "주소 파싱 실패", e)
+                    requireActivity().runOnUiThread {
+                        callback(null, e)
+                    }
+                }
+            }
+        })
+        */
+
+        // 임시 대체: 안드로이드 내장 Geocoder 사용
+        val geocoder = Geocoder(requireContext(), Locale.KOREA)
+        try {
+            val addresses = geocoder.getFromLocation(lat, lng, 1)
+            val address = addresses?.firstOrNull()?.getAddressLine(0)
+
+            if (address != null) {
+                Log.d("GeocoderAPI", "변환된 주소: $address")
+                callback(address, null)
+            } else {
+                Log.w("GeocoderAPI", "주소 없음 (null)")
+                callback("주소 없음", null)
+            }
+        } catch (e: IOException) {
+            Log.e("GeocoderAPI", "Geocoder 실패: ${e.message}", e)
+            callback(null, e)
+        }
+    }
+
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
@@ -389,9 +531,34 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
         dialogBuilder.setTitle("플로깅 종료")
             .setMessage("플로깅을 종료하고 일지를 작성하시겠습니까?")
             .setPositiveButton("예") { dialog, _ ->
-                // Todo: 일지 화면으로 이동하면서 플로깅 기록 보내기
                 stopRecordTime()
                 stopLocationUpdates()
+                dialog.dismiss()
+
+                // 종료 지점 주소 변환
+                val currentLocation = prevLocation
+                if (currentLocation != null) {
+                    getAddressFromLatLng(
+                        currentLocation.latitude,
+                        currentLocation.longitude
+                    ) { address, error ->
+                        if (error != null) {
+                            Log.e("종료 주소 오류", error.message ?: "알 수 없음")
+                            endAddress = "주소 없음"
+                        } else {
+                            Log.d("종료 주소", address ?: "없음")
+                            endAddress = address ?: "주소 없음"
+                        }
+
+                        // 주소 받아온 후 커스텀 다이얼로그 띄우기
+                        val displayTime = binding.tvPloggingTime.text.toString().replace("시간 - ", "")
+                        val displayDist = binding.tvPloggingDistance.text.toString().replace("이동 거리 - ", "")
+                        showPloggingSummaryDialog(startAddress, endAddress, displayTime, displayDist)
+                    }
+                } else {
+                    Log.w("종료 주소 오류", "종료 시 위치 정보 없음")
+                    Toast.makeText(requireContext(), "위치 정보를 확인할 수 없습니다.", Toast.LENGTH_SHORT).show()
+                }
                 dialog.dismiss()
             }
             .setNegativeButton("아니오") { dialog, _ ->
@@ -416,6 +583,38 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
         val alertDialog = dialogBuilder.create()
         alertDialog.show()
     }
+
+    // 플로깅 기록 다이얼로그 표시
+    private fun showPloggingSummaryDialog(
+        startAddress: String,
+        endAddress: String,
+        totalTime: String,
+        totalDistance: String
+    ) {
+        val binding = DialogPloggingSummaryBinding.inflate(LayoutInflater.from(requireContext()))
+
+        binding.tvSummaryStart.text = "시작 지점: $startAddress"
+        binding.tvSummaryEnd.text = "종료 지점: $endAddress"
+        binding.tvSummaryTime.text = "시간: $totalTime"
+        binding.tvSummaryDistance.text = "이동 거리: $totalDistance"
+
+        val dialog = AlertDialog.Builder(requireContext())
+            .setView(binding.root)
+            .create()
+
+        binding.btnSummaryYes.setOnClickListener {
+            dialog.dismiss()
+            // TODO: 일지 작성 화면으로 이동
+        }
+
+        binding.btnSummaryNo.setOnClickListener {
+            dialog.dismiss()
+            finishFragment()
+        }
+
+        dialog.show()
+    }
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
