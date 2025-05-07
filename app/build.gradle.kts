@@ -23,6 +23,8 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         buildConfigField("String", "NAVER_CLIENT_ID", "\"${properties.getProperty("NAVER_CLIENT_ID")}\"")
+        buildConfigField("String", "NAVER_GEO_CLIENT_ID", "\"${properties.getProperty("NAVER_GEO_CLIENT_ID")}\"")
+        buildConfigField("String", "NAVER_GEO_CLIENT_SECRET", "\"${properties.getProperty("NAVER_GEO_CLIENT_SECRET")}\"")
     }
 
     buildTypes {
