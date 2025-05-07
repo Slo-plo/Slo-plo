@@ -21,6 +21,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import com.example.slo_plo.databinding.DialogPloggingSummaryBinding
 import com.example.slo_plo.databinding.FragmentPloggingBinding
 import com.naver.maps.map.CameraUpdate
 import com.naver.maps.map.MapFragment
@@ -530,9 +531,9 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
         dialogBuilder.setTitle("플로깅 종료")
             .setMessage("플로깅을 종료하고 일지를 작성하시겠습니까?")
             .setPositiveButton("예") { dialog, _ ->
-                // Todo: 일지 화면으로 이동하면서 플로깅 기록 보내기
                 stopRecordTime()
                 stopLocationUpdates()
+                dialog.dismiss()
 
                 // 종료 지점 주소 변환
                 val currentLocation = prevLocation
@@ -543,15 +544,21 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
                     ) { address, error ->
                         if (error != null) {
                             Log.e("종료 주소 오류", error.message ?: "알 수 없음")
+                            endAddress = "주소 없음"
                         } else {
                             Log.d("종료 주소", address ?: "없음")
                             endAddress = address ?: "주소 없음"
                         }
+
+                        // 주소 받아온 후 커스텀 다이얼로그 띄우기
+                        val displayTime = binding.tvPloggingTime.text.toString().replace("시간 - ", "")
+                        val displayDist = binding.tvPloggingDistance.text.toString().replace("이동 거리 - ", "")
+                        showPloggingSummaryDialog(startAddress, endAddress, displayTime, displayDist)
                     }
                 } else {
                     Log.w("종료 주소 오류", "종료 시 위치 정보 없음")
+                    Toast.makeText(requireContext(), "위치 정보를 확인할 수 없습니다.", Toast.LENGTH_SHORT).show()
                 }
-
                 dialog.dismiss()
             }
             .setNegativeButton("아니오") { dialog, _ ->
@@ -576,6 +583,38 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
         val alertDialog = dialogBuilder.create()
         alertDialog.show()
     }
+
+    // 플로깅 기록 다이얼로그 표시
+    private fun showPloggingSummaryDialog(
+        startAddress: String,
+        endAddress: String,
+        totalTime: String,
+        totalDistance: String
+    ) {
+        val binding = DialogPloggingSummaryBinding.inflate(LayoutInflater.from(requireContext()))
+
+        binding.tvSummaryStart.text = "시작 지점: $startAddress"
+        binding.tvSummaryEnd.text = "종료 지점: $endAddress"
+        binding.tvSummaryTime.text = "시간: $totalTime"
+        binding.tvSummaryDistance.text = "이동 거리: $totalDistance"
+
+        val dialog = AlertDialog.Builder(requireContext())
+            .setView(binding.root)
+            .create()
+
+        binding.btnSummaryYes.setOnClickListener {
+            dialog.dismiss()
+            // TODO: 일지 작성 화면으로 이동
+        }
+
+        binding.btnSummaryNo.setOnClickListener {
+            dialog.dismiss()
+            finishFragment()
+        }
+
+        dialog.show()
+    }
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
