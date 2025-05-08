@@ -2,143 +2,152 @@ package com.example.slo_plo
 
 import android.app.Activity
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.EditText
-import android.widget.ImageButton
-import android.widget.ImageView
-import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.content.ContextCompat
-import android.Manifest
+import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
+import com.example.slo_plo.databinding.FragmentLogWriteBinding
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
-
 class LogWriteFragment : Fragment() {
 
-    private lateinit var imageView: ImageView
+    private var _binding: FragmentLogWriteBinding? = null
+    private val binding get() = _binding!!
     private var selectedImageUri: Uri? = null
 
+    // 카메라 권한 요청
+    private val cameraPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        if (granted) openCamera()
+        else Toast.makeText(requireContext(), "카메라 접근 권한이 필요합니다.", Toast.LENGTH_SHORT).show()
+    }
+
+    // 갤러리 권한 요청
+    private val galleryPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        if (granted) openGallery()
+        else Toast.makeText(requireContext(), "갤러리 접근 권한이 필요합니다.", Toast.LENGTH_SHORT).show()
+    }
+
+    // 카메라 실행 결과 처리
+    private val cameraLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val bitmap = result.data?.extras?.get("data") as? android.graphics.Bitmap
+            binding.imageSelected.apply {
+                setImageBitmap(bitmap)
+                visibility = View.VISIBLE
+            }
+        }
+    }
+
+    // 갤러리 실행 결과 처리
+    private val galleryLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            selectedImageUri = result.data?.data
+            binding.imageSelected.apply {
+                setImageURI(selectedImageUri)
+                visibility = View.VISIBLE
+            }
+        }
+    }
+
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_log_write, container, false)
+    ): View {
+        _binding = FragmentLogWriteBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        // 뒤로가기: 요약 팝업으로 돌아가기
+        binding.buttonBack.setOnClickListener {
+            // 이전 플로깅 Fragment 에 저장
+            findNavController().previousBackStackEntry
+                ?.savedStateHandle
+                ?.set("showSummary", true)
+            // 원래 Fragment 로 팝백
+            findNavController().popBackStack()
+        }
+
+        // 플로깅 기록 불러오기
+        val args = requireArguments()
+        val startAddr = args.getString("startAddress") ?: ""
+        val endAddr = args.getString("endAddress") ?: ""
+        val totalTime = args.getString("totalTime") ?: ""
+        val totalDist = args.getString("totalDistance") ?: ""
 
         // 날짜 설정
-        val textDate = view.findViewById<TextView>(R.id.text_date)
         val currentDate = LocalDate.now()
         val formatter = DateTimeFormatter.ofPattern("yyyy년 M월 d일 E요일", Locale.KOREA)
-        textDate.text = currentDate.format(formatter)
+        binding.textDate.text = currentDate.format(formatter)
 
-        // 임시 정보 세팅
-        val textInfo = view.findViewById<TextView>(R.id.text_info)
-        textInfo.text = """
-            출발지점: 서울시 강남구 역삼동
-            도착지점: 서울시 송파구 문정동
-            시간: 35분
-            거리: 3.2km
-            쓰레기 개수: 7개
-        """.trimIndent()
-
-        // 뒤로가기
-        view.findViewById<ImageButton>(R.id.button_back).setOnClickListener {
-            requireActivity().onBackPressedDispatcher.onBackPressed()
+        // 플로깅 정보 반영
+        binding.textInfo.text = buildString {
+            append("출발지점: $startAddr\n")
+            append("도착지점: $endAddr\n")
+            append("시간: $totalTime\n")
+            append("거리: $totalDist")
         }
-
-        // 이미지뷰 참조
-        imageView = view.findViewById(R.id.image_selected)
 
         // 카메라 버튼
-        view.findViewById<ImageButton>(R.id.button_camera).setOnClickListener {
-            requestCameraPermission()
+        binding.buttonCamera.setOnClickListener {
+            cameraPermissionLauncher.launch(android.Manifest.permission.CAMERA)
         }
 
-        // 갤러리 버튼
-        view.findViewById<ImageButton>(R.id.button_gallery).setOnClickListener {
-            galleryPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
+//        // 갤러리 버튼
+//        binding.buttonGallery.setOnClickListener {
+//            galleryPermissionLauncher.launch(android.Manifest.permission.READ_EXTERNAL_STORAGE)
+//        }
+        binding.buttonGallery.setOnClickListener {
+            val permission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                android.Manifest.permission.READ_MEDIA_IMAGES
+            } else {
+                android.Manifest.permission.READ_EXTERNAL_STORAGE
+            }
+            galleryPermissionLauncher.launch(permission)
         }
+
 
         // 저장 버튼
-        view.findViewById<Button>(R.id.button_save).setOnClickListener {
-            val title = view.findViewById<EditText>(R.id.edit_title).text.toString()
-            val content = view.findViewById<EditText>(R.id.edit_content).text.toString()
+        binding.buttonSave.setOnClickListener {
+            val title = binding.editTitle.text.toString()
+            val content = binding.editContent.text.toString()
             Toast.makeText(requireContext(), "저장됨\n제목: $title\n내용: $content", Toast.LENGTH_SHORT).show()
         }
     }
 
-    // 갤러리 실행
-    private fun openGallery() {
-        galleryLauncher.launch(Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI))
-    }
-
-
-
-    private val cameraPermissionLauncher =
-        registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
-            if (granted) {
-                openCamera()
-            } else {
-                Toast.makeText(requireContext(), "카메라 권한이 필요합니다.", Toast.LENGTH_SHORT).show()
-            }
-        }
-
-    private fun requestCameraPermission() {
-        cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
-    }
-
-
-    // 카메라 실행
     private fun openCamera() {
         val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
         cameraLauncher.launch(intent)
     }
 
-    private val galleryPermissionLauncher =
-        registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
-            if (granted) {
-                openGallery()
-            } else {
-                Toast.makeText(requireContext(), "갤러리 접근 권한이 필요합니다.", Toast.LENGTH_SHORT).show()
-            }
-        }
-
-    private fun requestGalleryPermissionAndOpenGallery() {
-        galleryPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
+    private fun openGallery() {
+        val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+        galleryLauncher.launch(intent)
     }
 
-
-    // 결과 처리
-    private val galleryLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            selectedImageUri = result.data?.data
-            imageView.setImageURI(selectedImageUri)
-            imageView.visibility = View.VISIBLE
-        }
-    }
-
-    private val cameraLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            val bitmap = result.data?.extras?.get("data") as? android.graphics.Bitmap
-            imageView.setImageBitmap(bitmap)
-            imageView.visibility = View.VISIBLE
-        }
-    }
-
-    companion object {
-        private const val REQUEST_CAMERA_PERMISSION = 1001
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }
+

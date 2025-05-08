@@ -606,7 +606,21 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
         binding.btnSummaryYes.setOnClickListener {
             dialog.dismiss()
             // TODO: 일지 작성 화면으로 이동
-            findNavController().navigate(R.id.action_plogging_to_logWrite)
+            // 전달할 데이터 묶기
+            val bundle = Bundle().apply {
+                putString("startAddress", startAddress)
+                putString("endAddress",   endAddress)
+                putString("totalTime",    totalTime)
+                putString("totalDistance", totalDistance)
+            }
+
+            // nav_graph.xml 에 정의된 action ID로 네비게이트
+            findNavController().navigate(
+                R.id.action_plogging_to_logWrite,
+                bundle
+            )
+
+//            findNavController().navigate(R.id.action_plogging_to_logWrite)
         }
 
         binding.btnSummaryNo.setOnClickListener {
@@ -625,5 +639,23 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
             showDialogForCancel()
         }
+
+        // 2) LogWriteFragment 에서 popBackStack 할 때 설정해준 "showSummary" 플래그를 관찰
+        findNavController().currentBackStackEntry
+            ?.savedStateHandle
+            ?.getLiveData<Boolean>("showSummary")
+            ?.observe(viewLifecycleOwner) { shouldShow ->
+                if (shouldShow == true) {
+                    // 플로깅 종료 팝업(요약) 다시 띄우기
+                    val displayTime = binding.tvPloggingTime.text.toString().replace("시간 - ", "")
+                    val displayDist = binding.tvPloggingDistance.text.toString().replace("이동 거리 - ", "")
+                    showPloggingSummaryDialog(startAddress, endAddress, displayTime, displayDist)
+
+                    // 한번만 실행되도록 플래그 제거
+                    findNavController().currentBackStackEntry
+                        ?.savedStateHandle
+                        ?.remove<Boolean>("showSummary")
+                }
+            }
     }
 }

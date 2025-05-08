@@ -53,10 +53,52 @@
             <TextView
                 android:id="@+id/text_info"
                 android:layout_marginTop="8dp"
-                android:text="출발지점: \n도착지점: \n시간: \n거리: \n쓰레기 개수:"
+                android:text="출발지점: \n도착지점: \n시간: \n거리: "
                 android:textSize="14sp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:id="@+id/text_trash_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="쓰레기 개수:"
+                    android:textSize="14sp"/>
+
+                <EditText
+                    android:id="@+id/edit_trash_count"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="1"
+                    android:inputType="number"
+                    android:hint="입력"
+                    android:textSize="14sp"/>
+            </LinearLayout>
+
+<!--            <TextView-->
+<!--                android:id="@+id/trash_info"-->
+<!--                android:text="쓰레기 개수:  "-->
+<!--                android:textSize="14sp"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"/>-->
+
+<!--            &lt;!&ndash; 여기에 추가 &ndash;&gt;-->
+<!--            <EditText-->
+<!--                android:id="@+id/edit_trash_count"-->
+<!--                android:layout_width="0dp"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_weight="1"-->
+<!--                android:inputType="number"-->
+<!--                android:textSize="14sp"-->
+<!--                android:hint="입력"-->
+<!--                />-->
 
             <!-- 선택 이미지 -->
             <ImageView
@@ -73,7 +115,7 @@
             <EditText
                 android:id="@+id/edit_content"
                 android:layout_marginTop="16dp"
-                android:hint="플로깅 내용을 입력하세요"
+                android:hint="플로깅을 기록해보세요"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textMultiLine"
@@ -126,7 +168,7 @@
             android:layout_width="0dp"
             android:layout_height="48dp"
             android:layout_weight="1"
-            android:backgroundTint="@color/main_color"
+            android:background="@drawable/bg_square_sub_color_15"
             android:textColor="@android:color/white"
             android:text="저장" />
     </LinearLayout>
