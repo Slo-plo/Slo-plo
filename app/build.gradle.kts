@@ -2,7 +2,10 @@ import java.io.FileInputStream
 import java.util.Properties
 
 plugins {
-    alias(libs.plugins.android.application)
+//    alias(libs.plugins.android.application)
+//    alias(libs.plugins.kotlin.android)
+//    id("com.android.application")
+    id("com.android.application")
     alias(libs.plugins.kotlin.android)
 }
 
@@ -39,6 +42,7 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
+        isCoreLibraryDesugaringEnabled = true
     }
     kotlinOptions {
         jvmTarget = "1.8"
@@ -61,7 +65,14 @@ dependencies {
     implementation(libs.androidx.fragment)
     implementation(libs.map.sdk)
     implementation(libs.play.services.location)
+    implementation(libs.places)
+    implementation(libs.androidx.core.i18n)
+    implementation(libs.androidx.ui.text.android)
+    implementation(libs.androidx.navigation.fragment.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+    coreLibraryDesugaring(libs.core.desugaring)
+    implementation(libs.kotlin.stdlib)
+
 }

@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/log_write_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- 뒤로가기 버튼 -->
+    <ImageButton
+        android:id="@+id/button_back"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:src="@android:drawable/ic_menu_revert"
+        android:contentDescription="뒤로가기 버튼" />
+
+    <!-- 스크롤 가능한 전체 내용 -->
+    <ScrollView
+        android:id="@+id/scroll_area"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="56dp"
+        android:layout_marginBottom="80dp"
+        android:padding="16dp">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <!-- 제목 입력 -->
+            <EditText
+                android:id="@+id/edit_title"
+                android:hint="제목을 입력하세요"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"/>
+
+            <!-- 날짜 -->
+            <TextView
+                android:id="@+id/text_date"
+                android:layout_marginTop="8dp"
+                android:text="날짜 로딩 중..."
+                android:textSize="16sp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+            <!-- 플로깅 정보 -->
+            <TextView
+                android:id="@+id/text_info"
+                android:layout_marginTop="8dp"
+                android:text="출발지점: \n도착지점: \n시간: \n거리: \n쓰레기 개수:"
+                android:textSize="14sp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+            <!-- 선택 이미지 -->
+            <ImageView
+                android:id="@+id/image_selected"
+                android:layout_marginTop="16dp"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:scaleType="centerCrop"
+                android:visibility="gone"
+                android:contentDescription="선택된 이미지"/>
+
+            <!-- 본문 작성 -->
+            <EditText
+                android:id="@+id/edit_content"
+                android:layout_marginTop="16dp"
+                android:hint="플로깅 내용을 입력하세요"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:gravity="top"
+                android:background="@android:color/transparent"/>
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- 하단 버튼 -->
+    <LinearLayout
+        android:id="@+id/bottom_buttons"
+        android:layout_gravity="bottom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/white"
+        android:padding="12dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:weightSum="3">
+
+        <!-- 카메라 버튼 -->
+        <ImageButton
+            android:id="@+id/button_camera"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:background="@drawable/round_button"
+            android:src="@drawable/ic_camera"
+            android:scaleType="centerInside"
+            android:contentDescription="카메라"
+            android:padding="8dp" />
+
+        <!-- 갤러리 버튼 -->
+        <ImageButton
+            android:id="@+id/button_gallery"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:background="@drawable/round_button"
+            android:src="@android:drawable/ic_menu_gallery"
+            android:scaleType="centerInside"
+            android:contentDescription="갤러리"
+            android:padding="8dp" />
+
+        <!-- 저장 버튼 -->
+        <Button
+            android:id="@+id/button_save"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:backgroundTint="@color/main_color"
+            android:textColor="@android:color/white"
+            android:text="저장" />
+    </LinearLayout>
+</FrameLayout>

@@ -21,6 +21,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.example.slo_plo.databinding.DialogPloggingSummaryBinding
 import com.example.slo_plo.databinding.FragmentPloggingBinding
 import com.naver.maps.map.CameraUpdate
@@ -605,6 +606,7 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
         binding.btnSummaryYes.setOnClickListener {
             dialog.dismiss()
             // TODO: 일지 작성 화면으로 이동
+            findNavController().navigate(R.id.action_plogging_to_logWrite)
         }
 
         binding.btnSummaryNo.setOnClickListener {
