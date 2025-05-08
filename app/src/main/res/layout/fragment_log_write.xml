@@ -2,7 +2,8 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/log_write_root"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:fillViewport="true">
 
     <!-- 뒤로가기 버튼 -->
     <ImageButton
@@ -15,13 +16,14 @@
         android:contentDescription="뒤로가기 버튼" />
 
     <!-- 스크롤 가능한 전체 내용 -->
-    <ScrollView
-        android:id="@+id/scroll_area"
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/scroll_root"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="56dp"
         android:layout_marginBottom="80dp"
-        android:padding="16dp">
+        android:padding="16dp"
+        android:fillViewport="true">
 
         <LinearLayout
             android:orientation="vertical"
@@ -53,7 +55,7 @@
                 android:layout_marginTop="8dp"
                 android:text="출발지점: \n도착지점: \n시간: \n거리: \n쓰레기 개수:"
                 android:textSize="14sp"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
 
             <!-- 선택 이미지 -->
@@ -61,9 +63,10 @@
                 android:id="@+id/image_selected"
                 android:layout_marginTop="16dp"
                 android:layout_width="match_parent"
-                android:layout_height="200dp"
-                android:scaleType="centerCrop"
+                android:layout_height="wrap_content"
                 android:visibility="gone"
+                android:adjustViewBounds="true"
+                android:scaleType="fitCenter"
                 android:contentDescription="선택된 이미지"/>
 
             <!-- 본문 작성 -->
@@ -72,11 +75,14 @@
                 android:layout_marginTop="16dp"
                 android:hint="플로깅 내용을 입력하세요"
                 android:layout_width="match_parent"
-                android:layout_height="200dp"
+                android:layout_height="wrap_content"
+                android:inputType="textMultiLine"
+                android:minLines="5"
                 android:gravity="top"
                 android:background="@android:color/transparent"/>
+
         </LinearLayout>
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
 
     <!-- 하단 버튼 -->
     <LinearLayout
