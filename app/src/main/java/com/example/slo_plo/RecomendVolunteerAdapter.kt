@@ -11,10 +11,12 @@ class RecomendVolunteerAdapter(private val recomendVolunteerList: List<RecomendV
     inner class VolunteerViewHolder(private val binding: ItemRecomendVolunteerBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(recomendVolunteer: RecomendVolunteer) {
-            binding.tvTitle.text = recomendVolunteer.title
-            binding.tvDescription.text = recomendVolunteer.description
+            binding.tvRecommendTitle.text = recomendVolunteer.title
+            binding.tvRecommendDescription.text = recomendVolunteer.description
+            binding.tvRecommendLocation.text = recomendVolunteer.location
+            binding.tvRecommendDate.text = recomendVolunteer.date
             // 아이템의 배경색을 흰색으로 설정
-            binding.root.setBackgroundColor(itemView.context.getColor(R.color.white))
+            //binding.root.setBackgroundColor(itemView.context.getColor(R.color.white))
         }
     }
 
