@@ -1,59 +1,64 @@
 package com.example.slo_plo
 
+import android.content.Context
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
+import com.example.slo_plo.databinding.FragmentOnboardingGuideBinding
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [OnboardingGuideFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class OnboardingGuideFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
+    private var _binding: FragmentOnboardingGuideBinding? = null
+    private val binding get() = _binding!!
+
+    private val pages = OnboardingGuide.entries.toTypedArray()
+    private var currentPage = 0
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_onboarding_guide, container, false)
+    ): View {
+        _binding = FragmentOnboardingGuideBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment OnboardingGuideFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            OnboardingGuideFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        updatePage()
+
+        binding.btnGuideContinue.setOnClickListener {
+            if (currentPage < pages.lastIndex) {
+                currentPage++
+                updatePage()
+            } else {
+                // 온보딩 종료와 플래그 저장
+                requireActivity().getSharedPreferences("slo_plo_prefs", Context.MODE_PRIVATE)
+                    .edit().putBoolean("isFirstLaunch", false).apply()
+
+                findNavController().navigate(R.id.action_onboardingGuideFragment_to_homeFragment)
             }
+        }
+
+        binding.btnGuideSkip.setOnClickListener {
+            // 홈 화면 이동과 플래그 저장
+            requireActivity().getSharedPreferences("slo_plo_prefs", Context.MODE_PRIVATE)
+                .edit().putBoolean("isFirstLaunch", false).apply()
+
+            findNavController().navigate(R.id.action_onboardingGuideFragment_to_homeFragment)
+        }
+    }
+
+    private fun updatePage() {
+        val page = pages[currentPage]
+        binding.tvGuideTitle.text = page.title
+        binding.tvGuideContent.text = page.content
+        binding.ivGuideContent.setImageResource(page.imageResId)
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }
