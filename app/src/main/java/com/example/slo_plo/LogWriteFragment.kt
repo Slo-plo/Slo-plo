@@ -109,15 +109,17 @@ class LogWriteFragment : Fragment() {
         }
 
         // 카메라 버튼
-        binding.buttonCamera.setOnClickListener {
+        binding.bottomButtons.buttonCamera.setOnClickListener {
             cameraPermissionLauncher.launch(android.Manifest.permission.CAMERA)
         }
 
-//        // 갤러리 버튼
-//        binding.buttonGallery.setOnClickListener {
-//            galleryPermissionLauncher.launch(android.Manifest.permission.READ_EXTERNAL_STORAGE)
-//        }
-        binding.buttonGallery.setOnClickListener {
+        // 갤러리 버튼
+        binding.bottomButtons.buttonGallery.setOnClickListener {
+            galleryPermissionLauncher.launch(android.Manifest.permission.READ_EXTERNAL_STORAGE)
+        }
+
+        binding.bottomButtons.buttonGallery.setOnClickListener {
+            // Android 13(API 33) 이상: 사진 전용 권한, 그 외 버전: 외부 저장소 전체 읽기 권한
             val permission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 android.Manifest.permission.READ_MEDIA_IMAGES
             } else {
@@ -128,11 +130,39 @@ class LogWriteFragment : Fragment() {
 
 
         // 저장 버튼
-        binding.buttonSave.setOnClickListener {
+        binding.bottomButtons.buttonSave.setOnClickListener {
             val title = binding.editTitle.text.toString()
             val content = binding.editContent.text.toString()
-            Toast.makeText(requireContext(), "저장됨\n제목: $title\n내용: $content", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(),
+                "제목: $title\n내용: $content",
+                Toast.LENGTH_SHORT
+            ).show()
         }
+//        // 카메라 버튼
+//        binding.buttonCamera.setOnClickListener {
+//            cameraPermissionLauncher.launch(android.Manifest.permission.CAMERA)
+//        }
+//
+////        // 갤러리 버튼
+////        binding.buttonGallery.setOnClickListener {
+////            galleryPermissionLauncher.launch(android.Manifest.permission.READ_EXTERNAL_STORAGE)
+////        }
+//        binding.buttonGallery.setOnClickListener {
+//            val permission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+//                android.Manifest.permission.READ_MEDIA_IMAGES
+//            } else {
+//                android.Manifest.permission.READ_EXTERNAL_STORAGE
+//            }
+//            galleryPermissionLauncher.launch(permission)
+//        }
+//
+//
+//        // 저장 버튼
+//        binding.buttonSave.setOnClickListener {
+//            val title = binding.editTitle.text.toString()
+//            val content = binding.editContent.text.toString()
+//            Toast.makeText(requireContext(), "저장됨\n제목: $title\n내용: $content", Toast.LENGTH_SHORT).show()
+//        }
     }
 
     private fun openCamera() {

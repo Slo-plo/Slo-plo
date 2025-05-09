@@ -126,50 +126,60 @@
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
-    <!-- 하단 버튼 -->
-    <LinearLayout
+    <!-- 하단 버튼 레이아웃 include -->
+    <include
         android:id="@+id/bottom_buttons"
-        android:layout_gravity="bottom"
+        layout="@layout/button_log_write"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@android:color/white"
-        android:padding="12dp"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:weightSum="3">
+        android:layout_gravity="bottom"/>
 
-        <!-- 카메라 버튼 -->
-        <ImageButton
-            android:id="@+id/button_camera"
-            android:layout_width="0dp"
-            android:layout_height="48dp"
-            android:layout_weight="1"
-            android:background="@drawable/round_button"
-            android:src="@drawable/ic_camera"
-            android:scaleType="centerInside"
-            android:contentDescription="카메라"
-            android:padding="8dp" />
 
-        <!-- 갤러리 버튼 -->
-        <ImageButton
-            android:id="@+id/button_gallery"
-            android:layout_width="0dp"
-            android:layout_height="48dp"
-            android:layout_weight="1"
-            android:background="@drawable/round_button"
-            android:src="@android:drawable/ic_menu_gallery"
-            android:scaleType="centerInside"
-            android:contentDescription="갤러리"
-            android:padding="8dp" />
+<!--    &lt;!&ndash; 하단 버튼 &ndash;&gt;-->
+<!--    <LinearLayout-->
+<!--        android:id="@+id/bottom_buttons"-->
+<!--        android:layout_gravity="bottom"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:background="@android:color/white"-->
+<!--        android:padding="12dp"-->
+<!--        android:orientation="horizontal"-->
+<!--        android:gravity="center_vertical"-->
+<!--        android:weightSum="3">-->
 
-        <!-- 저장 버튼 -->
-        <Button
-            android:id="@+id/button_save"
-            android:layout_width="0dp"
-            android:layout_height="48dp"
-            android:layout_weight="1"
-            android:background="@drawable/bg_square_sub_color_15"
-            android:textColor="@android:color/white"
-            android:text="저장" />
-    </LinearLayout>
+<!--        &lt;!&ndash; 카메라 버튼 &ndash;&gt;-->
+<!--        <ImageButton-->
+<!--            android:id="@+id/button_camera"-->
+<!--            android:layout_width="0dp"-->
+<!--            android:layout_height="48dp"-->
+<!--            android:layout_weight="1"-->
+<!--            android:background="@drawable/round_button"-->
+<!--            android:src="@drawable/ic_camera"-->
+<!--            android:scaleType="centerInside"-->
+<!--            android:contentDescription="카메라"-->
+<!--            android:padding="8dp" />-->
+
+<!--        &lt;!&ndash; 갤러리 버튼 &ndash;&gt;-->
+<!--        <ImageButton-->
+<!--            android:id="@+id/button_gallery"-->
+<!--            android:layout_width="0dp"-->
+<!--            android:layout_height="48dp"-->
+<!--            android:layout_weight="1"-->
+<!--            android:background="@drawable/round_button"-->
+<!--            android:src="@android:drawable/ic_menu_gallery"-->
+<!--            android:scaleType="centerInside"-->
+<!--            android:contentDescription="갤러리"-->
+<!--            android:padding="8dp" />-->
+
+<!--        &lt;!&ndash; 저장 버튼 &ndash;&gt;-->
+<!--        <Button-->
+<!--            android:id="@+id/button_save"-->
+<!--            android:layout_width="0dp"-->
+<!--            android:layout_height="48dp"-->
+<!--            android:layout_weight="1"-->
+<!--            android:background="@drawable/bg_square_sub_color_15"-->
+<!--            android:textColor="@android:color/white"-->
+<!--            android:text="저장" />-->
+<!--    </LinearLayout>-->
 </FrameLayout>
+

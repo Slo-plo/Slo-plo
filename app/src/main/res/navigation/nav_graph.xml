@@ -31,7 +31,9 @@
         android:label="플로깅 활동" >
         <action
             android:id="@+id/action_plogging_to_logWrite"
-            app:destination="@id/logWriteFragment" />
+            app:destination="@id/logWriteFragment"
+            app:popUpTo="@id/ploggingFragment"
+            app:popUpToInclusive="true"/>
     </fragment>
 
     <fragment
