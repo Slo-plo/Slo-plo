@@ -4,10 +4,12 @@ import android.Manifest
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Geocoder
 import android.location.Location
 import android.location.LocationManager
+import android.os.Build
 import android.os.Bundle
 import android.os.Looper
 import android.util.Log
@@ -214,6 +216,9 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
         }
 
         Log.d("PloggingFragment", "위치 정보 요청 시작")
+
+        startForegroundLocationService()
+
         // 권한이 승인된 상태에서 위치 정보 가져오기
         fusedLocationClient.lastLocation
             .addOnSuccessListener { location: Location? ->
@@ -522,6 +527,7 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
     private fun finishFragment() {
         stopRecordTime()
         stopLocationUpdates()
+        stopForegroundLocationService()
         parentFragmentManager.popBackStack()  // 프래그먼트 종료
     }
 
@@ -533,6 +539,7 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
             .setPositiveButton("예") { dialog, _ ->
                 stopRecordTime()
                 stopLocationUpdates()
+                stopForegroundLocationService()
                 dialog.dismiss()
 
                 // 종료 지점 주소 변환
@@ -615,6 +622,16 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
         dialog.show()
     }
 
+    private fun startForegroundLocationService() {
+        Log.d("LocationService", "Foreground 서비스 시작 요청")
+        val intent = Intent(requireContext(), LocationTrackingService::class.java)
+        ContextCompat.startForegroundService(requireContext(), intent)
+    }
+
+    private fun stopForegroundLocationService() {
+        val intent = Intent(requireContext(), LocationTrackingService::class.java)
+        requireContext().stopService(intent)
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

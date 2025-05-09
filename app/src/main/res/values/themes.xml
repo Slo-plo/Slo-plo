@@ -13,4 +13,10 @@
     <style name="Theme.Navi.Indicator" parent="Widget.Material3.BottomNavigationView.ActiveIndicator">
         <item name="android:color">@color/white</item>
     </style>
+
+    <!-- Splash Screen -->
+    <style name="SplashTheme" parent="Base.Theme.Sloplo">
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowIsTranslucent">true</item>
+    </style>
 </resources>
