@@ -101,12 +101,10 @@ class LogWriteFragment : Fragment() {
         binding.textDate.text = currentDate.format(formatter)
 
         // 플로깅 정보 반영
-        binding.textInfo.text = buildString {
-            append("출발지점: $startAddr\n")
-            append("도착지점: $endAddr\n")
-            append("시간: $totalTime\n")
-            append("거리: $totalDist")
-        }
+        binding.textStartAddress.text = "출발지점: $startAddr"
+        binding.textEndAddress.text = "도착지점: $endAddr"
+        binding.textTime.text = "시간: $totalTime"
+        binding.textDistance.text = "거리: $totalDist"
 
         // 카메라 버튼
         binding.bottomButtons.buttonCamera.setOnClickListener {
@@ -118,8 +116,8 @@ class LogWriteFragment : Fragment() {
             galleryPermissionLauncher.launch(android.Manifest.permission.READ_EXTERNAL_STORAGE)
         }
 
+        // 갤러리 권한
         binding.bottomButtons.buttonGallery.setOnClickListener {
-            // Android 13(API 33) 이상: 사진 전용 권한, 그 외 버전: 외부 저장소 전체 읽기 권한
             val permission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 android.Manifest.permission.READ_MEDIA_IMAGES
             } else {

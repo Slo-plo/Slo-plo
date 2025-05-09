@@ -49,14 +49,50 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
 
-            <!-- 플로깅 정보 -->
+<!--            &lt;!&ndash; 플로깅 정보 &ndash;&gt;-->
+<!--            <TextView-->
+<!--                android:id="@+id/text_info"-->
+<!--                android:layout_marginTop="8dp"-->
+<!--                android:text="출발지점: \n도착지점: \n시간: \n거리: "-->
+<!--                android:textSize="14sp"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"/>-->
+            <!-- 출발지점 (한 줄, 말줄임) -->
             <TextView
-                android:id="@+id/text_info"
-                android:layout_marginTop="8dp"
-                android:text="출발지점: \n도착지점: \n시간: \n거리: "
-                android:textSize="14sp"
+                android:id="@+id/text_start_address"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="시작지점: 서울시 영등포구 선유동 2로 7-12번지"
+                android:textSize="14sp"
+                android:maxLines="1"
+                android:ellipsize="end"/>
+
+            <!-- 도착지점 (한 줄, 말줄임) -->
+            <TextView
+                android:id="@+id/text_end_address"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="종료지점: 서울시 송파구 문정동 어쩌구저쩌구 길어서 화랑초등학교 화단"
+                android:textSize="14sp"
+                android:maxLines="1"
+                android:ellipsize="end"/>
+
+            <!-- 시간 -->
+            <TextView
+                android:id="@+id/text_time"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="시간: "
+                android:textSize="14sp"/>
+
+            <!-- 거리 -->
+            <TextView
+                android:id="@+id/text_distance"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="거리: "
+                android:textSize="14sp"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -82,24 +118,6 @@
                     android:textSize="14sp"/>
             </LinearLayout>
 
-<!--            <TextView-->
-<!--                android:id="@+id/trash_info"-->
-<!--                android:text="쓰레기 개수:  "-->
-<!--                android:textSize="14sp"-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="wrap_content"/>-->
-
-<!--            &lt;!&ndash; 여기에 추가 &ndash;&gt;-->
-<!--            <EditText-->
-<!--                android:id="@+id/edit_trash_count"-->
-<!--                android:layout_width="0dp"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:layout_weight="1"-->
-<!--                android:inputType="number"-->
-<!--                android:textSize="14sp"-->
-<!--                android:hint="입력"-->
-<!--                />-->
-
             <!-- 선택 이미지 -->
             <ImageView
                 android:id="@+id/image_selected"
@@ -109,9 +127,10 @@
                 android:visibility="gone"
                 android:adjustViewBounds="true"
                 android:scaleType="fitCenter"
+                android:maxHeight="280dp"
                 android:contentDescription="선택된 이미지"/>
 
-            <!-- 본문 작성 -->
+            <!-- 본문 입력 -->
             <EditText
                 android:id="@+id/edit_content"
                 android:layout_marginTop="16dp"
