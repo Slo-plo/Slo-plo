@@ -9,8 +9,15 @@ plugins {
     alias(libs.plugins.kotlin.android)
 }
 
-var properties = Properties()
-properties.load(FileInputStream("local.properties"))
+//var properties = Properties()
+//properties.load(FileInputStream("local.properties"))
+val properties = Properties()
+val localFile = File("local.properties")
+if (localFile.exists()) {
+    properties.load(FileInputStream(localFile))
+} else {
+    println("⚠️ Warning: local.properties not found. API keys may be missing.")
+}
 
 android {
     namespace = "com.example.slo_plo"
@@ -25,9 +32,11 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        buildConfigField("String", "NAVER_CLIENT_ID", "\"${properties.getProperty("NAVER_CLIENT_ID")}\"")
-        buildConfigField("String", "NAVER_GEO_CLIENT_ID", "\"${properties.getProperty("NAVER_GEO_CLIENT_ID")}\"")
-        buildConfigField("String", "NAVER_GEO_CLIENT_SECRET", "\"${properties.getProperty("NAVER_GEO_CLIENT_SECRET")}\"")
+//        buildConfigField("String", "NAVER_CLIENT_ID", "\"${properties.getProperty("NAVER_CLIENT_ID")}\"")
+//        buildConfigField("String", "NAVER_GEO_CLIENT_ID", "\"${properties.getProperty("NAVER_GEO_CLIENT_ID")}\"")
+//        buildConfigField("String", "NAVER_GEO_CLIENT_SECRET", "\"${properties.getProperty("NAVER_GEO_CLIENT_SECRET")}\"")
+        buildConfigField("String", "NAVER_CLIENT_ID", "\"${properties.getProperty("NAVER_CLIENT_ID") ?: ""}\"")
+
     }
 
     buildTypes {
