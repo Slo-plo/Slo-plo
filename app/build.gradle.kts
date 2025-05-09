@@ -74,5 +74,6 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
     coreLibraryDesugaring(libs.core.desugaring)
     implementation(libs.kotlin.stdlib)
+    implementation ("com.kizitonwose.calendar:view:2.6.2")
 
 }
