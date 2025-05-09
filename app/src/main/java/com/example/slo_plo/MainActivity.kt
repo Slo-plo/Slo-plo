@@ -1,5 +1,6 @@
 package com.example.slo_plo
 
+import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
@@ -8,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
+import androidx.navigation.NavGraph
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.example.slo_plo.databinding.ActivityMainBinding
@@ -18,6 +20,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         val binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -36,22 +39,33 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        // navController 연결
+        // NavHostFragment & NavController 초기화
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         navController = navHostFragment.navController
 
-        // bottomNavigationView 연결
+        // 온보딩 여부 확인 후 startDestination 설정
+        val prefs = getSharedPreferences("slo_plo_prefs", Context.MODE_PRIVATE)
+        val isFirstLaunch = prefs.getBoolean("isFirstLaunch", true)
+
+        val navInflater = navController.navInflater
+        val navGraph: NavGraph = navInflater.inflate(R.navigation.nav_graph)
+
+        navGraph.setStartDestination(
+            if (isFirstLaunch) R.id.onboardingIntroFragment else R.id.homeFragment
+        )
+        navController.graph = navGraph
+
+        // 바텀 네비게이션 설정
         binding.bottomNavigationView.setupWithNavController(navController)
 
-        // 이동할 Fragment에 따라 BottomNavigationView 숨기거나 보이게 하기
+        // 특정 화면에서는 바텀 네비 숨김
         navController.addOnDestinationChangedListener { _, destination, _ ->
-            if (destination.id == R.id.ploggingFragment) {  // 바텀 네비 숨겨야 하는 경우 여기에 추가
-                // PloggingFragment로 이동 시 BottomNavigationView 숨기기
-                binding.bottomNavigationView.visibility = View.GONE
-            } else {
-                binding.bottomNavigationView.visibility = View.VISIBLE
-            }
+            val hideNav = destination.id == R.id.ploggingFragment ||
+                    destination.id == R.id.onboardingIntroFragment ||
+                    destination.id == R.id.onboardingGuideFragment
+
+            binding.bottomNavigationView.visibility = if (hideNav) View.GONE else View.VISIBLE
         }
     }
 }
