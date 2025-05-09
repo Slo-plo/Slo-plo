@@ -61,11 +61,15 @@ class MainActivity : AppCompatActivity() {
 
         // 특정 화면에서는 바텀 네비 숨김
         navController.addOnDestinationChangedListener { _, destination, _ ->
-            val hideNav = destination.id == R.id.ploggingFragment ||
-                    destination.id == R.id.onboardingIntroFragment ||
-                    destination.id == R.id.onboardingGuideFragment
-
+            val hideNav = when (destination.id) {
+                R.id.ploggingFragment,
+                R.id.logWriteFragment,
+                R.id.onboardingIntroFragment,
+                R.id.onboardingGuideFragment -> true
+                else -> false
+            }
             binding.bottomNavigationView.visibility = if (hideNav) View.GONE else View.VISIBLE
+
         }
     }
 }
