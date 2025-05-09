@@ -6,11 +6,13 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
+import android.text.method.ScrollingMovementMethod
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.slo_plo.databinding.FragmentLogWriteBinding
@@ -46,7 +48,7 @@ class LogWriteFragment : Fragment() {
     ) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
             val bitmap = result.data?.extras?.get("data") as? android.graphics.Bitmap
-            binding.imageSelected.apply {
+            binding.ivLogSelected.apply {
                 setImageBitmap(bitmap)
                 visibility = View.VISIBLE
             }
@@ -59,7 +61,7 @@ class LogWriteFragment : Fragment() {
     ) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
             selectedImageUri = result.data?.data
-            binding.imageSelected.apply {
+            binding.ivLogSelected.apply {
                 setImageURI(selectedImageUri)
                 visibility = View.VISIBLE
             }
@@ -75,11 +77,15 @@ class LogWriteFragment : Fragment() {
         return binding.root
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        binding.etLogContent.movementMethod = ScrollingMovementMethod()
+
+
         // 뒤로가기: 홈 화면으로 이동
-        binding.buttonBack.setOnClickListener {
+        binding.btnLogCancel.setOnClickListener {
             findNavController().previousBackStackEntry
                 ?.savedStateHandle
                 ?.set("showSummary", true)
@@ -96,26 +102,21 @@ class LogWriteFragment : Fragment() {
         // 날짜 설정
         val currentDate = LocalDate.now()
         val formatter = DateTimeFormatter.ofPattern("yyyy년 M월 d일 E요일", Locale.KOREA)
-        binding.textDate.text = currentDate.format(formatter)
+        binding.tvLogDate.text = currentDate.format(formatter)
 
         // 플로깅 정보 반영
-        binding.textStartAddress.text = "출발지점: $startAddr"
-        binding.textEndAddress.text = "도착지점: $endAddr"
-        binding.textTime.text = "시간: $totalTime"
-        binding.textDistance.text = "거리: $totalDist"
+        binding.tvStartAddress.text = "출발지점: $startAddr"
+        binding.tvEndAddress.text = "도착지점: $endAddr"
+        binding.tvLogTime.text = "시간 - $totalTime"
+        binding.tvLogDistance.text = "이동 거리 - $totalDist"
 
         // 카메라 버튼
-        binding.bottomButtons.buttonCamera.setOnClickListener {
+        binding.btnBottom.btnLogCamera.setOnClickListener {
             cameraPermissionLauncher.launch(android.Manifest.permission.CAMERA)
         }
 
-        // 갤러리 버튼
-        binding.bottomButtons.buttonGallery.setOnClickListener {
-            galleryPermissionLauncher.launch(android.Manifest.permission.READ_EXTERNAL_STORAGE)
-        }
-
         // 갤러리 권한
-        binding.bottomButtons.buttonGallery.setOnClickListener {
+        binding.btnBottom.btnLogGallery.setOnClickListener {
             val permission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 android.Manifest.permission.READ_MEDIA_IMAGES
             } else {
@@ -124,41 +125,16 @@ class LogWriteFragment : Fragment() {
             galleryPermissionLauncher.launch(permission)
         }
 
-
         // 저장 버튼
-        binding.bottomButtons.buttonSave.setOnClickListener {
-            val title = binding.editTitle.text.toString()
-            val content = binding.editContent.text.toString()
+        binding.btnBottom.btnLogSave.setOnClickListener {
+            val title = binding.etLogTitle.text.toString()
+            val content = binding.etLogTitle.text.toString()
+            val trash = binding.etLogTrash.text.toString()
             Toast.makeText(requireContext(),
                 "제목: $title\n내용: $content",
                 Toast.LENGTH_SHORT
             ).show()
         }
-//        // 카메라 버튼
-//        binding.buttonCamera.setOnClickListener {
-//            cameraPermissionLauncher.launch(android.Manifest.permission.CAMERA)
-//        }
-//
-////        // 갤러리 버튼
-////        binding.buttonGallery.setOnClickListener {
-////            galleryPermissionLauncher.launch(android.Manifest.permission.READ_EXTERNAL_STORAGE)
-////        }
-//        binding.buttonGallery.setOnClickListener {
-//            val permission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-//                android.Manifest.permission.READ_MEDIA_IMAGES
-//            } else {
-//                android.Manifest.permission.READ_EXTERNAL_STORAGE
-//            }
-//            galleryPermissionLauncher.launch(permission)
-//        }
-//
-//
-//        // 저장 버튼
-//        binding.buttonSave.setOnClickListener {
-//            val title = binding.editTitle.text.toString()
-//            val content = binding.editContent.text.toString()
-//            Toast.makeText(requireContext(), "저장됨\n제목: $title\n내용: $content", Toast.LENGTH_SHORT).show()
-//        }
     }
 
     private fun openCamera() {
