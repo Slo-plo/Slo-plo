@@ -36,7 +36,7 @@
             android:gravity="center"
             android:layout_gravity="center"
             android:text="우리는 매년 800만 톤의 플라스틱을\n바다에 버리고 있습니다.\n\n그 중 상당수는 길거리에\n무심코 버려진 쓰레기에서 시작돼요."
-            android:textSize="18sp"
+            android:textSize="14sp"
             android:fontFamily="@font/noto_sans_kr_medium"
             android:includeFontPadding="false"
             android:paddingVertical="40dp"/>
