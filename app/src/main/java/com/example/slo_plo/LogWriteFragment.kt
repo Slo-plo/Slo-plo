@@ -78,13 +78,11 @@ class LogWriteFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // 뒤로가기: 요약 팝업으로 돌아가기
+        // 뒤로가기: 홈 화면으로 이동
         binding.buttonBack.setOnClickListener {
-            // 이전 플로깅 Fragment 에 저장
             findNavController().previousBackStackEntry
                 ?.savedStateHandle
                 ?.set("showSummary", true)
-            // 원래 Fragment 로 팝백
             findNavController().popBackStack()
         }
 
