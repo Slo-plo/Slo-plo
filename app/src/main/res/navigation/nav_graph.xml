@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     app:startDestination="@id/homeFragment">
 
     <fragment
@@ -27,4 +28,28 @@
         android:id="@+id/ploggingFragment"
         android:name="com.example.slo_plo.PloggingFragment"
         android:label="플로깅 활동" />
+
+    <fragment
+        android:id="@+id/onboardingIntroFragment"
+        android:name="com.example.slo_plo.OnboardingIntroFragment"
+        android:label="온보딩 인트로"
+        tools:layout="@layout/fragment_onboarding_intro">
+
+        <!-- OnboardingIntroFragment -> OnboardingGuideFragment -->
+        <action
+            android:id="@+id/action_onboardingIntroFragment_to_onboardingGuideFragment"
+            app:destination="@id/onboardingGuideFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/onboardingGuideFragment"
+        android:name="com.example.slo_plo.OnboardingGuideFragment"
+        android:label="온보딩 가이드"
+        tools:layout="@layout/fragment_onboarding_guide">
+
+        <!-- OnboardingGuideFragment -> HomeFragment -->
+        <action
+            android:id="@+id/action_onboardingGuideFragment_to_homeFragment"
+            app:destination="@id/homeFragment" />
+    </fragment>
 </navigation>
