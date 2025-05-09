@@ -1,14 +1,120 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".OnboardingGuideFragment">
+    android:background="@color/main_color"
+    tools:context=".OnboardingIntroFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <!-- 앱 아이콘 -->
+    <ImageView
+        android:id="@+id/ic_app_sloplo"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:src="@drawable/ic_app_default"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/iv_guide_background"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="onboarding" />
+        android:layout_height="0dp"
+        android:layout_marginHorizontal="25dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginBottom="40dp"
+        android:background="@drawable/bg_square_white_grey_15"
+        app:layout_constraintBottom_toTopOf="@+id/layout_guide_btn"
+        app:layout_constraintTop_toBottomOf="@+id/ic_app_sloplo"
+        tools:layout_editor_absoluteX="25dp" />
 
-</FrameLayout>
+    <TextView
+        android:id="@+id/tv_guide_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/noto_sans_kr_semi_bold"
+        android:includeFontPadding="false"
+        android:layout_marginTop="30dp"
+        android:text="플로깅을 기록해요!"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="@+id/iv_guide_background"
+        app:layout_constraintStart_toStartOf="@+id/iv_guide_background"
+        app:layout_constraintTop_toTopOf="@+id/iv_guide_background" />
+
+    <TextView
+        android:id="@+id/tv_guide_content"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/noto_sans_kr_semi_bold"
+        android:gravity="center"
+        android:includeFontPadding="false"
+        android:text="슬로플로를 통해 플로깅을 측정하고\n나의 기록을 확인해요"
+        android:textSize="14sp"
+        android:layout_marginTop="10dp"
+        app:layout_constraintBottom_toTopOf="@+id/iv_guide_content"
+        app:layout_constraintEnd_toEndOf="@+id/iv_guide_background"
+        app:layout_constraintStart_toStartOf="@+id/iv_guide_background"
+        app:layout_constraintTop_toBottomOf="@+id/tv_guide_title" />
+
+    <ImageView
+        android:id="@+id/iv_guide_content"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:src="@drawable/img_guide"
+        app:layout_constraintTop_toBottomOf="@id/tv_guide_content"
+        app:layout_constraintBottom_toBottomOf="@+id/iv_guide_background"
+        app:layout_constraintStart_toStartOf="@+id/iv_guide_background"
+        app:layout_constraintEnd_toEndOf="@+id/iv_guide_background"/>
+
+    <!-- 버튼 영역 -->
+    <LinearLayout
+        android:id="@+id/layout_guide_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="30dp"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <!-- 건너뛰기 버튼 -->
+        <FrameLayout
+            android:id="@+id/btn_guide_skip"
+            android:layout_width="120dp"
+            android:layout_height="50dp"
+            android:layout_marginStart="25dp"
+            android:background="@drawable/bg_square_support_color_10">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:fontFamily="@font/noto_sans_kr_regular"
+                android:includeFontPadding="false"
+                android:text="건너뛰기"
+                android:textColor="@color/white"
+                android:textSize="16sp" />
+        </FrameLayout>
+
+        <!-- 계속하기 버튼 -->
+        <FrameLayout
+            android:id="@+id/btn_guide_continue"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="25dp"
+            android:layout_weight="1"
+            android:background="@drawable/bg_square_white_grey_10">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:fontFamily="@font/noto_sans_kr_bold"
+                android:includeFontPadding="false"
+                android:text="계속하기"
+                android:textSize="16sp" />
+        </FrameLayout>
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
