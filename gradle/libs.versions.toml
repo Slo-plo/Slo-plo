@@ -14,6 +14,11 @@ navigationFragment = "2.8.9"
 navigationUiKtx = "2.8.9"
 fragment = "1.8.6"
 playServicesLocation = "21.3.0"
+places = "4.2.0"
+coreI18n = "1.0.0"
+uiTextAndroid = "1.8.0"
+desguaring = "2.1.2"
+navigationFragmentKtx = "2.8.9"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -29,8 +34,15 @@ androidx-navigation-fragment = { group = "androidx.navigation", name = "navigati
 androidx-navigation-ui-ktx = { group = "androidx.navigation", name = "navigation-ui-ktx", version.ref = "navigationUiKtx" }
 androidx-fragment = { group = "androidx.fragment", name = "fragment", version.ref = "fragment" }
 play-services-location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "playServicesLocation" }
+places = { group = "com.google.android.libraries.places", name = "places", version.ref = "places" }
+androidx-core-i18n = { group = "androidx.core", name = "core-i18n", version.ref = "coreI18n" }
+androidx-ui-text-android = { group = "androidx.compose.ui", name = "ui-text-android", version.ref = "uiTextAndroid" }
+core-desugaring = {group = "com.android.tools", name="desugar_jdk_libs", version.ref="desguaring"}
+kotlin-stdlib = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib", version = "2.1.0" }
+androidx-navigation-fragment-ktx = { group = "androidx.navigation", name = "navigation-fragment-ktx", version.ref = "navigationFragmentKtx" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version = "2.1.0" }
+kotlin-jvm     = { id = "org.jetbrains.kotlin.jvm",     version = "2.1.0" }
 

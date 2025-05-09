@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     app:startDestination="@id/homeFragment">
 
     <fragment
@@ -26,5 +27,17 @@
     <fragment
         android:id="@+id/ploggingFragment"
         android:name="com.example.slo_plo.PloggingFragment"
-        android:label="플로깅 활동" />
+        tools:layout="@layout/fragment_plogging"
+        android:label="플로깅 활동" >
+        <action
+            android:id="@+id/action_plogging_to_logWrite"
+            app:destination="@id/logWriteFragment"
+            app:popUpTo="@id/ploggingFragment"
+            app:popUpToInclusive="true"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/logWriteFragment"
+        android:name="com.example.slo_plo.LogWriteFragment"
+        tools:layout="@layout/fragment_log_write" />
 </navigation>
