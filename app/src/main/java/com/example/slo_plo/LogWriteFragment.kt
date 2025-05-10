@@ -139,8 +139,8 @@ class LogWriteFragment : Fragment() {
             val trash = binding.etLogTrash.text.toString()
 
             showConfirmDialog(
-                title = "저장 확인",
-                message = "이 내용을 저장하시겠습니까?"
+                title = "일지 저장",
+                message = "일지를 저장하시겠습니까?"
             ) {
                 Toast.makeText(
                     requireContext(),
