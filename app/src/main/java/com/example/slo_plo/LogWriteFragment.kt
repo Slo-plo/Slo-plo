@@ -1,6 +1,7 @@
 package com.example.slo_plo
 
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
@@ -15,6 +16,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import com.example.slo_plo.databinding.DialogDefaultBinding
 import com.example.slo_plo.databinding.FragmentLogWriteBinding
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -146,6 +148,32 @@ class LogWriteFragment : Fragment() {
         val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
         galleryLauncher.launch(intent)
     }
+
+    fun showConfirmDialog(
+        title: String,
+        message: String,
+        onConfirm: () -> Unit
+    ) {
+        val binding = DialogDefaultBinding.inflate(layoutInflater)
+        val alertDialog = AlertDialog.Builder(requireContext())
+            .setView(binding.root)
+            .create()
+
+        binding.tvDefaultTitle.text = title
+        binding.tvDefaultContent.text = message
+
+        binding.btnDefaultYes.setOnClickListener {
+            onConfirm()
+            alertDialog.dismiss()
+        }
+
+        binding.btnDefaultNo.setOnClickListener {
+            alertDialog.dismiss()
+        }
+
+        alertDialog.show()
+    }
+
 
     override fun onDestroyView() {
         super.onDestroyView()
