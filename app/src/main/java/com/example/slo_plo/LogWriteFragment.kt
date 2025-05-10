@@ -88,10 +88,15 @@ class LogWriteFragment : Fragment() {
 
         // 뒤로가기: 홈 화면으로 이동
         binding.btnLogCancel.setOnClickListener {
-            findNavController().previousBackStackEntry
-                ?.savedStateHandle
-                ?.set("showSummary", true)
-            findNavController().popBackStack()
+            showConfirmDialog(
+                title = "일지 작성 취소",
+                message = "일지 작성을 취소하고\n홈화면으로 돌아가겠습니까?"
+            ) {
+                findNavController().previousBackStackEntry
+                    ?.savedStateHandle
+                    ?.set("showSummary", true)
+                findNavController().popBackStack()
+            }
         }
 
         // 플로깅 기록 불러오기
@@ -133,7 +138,7 @@ class LogWriteFragment : Fragment() {
             val content = binding.etLogTitle.text.toString()
             val trash = binding.etLogTrash.text.toString()
             Toast.makeText(requireContext(),
-                "제목: $title\n내용: $content",
+                "제목: $title\n내용: $content 쓰레기 개수: $trash",
                 Toast.LENGTH_SHORT
             ).show()
         }
