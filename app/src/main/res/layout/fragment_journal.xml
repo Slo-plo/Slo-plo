@@ -98,7 +98,7 @@
             android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/logSummaryText"
+            android:id="@+id/logTitleText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="담배꽁초 50개 주움"

@@ -12,9 +12,11 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import android.graphics.Color
+import android.util.Log
 import androidx.core.view.children
 import com.example.slo_plo.databinding.DayViewBinding
 import com.example.slo_plo.databinding.FragmentJournalBinding
+import com.google.firebase.firestore.FirebaseFirestore
 import com.kizitonwose.calendar.core.CalendarDay
 import com.kizitonwose.calendar.core.CalendarMonth
 import com.kizitonwose.calendar.core.DayPosition
@@ -25,8 +27,10 @@ import java.io.File
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
+import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import java.util.Locale
+import java.util.logging.LogRecord
 
 class JournalFragment : Fragment() {
 
@@ -34,14 +38,65 @@ class JournalFragment : Fragment() {
     private val binding get() = _binding!!
     private var selectedDate: LocalDate? = null
 
+    private val today = LocalDate.now()
+
+    private val firestoreDateFormatter = DateTimeFormatter.ofPattern("yyyy.MM.dd")
+
+    data class LogRecord(
+        val distance: Double = 0.0,
+        val time: Int = 0,
+        val trashCount: Int = 0,
+        val title: String = "",
+        val address: String = ""
+    )
 
     // 표시할 날짜
-    private val greenDates = setOf(
-        LocalDate.of(2025, 4, 2),
-        LocalDate.of(2025, 4, 4),
-        LocalDate.of(2025, 4, 5),
-        LocalDate.of(2025, 4, 11),
-    )
+    private val greenDates = mutableSetOf<LocalDate>()
+
+    private fun loadDatesForCalendarIcons() {
+        FirebaseFirestore.getInstance().collection("plogging_logs").get()
+            .addOnSuccessListener { result ->
+                for (doc in result) {
+                    val date = try {
+                        LocalDate.parse(doc.id, firestoreDateFormatter)  // 점(.) 포맷으로 파싱
+                    } catch (e: Exception) {
+                        null
+                    }
+                    date?.let { greenDates.add(it) }
+                }
+                binding.calendarView.notifyCalendarChanged()
+            }
+    }
+    // 날짜 형식
+    private fun formatDateWithDayOfWeek(date: LocalDate): String {
+        val formattedDate = date.format(java.time.format.DateTimeFormatter.ofPattern("yyyy.MM.dd"))
+        val dayOfWeek = date.dayOfWeek.getDisplayName(java.time.format.TextStyle.SHORT, Locale.KOREAN)
+        return "$formattedDate ($dayOfWeek)"
+    }
+
+
+    // Firestore에서 날짜별 기록 조회
+    private fun loadLogRecord(date: LocalDate, callback: (LogRecord?) -> Unit) {
+        val db = FirebaseFirestore.getInstance()
+        val docId = date.format(firestoreDateFormatter)
+
+        db.collection("plogging_logs").document(docId).get()
+            .addOnSuccessListener { doc ->
+                Log.d("Firestore", "📄 문서 내용: ${doc.data}")  // ✅
+                if (doc.exists()) {
+                    val record = doc.toObject(LogRecord::class.java)
+                    Log.d("Firestore", "✅ 변환된 record: $record")
+                    callback(record)
+                } else {
+                    Log.w("Firestore", "❌ 문서 없음: $docId")
+                    callback(null)
+                }
+            }
+            .addOnFailureListener {
+                Toast.makeText(requireContext(), "데이터 불러오기 실패", Toast.LENGTH_SHORT).show()
+                callback(null)
+            }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -87,7 +142,17 @@ class JournalFragment : Fragment() {
         binding.calendarView.monthHeaderBinder = object : MonthHeaderFooterBinder<MonthViewContainer> {
             override fun create(view: View) = MonthViewContainer(view)
             override fun bind(container: MonthViewContainer, month: CalendarMonth) {
-                val daysOfWeek = DayOfWeek.values()
+                // 일요일부터 시작하는 순서로 재정렬
+                val daysOfWeek = listOf(
+                    DayOfWeek.SUNDAY,
+                    DayOfWeek.MONDAY,
+                    DayOfWeek.TUESDAY,
+                    DayOfWeek.WEDNESDAY,
+                    DayOfWeek.THURSDAY,
+                    DayOfWeek.FRIDAY,
+                    DayOfWeek.SATURDAY,
+                )
+
                 container.monthTitle.text = "${month.yearMonth.year}년 ${month.yearMonth.monthValue}월"
                 container.titlesContainer.children
                     .map { it as TextView }
@@ -98,6 +163,14 @@ class JournalFragment : Fragment() {
                     }
             }
         }
+        loadDatesForCalendarIcons()
+
+        // 요약 뷰 초기 메시지
+        binding.logDateText.text = "기록을 확인할 날짜를 선택해 주세요"
+        binding.logTitleText.text = ""
+        binding.logStartPlaceText.text = ""
+        binding.logTrashText.text = ""
+
     }
 
     // 헤더 바인딩용 ViewContainer
@@ -122,24 +195,24 @@ class JournalFragment : Fragment() {
                 // 날짜 텍스트 표시
                 itemBinding.dayText.text = date.dayOfMonth.toString()
 
-                // 클릭된 날짜 표시
-                if (selectedDate == date) {
-                    itemBinding.dayText.setBackgroundResource(R.drawable.bg_selected_day)
-                    itemBinding.dayText.setTextColor(Color.WHITE)
-                } else {
-                    itemBinding.dayText.background = null
-                    itemBinding.dayText.setTextColor(Color.BLACK)
+                when {
+                    selectedDate == date -> {
+                        itemBinding.dayText.setBackgroundResource(R.drawable.bg_selected_day)
+                        itemBinding.dayText.setTextColor(Color.WHITE)
+                    }
+                    date == today -> {
+                        itemBinding.dayText.setBackgroundResource(R.drawable.bg_today_day)
+                        itemBinding.dayText.setTextColor(Color.BLACK)
+                    }
+                    else -> {
+                        itemBinding.dayText.background = null
+                        itemBinding.dayText.setTextColor(Color.BLACK)
+                    }
                 }
 
-
-                // 아이콘 표시 여부
-                itemBinding.dayIcon.visibility = View.VISIBLE
-                itemBinding.dayIcon.setImageResource(
-                    if (date in greenDates) R.drawable.ic_unit_24 else 0
-                )
-
-                // 클릭 이벤트
+                // 날짜 클릭 시 이벤트 설정
                 view.setOnClickListener {
+                    // 선택 날짜 변경
                     if (selectedDate != date) {
                         val oldDate = selectedDate
                         selectedDate = date
@@ -147,21 +220,28 @@ class JournalFragment : Fragment() {
                         oldDate?.let { binding.calendarView.notifyDateChanged(it) }
                     }
 
-                    // 요약 텍스트 갱신
-                    view.setOnClickListener {
-                        if (date == LocalDate.of(2025, 4, 11)) {
-                            parentBinding.logDateText.text = "2025.04.11 (금) 2.5km"
-                            parentBinding.logSummaryText.text = "담배꽁초 50개 주움"
-                            parentBinding.logStartPlaceText.text = "📍 반포한강공원 | 50분"
-                            parentBinding.logTrashText.text = "오늘의 총 쓰레기: 50개"
+                    // 요약 데이터 불러오기
+                    loadLogRecord(date) { record ->
+                        if (record != null) {
+                            parentBinding.logDateText.text = "${formatDateWithDayOfWeek(date)} ${record.distance}km"
+                            parentBinding.logTitleText.text = record.title
+                            parentBinding.logStartPlaceText.text = "📍 ${record.address} | ${record.time}"
+                            parentBinding.logTrashText.text = "오늘의 총 쓰레기: ${record.trashCount}개"
                         } else {
-                            parentBinding.logDateText.text = "$date 기록 없음"
-                            parentBinding.logSummaryText.text = ""
+                            parentBinding.logDateText.text = "${formatDateWithDayOfWeek(date)} 기록 없음"
+                            parentBinding.logTitleText.text = ""
                             parentBinding.logStartPlaceText.text = ""
                             parentBinding.logTrashText.text = ""
                         }
                     }
                 }
+
+                // 아이콘 표시 여부
+                itemBinding.dayIcon.visibility = View.VISIBLE
+                itemBinding.dayIcon.setImageResource(
+                    if (date in greenDates) R.drawable.ic_unit_24 else 0
+                )
+
             } else {
                 itemBinding.dayText.text = ""
                 itemBinding.dayIcon.visibility = View.INVISIBLE
@@ -170,5 +250,4 @@ class JournalFragment : Fragment() {
             }
         }
     }
-
 }
