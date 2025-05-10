@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/main_color"
-    tools:context=".VolunteerFragment">
+    tools:context=".VolunteerFragment"
+    android:id="@+id/fragment_container_view" >
 
     <!-- 앱 아이콘 -->
     <ImageView
