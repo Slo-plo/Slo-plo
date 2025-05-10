@@ -31,6 +31,8 @@ import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import java.util.Locale
 import com.example.slo_plo.model.LogRecord
+import androidx.core.os.bundleOf
+import androidx.navigation.fragment.findNavController
 
 class JournalFragment : Fragment() {
 
@@ -106,6 +108,18 @@ class JournalFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        findNavController().currentBackStackEntry
+            ?.savedStateHandle
+            ?.getLiveData<Boolean>("needsRefresh")
+            ?.observe(viewLifecycleOwner) { needs ->
+                if (needs == true) {
+                    loadDatesForCalendarIcons()
+                    // 다시는 갱신하지 않도록 제거
+                    findNavController().currentBackStackEntry
+                        ?.savedStateHandle
+                        ?.remove<Boolean>("needsRefresh")
+                }
+            }
 
         // 뒤로가기 버튼 클릭 시 이전 화면으로 이동
         binding.btnBack.setOnClickListener {
@@ -125,7 +139,6 @@ class JournalFragment : Fragment() {
                 container.bind(day)
             }
         }
-
 
         // 현재 월을 기준으로 이전 12개월부터 이후 12개월까지 설정
         val currentMonth = YearMonth.now()

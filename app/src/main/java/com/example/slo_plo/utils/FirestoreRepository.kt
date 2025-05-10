@@ -6,7 +6,7 @@ import kotlin.jvm.java
 
 object FirestoreRepository {
     private val db = FirebaseFirestore.getInstance()
-    private const val COLLECTION = "logs"
+    private const val COLLECTION = "plogging_logs"
 
     /** 날짜별 일지 불러오기 */
     fun loadLogRecord(date: LocalDate, callback: (LogRecord?) -> Unit) {

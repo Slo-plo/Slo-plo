@@ -1,4 +1,5 @@
 package com.example.slo_plo.model
+import java.io.Serializable
 
 import java.time.LocalDate
 
@@ -22,4 +23,4 @@ data class LogRecord(
     val body: String = "",
     // 사진 URL 리스트
     val imageUrls: List<String> = emptyList()
-)
+) : Serializable
