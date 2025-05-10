@@ -169,13 +169,14 @@
             <!-- 선택 이미지 -->
             <ImageView
                 android:id="@+id/iv_log_selected"
-                android:layout_width="wrap_content"
-                android:layout_height="150dp"
-                android:visibility="gone"
-                android:scaleType="fitStart"
-                android:layout_gravity="start"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
-                android:layout_marginTop="25dp"/>
+                android:layout_marginTop="25dp"
+                android:visibility="gone"
+                android:adjustViewBounds="true"
+                android:scaleType="fitCenter"
+                android:maxHeight="300dp"/>
 
             <!-- 본문 EditText -->
             <EditText
