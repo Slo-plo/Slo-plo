@@ -135,12 +135,21 @@ class LogWriteFragment : Fragment() {
         // 저장 버튼
         binding.btnBottom.btnLogSave.setOnClickListener {
             val title = binding.etLogTitle.text.toString()
-            val content = binding.etLogTitle.text.toString()
+            val content = binding.etLogContent.text.toString()
             val trash = binding.etLogTrash.text.toString()
-            Toast.makeText(requireContext(),
-                "제목: $title\n내용: $content 쓰레기 개수: $trash",
-                Toast.LENGTH_SHORT
-            ).show()
+
+            showConfirmDialog(
+                title = "저장 확인",
+                message = "이 내용을 저장하시겠습니까?"
+            ) {
+                Toast.makeText(
+                    requireContext(),
+                    "제목: $title\n내용: $content\n쓰레기 개수: $trash",
+                    Toast.LENGTH_SHORT
+                ).show()
+
+                // Todo : DB에 저장 후 화면 전환
+            }
         }
     }
 
