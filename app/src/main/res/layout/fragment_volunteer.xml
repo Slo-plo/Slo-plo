@@ -57,7 +57,9 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.06"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/btn_find_location" />
+        app:layout_constraintTop_toBottomOf="@id/btn_find_location"
+        android:fontFamily="@font/noto_sans_kr_semi_bold"
+        android:includeFontPadding="false"/>
 
     <!-- 4) RecyclerView -->
     <androidx.recyclerview.widget.RecyclerView
@@ -78,7 +80,7 @@
         android:id="@+id/ic_map"
         android:layout_width="95dp"
         android:layout_height="88dp"
-        android:src="@drawable/ic_nav_volunteer"
+        android:src="@drawable/ic_volunteer_map"
         app:layout_constraintTop_toBottomOf="@id/ic_app_sloplo"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
