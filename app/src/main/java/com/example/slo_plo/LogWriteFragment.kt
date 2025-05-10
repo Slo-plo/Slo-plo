@@ -17,6 +17,7 @@ import androidx.navigation.fragment.navArgs
 import com.example.slo_plo.databinding.FragmentLogWriteBinding
 import com.example.slo_plo.model.LogRecord
 import com.example.slo_plo.utils.FirestoreRepository
+import com.google.firebase.auth.FirebaseAuth
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
@@ -26,6 +27,9 @@ class LogWriteFragment : Fragment() {
     private var _binding: FragmentLogWriteBinding? = null
     private val binding get() = _binding!!
     private var selectedImageUri: Uri? = null
+
+    private lateinit var auth: FirebaseAuth
+    private var uid: String? = null
 
     // 카메라 권한 요청
     private val cameraPermissionLauncher = registerForActivityResult(
@@ -81,12 +85,33 @@ class LogWriteFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        auth = FirebaseAuth.getInstance()
+        uid = auth.currentUser?.uid
+
         // 뒤로가기: 홈 화면으로 이동
         binding.buttonBack.setOnClickListener {
             findNavController().previousBackStackEntry
                 ?.savedStateHandle
                 ?.set("showSummary", true)
             findNavController().popBackStack()
+        }
+
+        // 저장 버튼 클릭 리스너 안에서 uid 사용
+        binding.bottomButtons.buttonSave.setOnClickListener {
+            val userId = uid ?: run {
+                Toast.makeText(requireContext(),
+                    "사용자 정보가 없습니다.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            // LogRecord 생성
+            val record = LogRecord(
+                /* ... */
+            )
+            // userId 와 record 순서로 넘겨야 함
+            FirestoreRepository.saveLogRecord(userId, record) { success ->
+                if (success) { /* 저장 완료 */ }
+                else { /* 저장 실패 */ }
+            }
         }
 
         // 플로깅 기록 불러오기
@@ -145,7 +170,8 @@ class LogWriteFragment : Fragment() {
                 imageUrls    = emptyList()  // 이미지 업로드 후 URL 리스트로 대체
             )
             // 2) 저장
-            FirestoreRepository.saveLogRecord(record) { success ->
+            val userId = uid ?: return@setOnClickListener
+            FirestoreRepository.saveLogRecord(userId, record) { success ->
                 if (success) {
                     Toast.makeText(requireContext(), "저장 완료", Toast.LENGTH_SHORT).show()
                     // 3) JournalFragment 에 갱신 요청
@@ -164,31 +190,6 @@ class LogWriteFragment : Fragment() {
 //                Toast.LENGTH_SHORT
 //            ).show()
         }
-//        // 카메라 버튼
-//        binding.buttonCamera.setOnClickListener {
-//            cameraPermissionLauncher.launch(android.Manifest.permission.CAMERA)
-//        }
-//
-////        // 갤러리 버튼
-////        binding.buttonGallery.setOnClickListener {
-////            galleryPermissionLauncher.launch(android.Manifest.permission.READ_EXTERNAL_STORAGE)
-////        }
-//        binding.buttonGallery.setOnClickListener {
-//            val permission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-//                android.Manifest.permission.READ_MEDIA_IMAGES
-//            } else {
-//                android.Manifest.permission.READ_EXTERNAL_STORAGE
-//            }
-//            galleryPermissionLauncher.launch(permission)
-//        }
-//
-//
-//        // 저장 버튼
-//        binding.buttonSave.setOnClickListener {
-//            val title = binding.editTitle.text.toString()
-//            val content = binding.editContent.text.toString()
-//            Toast.makeText(requireContext(), "저장됨\n제목: $title\n내용: $content", Toast.LENGTH_SHORT).show()
-//        }
     }
 
     private fun openCamera() {

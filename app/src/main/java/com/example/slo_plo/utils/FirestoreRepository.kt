@@ -2,6 +2,7 @@ package com.example.slo_plo.utils
 import com.example.slo_plo.model.LogRecord
 import com.google.firebase.firestore.FirebaseFirestore
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import kotlin.jvm.java
 
 object FirestoreRepository {
@@ -23,12 +24,37 @@ object FirestoreRepository {
     }
 
     /** 일지 저장 */
-    fun saveLogRecord(record: LogRecord, callback: (Boolean) -> Unit) {
-        val docId = record.dateId  // LogRecord.dateId에는 이미 DateUtils.toDocId(date) 사용
-        db.collection(COLLECTION)
-            .document(docId)
-            .set(record)
+    fun saveLogRecord(
+        userId: String,
+        record: LogRecord,
+        callback: (Boolean) -> Unit
+    ) {
+        val col = db.collection("users")
+            .document(userId)
+            .collection("plogging_logs")
+        col.add(record)
             .addOnSuccessListener { callback(true) }
             .addOnFailureListener { callback(false) }
+    }
+
+    fun loadLogRecordsForDate(
+        userId: String,
+        date: LocalDate,
+        callback: (List<LogRecord>) -> Unit
+    ) {
+        val dateId = date.format(DateTimeFormatter.ofPattern("yyyy.MM.dd"))
+        db.collection("users")
+            .document(userId)
+            .collection("plogging_logs")
+            .whereEqualTo("dateId", dateId)
+            .get()
+            .addOnSuccessListener { snap ->
+                val list = snap.documents
+                    .mapNotNull { it.toObject(LogRecord::class.java) }
+                callback(list)
+            }
+            .addOnFailureListener {
+                callback(emptyList())
+            }
     }
 }

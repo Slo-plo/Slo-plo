@@ -33,6 +33,7 @@ import java.util.Locale
 import com.example.slo_plo.model.LogRecord
 import androidx.core.os.bundleOf
 import androidx.navigation.fragment.findNavController
+import com.example.slo_plo.utils.FirestoreRepository
 import com.google.firebase.auth.FirebaseAuth
 
 class JournalFragment : Fragment() {
@@ -259,20 +260,17 @@ class JournalFragment : Fragment() {
 
                     // 요약 데이터 불러오기
                     uid?.let { user ->
-                        loadLogRecord(date) { record ->
-                            if (record != null) {
-                                parentBinding.logDateText.text =
-                                    "${formatDateWithDayOfWeek(date)} ${record.distance}km"
-                                parentBinding.logTitleText.text = record.title
-                                parentBinding.logStartPlaceText.text =
-                                    "📍 ${record.startAddress} | ${record.time}"
-                                parentBinding.logTrashText.text = "쓰레기 개수: ${record.trashCount}개"
-                            } else {
-                                parentBinding.logDateText.text =
-                                    "${formatDateWithDayOfWeek(date)} 기록 없음"
+                        FirestoreRepository.loadLogRecordsForDate(user, date) { records ->
+                            if (records.isEmpty()) {
+                                parentBinding.logDateText.text = "${formatDateWithDayOfWeek(date)} 기록 없음"
                                 parentBinding.logTitleText.text = ""
                                 parentBinding.logStartPlaceText.text = ""
                                 parentBinding.logTrashText.text = ""
+                            } else {
+                                parentBinding.logDateText.text =
+                                    "${formatDateWithDayOfWeek(date)} (${records.size}개 기록)"
+                                parentBinding.logTitleText.text = records[0].title
+                                // 필요에 따라 records 리스트를 더 사용하시면 됩니다.
                             }
                         }
                     }
