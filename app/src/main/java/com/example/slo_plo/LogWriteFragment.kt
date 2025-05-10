@@ -12,6 +12,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
@@ -19,6 +20,7 @@ import androidx.navigation.fragment.findNavController
 import com.example.slo_plo.databinding.DialogDefaultBinding
 import com.example.slo_plo.databinding.FragmentLogWriteBinding
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
@@ -99,6 +101,19 @@ class LogWriteFragment : Fragment() {
             }
         }
 
+        // 뒤로가기 버튼 클릭 이벤트를 감지하여 다이얼로그 띄우기
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
+            showConfirmDialog(
+                title = "일지 작성 취소",
+                message = "일지 작성을 취소하고\n홈화면으로 돌아가겠습니까?"
+            ) {
+                findNavController().previousBackStackEntry
+                    ?.savedStateHandle
+                    ?.set("showSummary", true)
+                findNavController().popBackStack()
+            }
+        }
+
         // 플로깅 기록 불러오기
         val args = requireArguments()
         val startAddr = args.getString("startAddress") ?: ""
@@ -106,10 +121,13 @@ class LogWriteFragment : Fragment() {
         val totalTime = args.getString("totalTime") ?: ""
         val totalDist = args.getString("totalDistance") ?: ""
 
-        // 날짜 설정
-        val currentDate = LocalDate.now()
-        val formatter = DateTimeFormatter.ofPattern("yyyy년 M월 d일 E요일", Locale.KOREA)
-        binding.tvLogDate.text = currentDate.format(formatter)
+        // 날짜 및 시간 설정
+        val currentDateTime = LocalDateTime.now()
+        val formatter = DateTimeFormatter.ofPattern(
+            "yyyy년 M월 d일 E요일 HH시 mm분",
+            Locale.KOREA
+        )
+        binding.tvLogDate.text = currentDateTime.format(formatter)
 
         // 플로깅 정보 반영
         binding.tvStartAddress.text = "출발지점: $startAddr"
