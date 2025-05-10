@@ -87,5 +87,6 @@ dependencies {
     implementation ("com.kizitonwose.calendar:view:2.6.2")
     implementation("com.google.firebase:firebase-firestore-ktx")
     implementation(platform("com.google.firebase:firebase-bom:33.13.0"))
+    implementation("com.google.firebase:firebase-auth")
 
 }

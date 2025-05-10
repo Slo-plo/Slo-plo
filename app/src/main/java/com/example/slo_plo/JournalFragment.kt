@@ -33,6 +33,7 @@ import java.util.Locale
 import com.example.slo_plo.model.LogRecord
 import androidx.core.os.bundleOf
 import androidx.navigation.fragment.findNavController
+import com.google.firebase.auth.FirebaseAuth
 
 class JournalFragment : Fragment() {
 
@@ -43,6 +44,10 @@ class JournalFragment : Fragment() {
     private val today = LocalDate.now()
 
     private val firestoreDateFormatter = DateTimeFormatter.ofPattern("yyyy.MM.dd")
+
+    private lateinit var auth: FirebaseAuth
+    private var uid: String? = null
+
 
 //    data class LogRecord(
 //        val distance: Double = 0.0,
@@ -55,16 +60,16 @@ class JournalFragment : Fragment() {
     // 표시할 날짜
     private val greenDates = mutableSetOf<LocalDate>()
 
+    // 수정: 인자 제거, 루트 plogging_logs 읽기
     private fun loadDatesForCalendarIcons() {
-        FirebaseFirestore.getInstance().collection("plogging_logs").get()
+        FirebaseFirestore.getInstance()
+            .collection("plogging_logs")
+            .get()
             .addOnSuccessListener { result ->
-                for (doc in result) {
-                    val date = try {
-                        LocalDate.parse(doc.id, firestoreDateFormatter)  // 점(.) 포맷으로 파싱
-                    } catch (e: Exception) {
-                        null
-                    }
-                    date?.let { greenDates.add(it) }
+                greenDates.clear()
+                result.forEach { doc ->
+                    LocalDate.parse(doc.id, firestoreDateFormatter)
+                        .let { greenDates.add(it) }
                 }
                 binding.calendarView.notifyCalendarChanged()
             }
@@ -78,22 +83,17 @@ class JournalFragment : Fragment() {
 
 
     // Firestore에서 날짜별 기록 조회
-    private fun loadLogRecord(date: LocalDate, callback: (LogRecord?) -> Unit) {
-        val db = FirebaseFirestore.getInstance()
-        val docId = date.format(firestoreDateFormatter)
-
-        db.collection("plogging_logs").document(docId).get()
-            .addOnSuccessListener { doc ->
-                if (doc.exists()) {
-                    val record = doc.toObject(LogRecord::class.java)
-                    callback(record)
-                } else {
-                    callback(null)
-                }
+    private fun loadLogRecord(date: LocalDate, cb: (LogRecord?) -> Unit) {
+        FirebaseFirestore.getInstance()
+            .collection("plogging_logs")
+            .document(date.format(firestoreDateFormatter))
+            .get()
+            .addOnSuccessListener { snap ->
+                cb(snap.toObject(LogRecord::class.java))
             }
             .addOnFailureListener {
                 Toast.makeText(requireContext(), "데이터 불러오기 실패", Toast.LENGTH_SHORT).show()
-                callback(null)
+                cb(null)
             }
     }
 
@@ -108,13 +108,35 @@ class JournalFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        auth = FirebaseAuth.getInstance()
+
+        // 이미 로그인되어 있으면 바로 uid 설정, 아니라면 익명 로그인
+        auth.currentUser?.let {
+            uid = it.uid
+            uid?.let { loadDatesForCalendarIcons() }
+        } ?: run {
+            auth.signInAnonymously()
+                .addOnCompleteListener(requireActivity()) { task ->
+                    if (task.isSuccessful) {
+                        uid = auth.currentUser?.uid
+                        Log.d("JournalFragment", "익명 로그인 성공, uid=$uid")
+                        uid?.let { loadDatesForCalendarIcons() }
+                    } else {
+                        Log.e("JournalFragment", "익명 로그인 실패", task.exception)
+                        Toast.makeText(requireContext(), "로그인에 실패했습니다.", Toast.LENGTH_SHORT).show()
+                    }
+                }
+        }
+
+        // savedStateHandle 옵저빙
         findNavController().currentBackStackEntry
             ?.savedStateHandle
             ?.getLiveData<Boolean>("needsRefresh")
             ?.observe(viewLifecycleOwner) { needs ->
                 if (needs == true) {
-                    loadDatesForCalendarIcons()
-                    // 다시는 갱신하지 않도록 제거
+                    uid?.let { loadDatesForCalendarIcons() }
                     findNavController().currentBackStackEntry
                         ?.savedStateHandle
                         ?.remove<Boolean>("needsRefresh")
@@ -173,7 +195,6 @@ class JournalFragment : Fragment() {
                     }
             }
         }
-        loadDatesForCalendarIcons()
 
         // 요약 뷰 초기 메시지
         binding.logDateText.text = "기록을 확인할 날짜를 선택해 주세요"
@@ -193,6 +214,12 @@ class JournalFragment : Fragment() {
         super.onDestroyView()
         _binding = null
     }
+
+    override fun onResume() {
+        super.onResume()
+        uid?.let { loadDatesForCalendarIcons() }
+    }
+
 
     inner class DayViewContainer(view: View) : ViewContainer(view) {
         private val itemBinding = DayViewBinding.bind(view)                 // 날짜 셀(binding)
@@ -231,17 +258,22 @@ class JournalFragment : Fragment() {
                     }
 
                     // 요약 데이터 불러오기
-                    loadLogRecord(date) { record ->
-                        if (record != null) {
-                            parentBinding.logDateText.text = "${formatDateWithDayOfWeek(date)} ${record.distance}km"
-                            parentBinding.logTitleText.text = record.title
-                            parentBinding.logStartPlaceText.text = "📍 ${record.startAddress} | ${record.time}"
-                            parentBinding.logTrashText.text = "쓰레기 개수: ${record.trashCount}개"
-                        } else {
-                            parentBinding.logDateText.text = "${formatDateWithDayOfWeek(date)} 기록 없음"
-                            parentBinding.logTitleText.text = ""
-                            parentBinding.logStartPlaceText.text = ""
-                            parentBinding.logTrashText.text = ""
+                    uid?.let { user ->
+                        loadLogRecord(date) { record ->
+                            if (record != null) {
+                                parentBinding.logDateText.text =
+                                    "${formatDateWithDayOfWeek(date)} ${record.distance}km"
+                                parentBinding.logTitleText.text = record.title
+                                parentBinding.logStartPlaceText.text =
+                                    "📍 ${record.startAddress} | ${record.time}"
+                                parentBinding.logTrashText.text = "쓰레기 개수: ${record.trashCount}개"
+                            } else {
+                                parentBinding.logDateText.text =
+                                    "${formatDateWithDayOfWeek(date)} 기록 없음"
+                                parentBinding.logTitleText.text = ""
+                                parentBinding.logStartPlaceText.text = ""
+                                parentBinding.logTrashText.text = ""
+                            }
                         }
                     }
                 }
