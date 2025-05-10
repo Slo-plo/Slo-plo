@@ -4,19 +4,18 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.graphics.Color
+import android.widget.ArrayAdapter
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.example.slo_plo.databinding.FragmentVolunteerBinding
 import com.example.slo_plo.databinding.BottomSheetLocationBinding
 import com.google.android.material.bottomsheet.BottomSheetDialog
-import android.widget.ArrayAdapter
-import android.widget.Toast
-import androidx.navigation.fragment.findNavController
-import com.example.slo_plo.RecommendVolunteerAdapter
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.example.slo_plo.RecommendVolunteerAdapter
 import com.example.slo_plo.RecommendVolunteer
-
 
 class VolunteerFragment : Fragment() {
 
@@ -32,22 +31,22 @@ class VolunteerFragment : Fragment() {
         _binding = FragmentVolunteerBinding.inflate(inflater, container, false)
         val view = binding.root
 
-        // ❗클릭 리스너 설정: 'btnFindLocation'이라는 ID는 존재하지 않으므로 이 부분을 실제 버튼 ID로 수정해야 함
-        binding.btnFindLocation.setOnClickListener {  // ✅예: binding.btnSelectRegion으로 수정 필요
+        // 'btnFindLocation' 버튼 클릭 리스너 설정
+        binding.btnFindLocation.setOnClickListener {
 
-            // ✅ 바텀시트 다이얼로그 생성
+            // 바텀시트 다이얼로그 생성
             val dialog = BottomSheetDialog(requireContext())
-            val sheetBinding = BottomSheetLocationBinding.inflate(layoutInflater)  // 바텀시트 전용 뷰 바인딩
+            val sheetBinding = BottomSheetLocationBinding.inflate(layoutInflater)
             val dialogView = sheetBinding.root
 
-            // ✅ 화면 높이의 75%로 바텀시트 높이 설정
+            // 화면 높이의 75%로 바텀시트 높이 설정
             val displayMetrics = resources.displayMetrics
             val screenHeight = displayMetrics.heightPixels
             val sheetHeight = (screenHeight * 0.75).toInt()
 
             dialog.setContentView(dialogView)
 
-            // ✅ 바텀시트 내부 뷰 속성 조정 (항상 확장 상태로, 숨김 불가)
+            // 바텀시트 내부 뷰 속성 조정
             val bottomSheet = dialog.delegate.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)
             bottomSheet?.let {
                 val behavior = BottomSheetBehavior.from(it)
@@ -57,7 +56,7 @@ class VolunteerFragment : Fragment() {
                 it.layoutParams.height = sheetHeight
                 it.requestLayout()
 
-                // ✅ 드래그로 닫히지 않도록 상태 감시
+                // 드래그로 닫히지 않도록 상태 감시
                 behavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
                     override fun onStateChanged(sheet: View, newState: Int) {
                         if (newState == BottomSheetBehavior.STATE_DRAGGING) {
@@ -68,23 +67,22 @@ class VolunteerFragment : Fragment() {
                 })
             }
 
-            // ✅ 지역 리스트 정의 및 맵핑
+            // 지역 리스트 정의 및 맵핑
             val regions = listOf("서울", "경기", "인천", "강원", "대전/충청", "대구", "부산/울산", "경상", "광주/전라")
             val regionMap = mapOf(
                 "서울" to listOf("강남", "강변", "건대입구", "구로", "노원구", "대학로", "동대문", "동촌", "명동", "미아", "버전"),
                 "경기" to listOf("수원", "성남", "용인")
-                // ✅ 나머지 지역은 필요에 따라 추가 가능
             )
 
-            // ✅ 선택된 지역 및 세부 지역 저장용 변수
+            // 선택된 지역 및 세부 지역 저장용 변수
             var selectedRegion: String? = null
             var selectedSubRegion: String? = null
 
-            // ✅ 첫 번째 리스트뷰에 지역 데이터 연결
+            // 첫 번째 리스트뷰에 지역 데이터 연결
             val regionAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, regions)
             sheetBinding.listRegion.adapter = regionAdapter
 
-            // ✅ 지역을 선택했을 때 서브 지역 리스트뷰 갱신
+            // 지역을 선택했을 때 서브 지역 리스트뷰 갱신
             sheetBinding.listRegion.setOnItemClickListener { _, _, position, _ ->
                 selectedRegion = regions[position]
                 val subRegions = regionMap[selectedRegion] ?: emptyList()
@@ -92,15 +90,40 @@ class VolunteerFragment : Fragment() {
                 sheetBinding.listSubregion.adapter = subAdapter
             }
 
-            // ✅ 서브 지역 선택 처리
-            sheetBinding.listSubregion.setOnItemClickListener { _, _, position, _ ->
-                selectedSubRegion = (sheetBinding.listSubregion.adapter.getItem(position) as String)
+            // onCreateView 안에서 selectedPosition을 초기화
+            var selectedPosition: Int? = null
+
+            // 지역 클릭 리스너에서 선택된 지역의 위치를 저장
+            sheetBinding.listRegion.setOnItemClickListener { _, _, position, _ ->
+                selectedRegion = regions[position]
+                selectedPosition = position  // 선택된 위치 저장
+                val subRegions = regionMap[selectedRegion] ?: emptyList()
+                val subAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, subRegions)
+                sheetBinding.listSubregion.adapter = subAdapter
             }
 
-            // ✅ 'X 창 닫기' 텍스트 클릭 시 바텀시트 닫기
+            // 서브 지역 선택 처리
+            sheetBinding.listSubregion.setOnItemClickListener { _, view, position, _ ->
+                // 선택된 아이템의 배경색을 어두운 색으로 변경
+                view.setBackgroundColor(Color.parseColor("#F0F0F0"))
+
+                // 이전 선택된 항목의 배경을 리셋
+                val previousSelectedPosition = sheetBinding.listSubregion.getTag(R.id.selected_position) as? Int
+                if (previousSelectedPosition != null) {
+                    val previousSelectedView = sheetBinding.listSubregion.getChildAt(previousSelectedPosition)
+                    previousSelectedView?.setBackgroundColor(Color.WHITE)
+                }
+
+                // 현재 선택된 항목의 배경을 어두운 색으로 설정
+                sheetBinding.listSubregion.setTag(R.id.selected_position, position)
+                selectedSubRegion = sheetBinding.listSubregion.adapter.getItem(position) as? String
+            }
+
+
+            // 'X 창 닫기' 텍스트 클릭 시 바텀시트 닫기
             sheetBinding.tvRegionClose.setOnClickListener { dialog.dismiss() }
 
-            // ✅ '지역 선택' 버튼 클릭 시
+            // '지역 선택' 버튼 클릭 시
             sheetBinding.btnSelectRegion.setOnClickListener {
                 if (selectedRegion != null && selectedSubRegion != null) {
                     val fullRegion = "$selectedRegion $selectedSubRegion"
@@ -111,9 +134,8 @@ class VolunteerFragment : Fragment() {
                         }
                     }
 
-                    // 반드시 BottomNavigation을 유지하는 컨테이너 ID로 교체
                     requireActivity().supportFragmentManager.beginTransaction()
-                        .replace(R.id.fragment_container_view, fragment) // nav_host_container는 Fragment를 띄우는 전용 FrameLayout
+                        .replace(R.id.fragment_container_view, fragment)
                         .addToBackStack(null)
                         .commit()
 
@@ -123,7 +145,7 @@ class VolunteerFragment : Fragment() {
                 }
             }
 
-            // ✅ 다이얼로그 표시
+            // 다이얼로그 표시
             dialog.show()
         }
 
