@@ -80,7 +80,7 @@
         android:id="@+id/ic_map"
         android:layout_width="95dp"
         android:layout_height="88dp"
-        android:src="@drawable/ic_volunteer_map"
+        android:src="@drawable/ic_volunteer_map_pin"
         app:layout_constraintTop_toBottomOf="@id/ic_app_sloplo"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
