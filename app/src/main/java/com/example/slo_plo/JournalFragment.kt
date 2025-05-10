@@ -30,7 +30,7 @@ import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import java.util.Locale
-import java.util.logging.LogRecord
+import com.example.slo_plo.model.LogRecord
 
 class JournalFragment : Fragment() {
 
@@ -42,13 +42,13 @@ class JournalFragment : Fragment() {
 
     private val firestoreDateFormatter = DateTimeFormatter.ofPattern("yyyy.MM.dd")
 
-    data class LogRecord(
-        val distance: Double = 0.0,
-        val time: Int = 0,
-        val trashCount: Int = 0,
-        val title: String = "",
-        val address: String = ""
-    )
+//    data class LogRecord(
+//        val distance: Double = 0.0,
+//        val time: Int = 0,
+//        val trashCount: Int = 0,
+//        val title: String = "",
+//        val address: String = ""
+//    )
 
     // 표시할 날짜
     private val greenDates = mutableSetOf<LocalDate>()
@@ -82,13 +82,10 @@ class JournalFragment : Fragment() {
 
         db.collection("plogging_logs").document(docId).get()
             .addOnSuccessListener { doc ->
-                Log.d("Firestore", "📄 문서 내용: ${doc.data}")  // ✅
                 if (doc.exists()) {
                     val record = doc.toObject(LogRecord::class.java)
-                    Log.d("Firestore", "✅ 변환된 record: $record")
                     callback(record)
                 } else {
-                    Log.w("Firestore", "❌ 문서 없음: $docId")
                     callback(null)
                 }
             }
@@ -225,8 +222,8 @@ class JournalFragment : Fragment() {
                         if (record != null) {
                             parentBinding.logDateText.text = "${formatDateWithDayOfWeek(date)} ${record.distance}km"
                             parentBinding.logTitleText.text = record.title
-                            parentBinding.logStartPlaceText.text = "📍 ${record.address} | ${record.time}"
-                            parentBinding.logTrashText.text = "오늘의 총 쓰레기: ${record.trashCount}개"
+                            parentBinding.logStartPlaceText.text = "📍 ${record.startAddress} | ${record.time}"
+                            parentBinding.logTrashText.text = "쓰레기 개수: ${record.trashCount}개"
                         } else {
                             parentBinding.logDateText.text = "${formatDateWithDayOfWeek(date)} 기록 없음"
                             parentBinding.logTitleText.text = ""

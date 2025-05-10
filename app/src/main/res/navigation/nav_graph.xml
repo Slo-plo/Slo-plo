@@ -40,4 +40,5 @@
         android:id="@+id/logWriteFragment"
         android:name="com.example.slo_plo.LogWriteFragment"
         tools:layout="@layout/fragment_log_write" />
+
 </navigation>

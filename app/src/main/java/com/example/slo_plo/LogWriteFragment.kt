@@ -13,6 +13,7 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.example.slo_plo.databinding.FragmentLogWriteBinding
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
