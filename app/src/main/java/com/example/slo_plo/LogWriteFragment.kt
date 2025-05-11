@@ -17,6 +17,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import com.example.slo_plo.DialogUtils.showConfirmDialog
 import com.example.slo_plo.databinding.DialogDefaultBinding
 import com.example.slo_plo.databinding.FragmentLogWriteBinding
 import com.example.slo_plo.model.LogRecord
@@ -99,6 +100,8 @@ class LogWriteFragment : Fragment() {
         // 뒤로가기: 홈 화면으로 이동
         binding.btnLogCancel.setOnClickListener {
             showConfirmDialog(
+                context = requireContext(),
+                layoutInflater = layoutInflater,
                 title = "일지 작성 취소",
                 message = "일지 작성을 취소하고\n홈화면으로 돌아가겠습니까?"
             ) {
@@ -112,6 +115,8 @@ class LogWriteFragment : Fragment() {
         // 뒤로가기 버튼 클릭 이벤트를 감지하여 다이얼로그 띄우기
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
             showConfirmDialog(
+                context = requireContext(),
+                layoutInflater = layoutInflater,
                 title = "일지 작성 취소",
                 message = "일지 작성을 취소하고\n홈화면으로 돌아가겠습니까?"
             ) {
@@ -178,60 +183,61 @@ class LogWriteFragment : Fragment() {
 
         // 저장 버튼
         binding.bottomButtons.buttonSave.setOnClickListener {
-    val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return@setOnClickListener
-    val dateId = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy.MM.dd"))
-    val logsRef = FirebaseFirestore.getInstance()
-        .collection("users")
-        .document(userId)
-        .collection("plogging_logs")
-    val title = binding.etLogTitle.text.toString()
-    val content = binding.etLogContent.text.toString()
-    val trash = binding.etLogTrash.text.toString()
+            val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return@setOnClickListener
+            val dateId = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy.MM.dd"))
+            val logsRef = FirebaseFirestore.getInstance()
+                .collection("users")
+                .document(userId)
+                .collection("plogging_logs")
+            val title = binding.etLogTitle.text.toString()
+            val content = binding.etLogContent.text.toString()
+            val trash = binding.etLogTrash.text.toString()
 
-    showConfirmDialog(
-        title = "일지 저장",
-        message = "일지를 저장하시겠습니까?"
-    ) {
-        // 1. 기존 개수 세고
-        logsRef
-            .whereEqualTo("dateId", dateId)
-            .get()
-            .addOnSuccessListener { querySnapshot ->
-                val count = querySnapshot.size()
-                val newDocId = "${dateId}_${count + 1}"
+            showConfirmDialog(
+                context = requireContext(),
+                layoutInflater = layoutInflater,
+                title = "일지 저장",
+                message = "일지를 저장하시겠습니까?"
+            ) {
+                // 1. 기존 개수 세고
+                logsRef
+                    .whereEqualTo("dateId", dateId)
+                    .get()
+                    .addOnSuccessListener { querySnapshot ->
+                        val count = querySnapshot.size()
+                        val newDocId = "${dateId}_${count + 1}"
 
-                // 2. 실제 저장할 데이터 구성
-                val record = LogRecord(
-                    dateId = dateId,
-                    startAddress = startAddr,
-                    endAddress = endAddr,
-                    time = totalTime.toIntOrNull() ?: 0,
-                    distance = totalDist.toDoubleOrNull() ?: 0.0,
-                    trashCount = trash.toIntOrNull() ?: 0,
-                    title = title,
-                    body = content,
-                    imageUrls = emptyList()
-                )
+                        // 2. 실제 저장할 데이터 구성
+                        val record = LogRecord(
+                            dateId = dateId,
+                            startAddress = startAddr,
+                            endAddress = endAddr,
+                            time = totalTime.toIntOrNull() ?: 0,
+                            distance = totalDist.toDoubleOrNull() ?: 0.0,
+                            trashCount = trash.toIntOrNull() ?: 0,
+                            title = title,
+                            body = content,
+                            imageUrls = emptyList()
+                        )
 
-                // 3. 저장
-                logsRef.document(newDocId).set(record)
-                    .addOnSuccessListener {
-                        Toast.makeText(requireContext(), "저장 완료", Toast.LENGTH_SHORT).show()
-                        findNavController().previousBackStackEntry
-                            ?.savedStateHandle
-                            ?.set("needsRefresh", true)
-                        findNavController().popBackStack()
+                        // 3. 저장
+                        logsRef.document(newDocId).set(record)
+                            .addOnSuccessListener {
+                                Toast.makeText(requireContext(), "저장 완료", Toast.LENGTH_SHORT).show()
+                                findNavController().previousBackStackEntry
+                                    ?.savedStateHandle
+                                    ?.set("needsRefresh", true)
+                                findNavController().popBackStack()
+                            }
+                            .addOnFailureListener {
+                                Toast.makeText(requireContext(), "저장 실패", Toast.LENGTH_SHORT).show()
+                            }
                     }
                     .addOnFailureListener {
-                        Toast.makeText(requireContext(), "저장 실패", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(requireContext(), "기록 카운트 조회 실패", Toast.LENGTH_SHORT).show()
                     }
             }
-            .addOnFailureListener {
-                Toast.makeText(requireContext(), "기록 카운트 조회 실패", Toast.LENGTH_SHORT).show()
-            }
-    }
-}
-
+        }
 
     private fun openCamera() {
         val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
@@ -242,32 +248,6 @@ class LogWriteFragment : Fragment() {
         val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
         galleryLauncher.launch(intent)
     }
-
-    fun showConfirmDialog(
-        title: String,
-        message: String,
-        onConfirm: () -> Unit
-    ) {
-        val binding = DialogDefaultBinding.inflate(layoutInflater)
-        val alertDialog = AlertDialog.Builder(requireContext())
-            .setView(binding.root)
-            .create()
-
-        binding.tvDefaultTitle.text = title
-        binding.tvDefaultContent.text = message
-
-        binding.btnDefaultYes.setOnClickListener {
-            onConfirm()
-            alertDialog.dismiss()
-        }
-
-        binding.btnDefaultNo.setOnClickListener {
-            alertDialog.dismiss()
-        }
-
-        alertDialog.show()
-    }
-
 
     override fun onDestroyView() {
         super.onDestroyView()
