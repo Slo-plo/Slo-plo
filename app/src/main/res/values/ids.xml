@@ -1,0 +1,3 @@
+<resources>
+    <item name="selected_position" type="id"/>
+</resources>
