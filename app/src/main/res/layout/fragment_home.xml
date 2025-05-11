@@ -30,6 +30,7 @@
         app:layout_constraintTop_toBottomOf="@+id/ic_app_sloplo">
 
         <include
+            android:id="@+id/item_home_plogging"
             layout="@layout/item_home_plogging"
             app:layout_constraintTop_toBottomOf="@+id/tv_home_title" />
 
