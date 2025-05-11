@@ -18,6 +18,8 @@ class HomeFragment : Fragment() {
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
 
+    private var isToday = true  // 오늘의 플로깅이 기본값
+
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -33,6 +35,21 @@ class HomeFragment : Fragment() {
         val currentDate = LocalDateTime.now()
         val dateFormatter = DateTimeFormatter.ofPattern("yyyy년 M월 d일", Locale.KOREA)
         binding.itemHomePlogging.tvHomeDate.text = currentDate.format(dateFormatter)
+
+        // 플로깅 섹션 전환 버튼 클릭
+        binding.itemHomePlogging.btnRecordChange.setOnClickListener {
+            isToday = !isToday
+
+            if (isToday) {
+                binding.itemHomePlogging.tvHomeTitle.text = "오늘의 플로깅"
+                binding.itemHomePlogging.layoutPloggingRecordToday.root.visibility = View.VISIBLE
+                binding.itemHomePlogging.layoutPloggingRecordHistory.root.visibility = View.GONE
+            } else {
+                binding.itemHomePlogging.tvHomeTitle.text = "역대의 플로깅"
+                binding.itemHomePlogging.layoutPloggingRecordToday.root.visibility = View.GONE
+                binding.itemHomePlogging.layoutPloggingRecordHistory.root.visibility = View.VISIBLE
+            }
+        }
 
         return binding.root
     }

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:paddingHorizontal="28dp"
@@ -32,8 +33,16 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tv_home_date" />
 
+    <ImageView
+        android:id="@+id/btn_record_change"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:src="@drawable/ic_home_change"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <LinearLayout
-        android:id="@+id/layout_plogging_record_trash"
+        android:id="@+id/layout_plogging_record_plogging"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="15dp"
@@ -43,8 +52,15 @@
         app:layout_constraintTop_toBottomOf="@+id/tv_home_title">
 
         <include
+            android:id="@+id/layout_plogging_record_today"
             layout="@layout/layout_plogging_record_today"
             app:layout_constraintTop_toBottomOf="@+id/tv_home_title" />
+
+        <include
+            android:id="@+id/layout_plogging_record_history"
+            layout="@layout/layout_plogging_record_history"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@+id/tv_home_title"/>
 
     </LinearLayout>
 
