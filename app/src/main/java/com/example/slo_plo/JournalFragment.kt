@@ -94,13 +94,18 @@ class JournalFragment : Fragment() {
 
     // Firestore에서 날짜별 기록 조회
     private fun loadLogRecord(date: LocalDate, cb: (LogRecord?) -> Unit) {
+        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        val dateStr = date.format(DateTimeFormatter.ofPattern("yyyy.MM.dd"))
 
         FirebaseFirestore.getInstance()
+            .collection("users")
+            .document(userId)
             .collection("plogging_logs")
-            .document(date.format(firestoreDateFormatter))
+            .whereEqualTo("dateId", dateStr)
             .get()
-            .addOnSuccessListener { snap ->
-                cb(snap.toObject(LogRecord::class.java))
+            .addOnSuccessListener { querySnapshot ->
+                val firstRecord = querySnapshot.documents.firstOrNull()?.toObject(LogRecord::class.java)
+                cb(firstRecord)
             }
             .addOnFailureListener {
                 Toast.makeText(requireContext(), "데이터 불러오기 실패", Toast.LENGTH_SHORT).show()

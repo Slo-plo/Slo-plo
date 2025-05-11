@@ -18,6 +18,7 @@ import com.example.slo_plo.databinding.FragmentLogWriteBinding
 import com.example.slo_plo.model.LogRecord
 import com.example.slo_plo.utils.FirestoreRepository
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
@@ -155,40 +156,80 @@ class LogWriteFragment : Fragment() {
 
         // 저장 버튼
         binding.bottomButtons.buttonSave.setOnClickListener {
-            // 1) LogRecord 객체 생성
-            val currentDate = LocalDate.now()
-            val dateId = currentDate.format(DateTimeFormatter.ofPattern("yyyy.MM.dd"))
-            val record = LogRecord(
-                dateId       = dateId,
-                startAddress = startAddr,
-                endAddress   = endAddr,
-                time         = totalTime.toIntOrNull() ?: 0,
-                distance     = totalDist.toDoubleOrNull() ?: 0.0,
-                trashCount   = args.getInt("trashCount", 0),
-                title        = binding.editTitle.text.toString(),
-                body         = binding.editContent.text.toString(),
-                imageUrls    = emptyList()  // 이미지 업로드 후 URL 리스트로 대체
-            )
-            // 2) 저장
-            val userId = uid ?: return@setOnClickListener
-            FirestoreRepository.saveLogRecord(userId, record) { success ->
-                if (success) {
-                    Toast.makeText(requireContext(), "저장 완료", Toast.LENGTH_SHORT).show()
-                    // 3) JournalFragment 에 갱신 요청
-                    findNavController().previousBackStackEntry
-                        ?.savedStateHandle
-                        ?.set("needsRefresh", true)
-                    findNavController().popBackStack()
-                } else {
-                    Toast.makeText(requireContext(), "저장 실패", Toast.LENGTH_SHORT).show()
+            val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return@setOnClickListener
+            val dateId = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy.MM.dd"))
+            val logsRef = FirebaseFirestore.getInstance()
+                .collection("users")
+                .document(userId)
+                .collection("plogging_logs")
+
+            // 1. 기존 개수 세고
+            logsRef
+                .whereEqualTo("dateId", dateId)
+                .get()
+                .addOnSuccessListener { querySnapshot ->
+                    val count = querySnapshot.size()
+                    val newDocId = "${dateId}_${count + 1}"
+
+                    // 2. 실제 저장할 데이터 구성
+                    val record = LogRecord(
+                        dateId = dateId,
+                        startAddress = startAddr,
+                        endAddress = endAddr,
+                        time = totalTime.toIntOrNull() ?: 0,
+                        distance = totalDist.toDoubleOrNull() ?: 0.0,
+                        trashCount = binding.editTrashCount.text.toString().toIntOrNull() ?: 0,
+                        title = binding.editTitle.text.toString(),
+                        body = binding.editContent.text.toString(),
+                        imageUrls = emptyList()
+                    )
+
+                    // 3. 저장
+                    logsRef.document(newDocId).set(record)
+                        .addOnSuccessListener {
+                            Toast.makeText(requireContext(), "저장 완료", Toast.LENGTH_SHORT).show()
+                            findNavController().previousBackStackEntry
+                                ?.savedStateHandle
+                                ?.set("needsRefresh", true)
+                            findNavController().popBackStack()
+                        }
+                        .addOnFailureListener {
+                            Toast.makeText(requireContext(), "저장 실패", Toast.LENGTH_SHORT).show()
+                        }
                 }
-            }
-//            val title = binding.editTitle.text.toString()
-//            val content = binding.editContent.text.toString()
-//            Toast.makeText(requireContext(),
-//                "제목: $title\n내용: $content",
-//                Toast.LENGTH_SHORT
-//            ).show()
+                .addOnFailureListener {
+                    Toast.makeText(requireContext(), "기록 카운트 조회 실패", Toast.LENGTH_SHORT).show()
+                }
+
+//            // 1) LogRecord 객체 생성
+//            val currentDate = LocalDate.now()
+//            val dateId = currentDate.format(DateTimeFormatter.ofPattern("yyyy.MM.dd"))
+//            val record = LogRecord(
+//                dateId       = dateId,
+//                startAddress = startAddr,
+//                endAddress   = endAddr,
+//                time         = totalTime.toIntOrNull() ?: 0,
+//                distance     = totalDist.toDoubleOrNull() ?: 0.0,
+//                trashCount   = args.getInt("trashCount", 0),
+//                title        = binding.editTitle.text.toString(),
+//                body         = binding.editContent.text.toString(),
+//                imageUrls    = emptyList()  // 이미지 업로드 후 URL 리스트로 대체
+//            )
+//            // 2) 저장
+//            val userId = uid ?: return@setOnClickListener
+//            FirestoreRepository.saveLogRecord(userId, record) { success ->
+//                if (success) {
+//                    Toast.makeText(requireContext(), "저장 완료", Toast.LENGTH_SHORT).show()
+//                    // 3) JournalFragment 에 갱신 요청
+//                    findNavController().previousBackStackEntry
+//                        ?.savedStateHandle
+//                        ?.set("needsRefresh", true)
+//                    findNavController().popBackStack()
+//                } else {
+//                    Toast.makeText(requireContext(), "저장 실패", Toast.LENGTH_SHORT).show()
+//                }
+//            }
+
         }
     }
 
