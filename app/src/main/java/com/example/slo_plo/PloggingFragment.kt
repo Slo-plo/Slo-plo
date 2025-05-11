@@ -534,16 +534,16 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
 
     // 플로깅 종료 다이얼로그 표시
     private fun showDialogForEnd() {
-        val dialogBuilder = AlertDialog.Builder(requireContext())
-        dialogBuilder.setTitle("플로깅 종료")
-            .setMessage("플로깅을 종료하고 일지를 작성하시겠습니까?")
-            .setPositiveButton("예") { dialog, _ ->
+        DialogUtils.showConfirmDialog(
+            context = requireContext(),
+            layoutInflater = layoutInflater,
+            title = "플로깅 종료",
+            message = "플로깅을 종료하고 일지를 작성하시겠습니까?",
+            onConfirm = {
                 stopRecordTime()
                 stopLocationUpdates()
                 stopForegroundLocationService()
-                dialog.dismiss()
 
-                // 종료 지점 주소 변환
                 val currentLocation = prevLocation
                 if (currentLocation != null) {
                     getAddressFromLatLng(
@@ -558,38 +558,31 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
                             endAddress = address ?: "주소 없음"
                         }
 
-                        // 주소 받아온 후 커스텀 다이얼로그 띄우기
-                        val displayTime = binding.tvPloggingTime.text.toString().replace("시간 - ", "")
-                        val displayDist = binding.tvPloggingDistance.text.toString().replace("이동 거리 - ", "")
+                        val displayTime = binding.tvPloggingTime.text.toString()
+                            .replace("시간 - ", "")
+                        val displayDist = binding.tvPloggingDistance.text.toString()
+                            .replace("이동 거리 - ", "")
                         showPloggingSummaryDialog(startAddress, endAddress, displayTime, displayDist)
                     }
                 } else {
                     Log.w("종료 주소 오류", "종료 시 위치 정보 없음")
                     Toast.makeText(requireContext(), "위치 정보를 확인할 수 없습니다.", Toast.LENGTH_SHORT).show()
                 }
-                dialog.dismiss()
             }
-            .setNegativeButton("아니오") { dialog, _ ->
-                dialog.dismiss()
-            }
-        val alertDialog = dialogBuilder.create()
-        alertDialog.show()
+        )
     }
 
     // 플로깅 취소 다이얼로그 표시
     private fun showDialogForCancel() {
-        val dialogBuilder = AlertDialog.Builder(requireContext())
-        dialogBuilder.setTitle("플로깅 취소")
-            .setMessage("플로깅을 취소하고 홈화면으로 돌아가시겠습니까?")
-            .setPositiveButton("예") { dialog, _ ->
-                dialog.dismiss()  // 다이얼로그 먼저 닫기
+        DialogUtils.showConfirmDialog(
+            context = requireContext(),
+            layoutInflater = layoutInflater,
+            title = "플로깅 취소",
+            message = "플로깅을 취소하고 홈화면으로 돌아가시겠습니까?",
+            onConfirm = {
                 finishFragment()
             }
-            .setNegativeButton("아니오") { dialog, _ ->
-                dialog.dismiss()  // 다이얼로그 닫기
-            }
-        val alertDialog = dialogBuilder.create()
-        alertDialog.show()
+        )
     }
 
     // 플로깅 기록 다이얼로그 표시

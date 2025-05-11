@@ -17,6 +17,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import com.example.slo_plo.DialogUtils.showConfirmDialog
 import com.example.slo_plo.databinding.DialogDefaultBinding
 import com.example.slo_plo.databinding.FragmentLogWriteBinding
 import java.time.LocalDate
@@ -91,6 +92,8 @@ class LogWriteFragment : Fragment() {
         // 뒤로가기: 홈 화면으로 이동
         binding.btnLogCancel.setOnClickListener {
             showConfirmDialog(
+                context = requireContext(),
+                layoutInflater = layoutInflater,
                 title = "일지 작성 취소",
                 message = "일지 작성을 취소하고\n홈화면으로 돌아가겠습니까?"
             ) {
@@ -104,6 +107,8 @@ class LogWriteFragment : Fragment() {
         // 뒤로가기 버튼 클릭 이벤트를 감지하여 다이얼로그 띄우기
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
             showConfirmDialog(
+                context = requireContext(),
+                layoutInflater = layoutInflater,
                 title = "일지 작성 취소",
                 message = "일지 작성을 취소하고\n홈화면으로 돌아가겠습니까?"
             ) {
@@ -157,6 +162,8 @@ class LogWriteFragment : Fragment() {
             val trash = binding.etLogTrash.text.toString()
 
             showConfirmDialog(
+                context = requireContext(),
+                layoutInflater = layoutInflater,
                 title = "일지 저장",
                 message = "일지를 저장하시겠습니까?"
             ) {
@@ -180,32 +187,6 @@ class LogWriteFragment : Fragment() {
         val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
         galleryLauncher.launch(intent)
     }
-
-    fun showConfirmDialog(
-        title: String,
-        message: String,
-        onConfirm: () -> Unit
-    ) {
-        val binding = DialogDefaultBinding.inflate(layoutInflater)
-        val alertDialog = AlertDialog.Builder(requireContext())
-            .setView(binding.root)
-            .create()
-
-        binding.tvDefaultTitle.text = title
-        binding.tvDefaultContent.text = message
-
-        binding.btnDefaultYes.setOnClickListener {
-            onConfirm()
-            alertDialog.dismiss()
-        }
-
-        binding.btnDefaultNo.setOnClickListener {
-            alertDialog.dismiss()
-        }
-
-        alertDialog.show()
-    }
-
 
     override fun onDestroyView() {
         super.onDestroyView()
