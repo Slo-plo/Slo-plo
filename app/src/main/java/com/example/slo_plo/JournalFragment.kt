@@ -50,19 +50,13 @@ class JournalFragment : Fragment() {
     private lateinit var auth: FirebaseAuth
     private var uid: String? = null
 
+    private var currentLogRecords: List<LogRecord> = emptyList()
 
-//    data class LogRecord(
-//        val distance: Double = 0.0,
-//        val time: Int = 0,
-//        val trashCount: Int = 0,
-//        val title: String = "",
-//        val address: String = ""
-//    )
 
     // 표시할 날짜
     private val greenDates = mutableSetOf<LocalDate>()
 
-    // 수정: 인자 제거, 루트 plogging_logs 읽기
+    // 날짜별로 저장된 일지 데이터에서 dateId 추출 → greenDates에 추가 → 아이콘 표시
     private fun loadDatesForCalendarIcons() {
         val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
         FirebaseFirestore.getInstance()
@@ -83,7 +77,7 @@ class JournalFragment : Fragment() {
                 binding.calendarView.notifyCalendarChanged()
             }
     }
-    // 날짜 형식
+    // 날짜 형식(yyyy.mm.dd (요일))
     private fun formatDateWithDayOfWeek(date: LocalDate): String {
         val formattedDate = date.format(java.time.format.DateTimeFormatter.ofPattern("yyyy.MM.dd"))
         val dayOfWeek = date.dayOfWeek.getDisplayName(java.time.format.TextStyle.SHORT, Locale.KOREAN)
@@ -119,8 +113,6 @@ class JournalFragment : Fragment() {
     ): View? {
         _binding = FragmentJournalBinding.inflate(inflater, container, false)
         return binding.root
-        // Inflate the layout for this fragment
-//        return inflater.inflate(R.layout.fragment_journal, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -146,7 +138,7 @@ class JournalFragment : Fragment() {
                 }
         }
 
-        // savedStateHandle 옵저빙
+        // 일지 작성 후 돌아왔을 때 갱신 트리거
         findNavController().currentBackStackEntry
             ?.savedStateHandle
             ?.getLiveData<Boolean>("needsRefresh")
@@ -162,12 +154,6 @@ class JournalFragment : Fragment() {
         // 뒤로가기 버튼 클릭 시 이전 화면으로 이동
         binding.btnBack.setOnClickListener {
             requireActivity().onBackPressedDispatcher.onBackPressed()
-        }
-
-        // 상세 보기 버튼 연결
-        binding.buttonDetail.setOnClickListener {
-            // 실제 이동은 나중에 구현
-            Toast.makeText(requireContext(), "상세보기 화면 연결 예정입니다.", Toast.LENGTH_SHORT).show()
         }
 
         // 날짜 셀 그리기 정의
@@ -212,18 +198,16 @@ class JournalFragment : Fragment() {
             }
         }
 
-        // 요약 뷰 초기 메시지
+        // 요약 뷰 초기 메시지 + ViewPager 숨김
         binding.logDateText.text = "기록을 확인할 날짜를 선택해 주세요"
-        binding.logTitleText.text = ""
-        binding.logStartPlaceText.text = ""
-        binding.logTrashText.text = ""
+        binding.logViewPager.visibility = View.GONE  // ← ViewPager 초기 비노출
 
+        //날짜 아이콘 표시용 초기 불러오기
         loadDatesForCalendarIcons()
-
 
     }
 
-    // 헤더 바인딩용 ViewContainer
+    // 요일 헤더 ViewHolder
     inner class MonthViewContainer(view: View) : ViewContainer(view) {
         val titlesContainer: LinearLayout = view.findViewById(R.id.dayOfWeekRow)
         val monthTitle: TextView = view.findViewById(R.id.textMonthTitle)
@@ -234,12 +218,13 @@ class JournalFragment : Fragment() {
         _binding = null
     }
 
+    // 다시 화면 돌아왔을 때 날짜 리프레시
     override fun onResume() {
         super.onResume()
         uid?.let { loadDatesForCalendarIcons() }
     }
 
-
+    // 날짜 셀의 ViewHolder
     inner class DayViewContainer(view: View) : ViewContainer(view) {
         private val itemBinding = DayViewBinding.bind(view)                 // 날짜 셀(binding)
         private val parentBinding get() = this@JournalFragment.binding      // 프래그먼트 전체(binding)
@@ -266,7 +251,7 @@ class JournalFragment : Fragment() {
                     }
                 }
 
-                // 날짜 클릭 시 이벤트 설정
+                // 날짜 클릭 시 기록 불러오기 + ViewPager 연결
                 view.setOnClickListener {
                     // 선택 날짜 변경
                     if (selectedDate != date) {
@@ -276,19 +261,27 @@ class JournalFragment : Fragment() {
                         oldDate?.let { binding.calendarView.notifyDateChanged(it) }
                     }
 
-                    // 요약 데이터 불러오기
                     uid?.let { user ->
                         FirestoreRepository.loadLogRecordsForDate(user, date) { records ->
                             if (records.isEmpty()) {
-                                parentBinding.logDateText.text = "${formatDateWithDayOfWeek(date)} 기록 없음"
-                                parentBinding.logTitleText.text = ""
-                                parentBinding.logStartPlaceText.text = ""
-                                parentBinding.logTrashText.text = ""
+                                binding.logDateText.text = "기록 없음"
+                                binding.logViewPager.visibility = View.GONE
                             } else {
-                                parentBinding.logDateText.text =
-                                    "${formatDateWithDayOfWeek(date)} (${records.size}개 기록)"
-                                parentBinding.logTitleText.text = records[0].title
-                                // 필요에 따라 records 리스트를 더 사용하시면 됩니다.
+                                binding.logDateText.text = "${records.size}개의 기록이 있습니다"
+                                binding.logViewPager.adapter = LogSummaryPagerAdapter(records) { selectedRecord ->
+                                    val bundle = Bundle().apply {
+                                        putSerializable("logRecord", selectedRecord)
+                                    }
+                                    findNavController().navigate(R.id.logDetailFragment, bundle)
+                                }
+                                binding.logViewPager.visibility = View.VISIBLE
+                                binding.logViewPager.adapter = LogSummaryPagerAdapter(records) { selectedRecord ->
+                                    val bundle = Bundle().apply {
+                                        putSerializable("logRecord", selectedRecord)
+                                    }
+                                    findNavController().navigate(R.id.logDetailFragment, bundle)
+                                }
+                                binding.logViewPager.visibility = View.VISIBLE
                             }
                         }
                     }
@@ -302,6 +295,7 @@ class JournalFragment : Fragment() {
                     itemBinding.dayIcon.visibility = View.INVISIBLE
                 }
             } else {
+                // 이번 달 외 날짜
                 itemBinding.dayText.text = ""
                 itemBinding.dayIcon.visibility = View.INVISIBLE
                 itemBinding.dayText.background = null
@@ -310,29 +304,3 @@ class JournalFragment : Fragment() {
         }
     }
 }
-
-//// 이 부분은 JournalFragment 클래스 밖에 위치해야 합니다
-//class LogRecordAdapter(private val logs: List<LogRecord>) : RecyclerView.Adapter<LogRecordAdapter.LogRecordViewHolder>() {
-//
-//    // ViewHolder 생성
-//    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LogRecordViewHolder {
-//        val binding = ListItemLogBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-//        return LogRecordViewHolder(binding)
-//    }
-//
-//    // 데이터를 ViewHolder에 바인딩
-//    override fun onBindViewHolder(holder: LogRecordViewHolder, position: Int) {
-//        val log = logs[position]
-//        holder.binding.apply {
-//            logTitle.text = log.title
-//            logDate.text = log.dateId
-//            logDistance.text = "${log.distance} km"
-//        }
-//    }
-//
-//    // RecyclerView의 항목 개수 반환
-//    override fun getItemCount(): Int = logs.size
-//
-//    // ViewHolder 클래스
-//    class LogRecordViewHolder(val binding: ListItemLogBinding) : RecyclerView.ViewHolder(binding.root)
-//}

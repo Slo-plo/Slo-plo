@@ -201,35 +201,6 @@ class LogWriteFragment : Fragment() {
                     Toast.makeText(requireContext(), "기록 카운트 조회 실패", Toast.LENGTH_SHORT).show()
                 }
 
-//            // 1) LogRecord 객체 생성
-//            val currentDate = LocalDate.now()
-//            val dateId = currentDate.format(DateTimeFormatter.ofPattern("yyyy.MM.dd"))
-//            val record = LogRecord(
-//                dateId       = dateId,
-//                startAddress = startAddr,
-//                endAddress   = endAddr,
-//                time         = totalTime.toIntOrNull() ?: 0,
-//                distance     = totalDist.toDoubleOrNull() ?: 0.0,
-//                trashCount   = args.getInt("trashCount", 0),
-//                title        = binding.editTitle.text.toString(),
-//                body         = binding.editContent.text.toString(),
-//                imageUrls    = emptyList()  // 이미지 업로드 후 URL 리스트로 대체
-//            )
-//            // 2) 저장
-//            val userId = uid ?: return@setOnClickListener
-//            FirestoreRepository.saveLogRecord(userId, record) { success ->
-//                if (success) {
-//                    Toast.makeText(requireContext(), "저장 완료", Toast.LENGTH_SHORT).show()
-//                    // 3) JournalFragment 에 갱신 요청
-//                    findNavController().previousBackStackEntry
-//                        ?.savedStateHandle
-//                        ?.set("needsRefresh", true)
-//                    findNavController().popBackStack()
-//                } else {
-//                    Toast.makeText(requireContext(), "저장 실패", Toast.LENGTH_SHORT).show()
-//                }
-//            }
-
         }
     }
 

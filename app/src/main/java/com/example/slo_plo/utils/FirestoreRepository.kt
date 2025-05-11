@@ -9,7 +9,7 @@ object FirestoreRepository {
     private val db = FirebaseFirestore.getInstance()
     private const val COLLECTION = "plogging_logs"
 
-    /** 날짜별 일지 불러오기 */
+    //날짜별 일지 불러오기
     fun loadLogRecord(date: LocalDate, callback: (LogRecord?) -> Unit) {
         val docId = DateUtils.toDocId(date)
         db.collection(COLLECTION)
@@ -23,7 +23,7 @@ object FirestoreRepository {
             }
     }
 
-    /** 일지 저장 */
+    //일지 저장
     fun saveLogRecord(
         userId: String,
         record: LogRecord,
@@ -51,6 +51,7 @@ object FirestoreRepository {
             .addOnSuccessListener { snap ->
                 val list = snap.documents
                     .mapNotNull { it.toObject(LogRecord::class.java) }
+                    .sortedByDescending { it.dateId }
                 callback(list)
             }
             .addOnFailureListener {

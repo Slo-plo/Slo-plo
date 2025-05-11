@@ -41,4 +41,15 @@
         android:name="com.example.slo_plo.LogWriteFragment"
         tools:layout="@layout/fragment_log_write" />
 
+    <fragment
+        android:id="@+id/logDetailFragment"
+        android:name="com.example.slo_plo.LogDetailFragment"
+        android:label="일지 상세보기"
+        tools:layout="@layout/fragment_log_detail">
+        <argument
+            android:name="logRecord"
+            app:argType="com.example.slo_plo.model.LogRecord" />
+    </fragment>
+
+
 </navigation>
