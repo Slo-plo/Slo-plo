@@ -33,6 +33,7 @@ import java.util.Locale
 import com.example.slo_plo.model.LogRecord
 import androidx.core.os.bundleOf
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.RecyclerView
 import com.example.slo_plo.utils.FirestoreRepository
 import com.google.firebase.auth.FirebaseAuth
 
@@ -63,15 +64,22 @@ class JournalFragment : Fragment() {
 
     // 수정: 인자 제거, 루트 plogging_logs 읽기
     private fun loadDatesForCalendarIcons() {
+        val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
         FirebaseFirestore.getInstance()
+            .collection("users")
+            .document(uid)
             .collection("plogging_logs")
             .get()
-            .addOnSuccessListener { result ->
+            .addOnSuccessListener { snaps ->
                 greenDates.clear()
-                result.forEach { doc ->
-                    LocalDate.parse(doc.id, firestoreDateFormatter)
-                        .let { greenDates.add(it) }
+                snaps.documents.forEach { doc ->
+                    val dateStr = doc.getString("dateId")  // 저장된 필드에서 dateId 읽기
+                    val date = runCatching {
+                        LocalDate.parse(dateStr, firestoreDateFormatter)
+                    }.getOrNull()
+                    date?.let { greenDates.add(it) }
                 }
+                Log.d("JournalFragment", "Loaded dates: $greenDates")
                 binding.calendarView.notifyCalendarChanged()
             }
     }
@@ -83,8 +91,10 @@ class JournalFragment : Fragment() {
     }
 
 
+
     // Firestore에서 날짜별 기록 조회
     private fun loadLogRecord(date: LocalDate, cb: (LogRecord?) -> Unit) {
+
         FirebaseFirestore.getInstance()
             .collection("plogging_logs")
             .document(date.format(firestoreDateFormatter))
@@ -203,6 +213,9 @@ class JournalFragment : Fragment() {
         binding.logStartPlaceText.text = ""
         binding.logTrashText.text = ""
 
+        loadDatesForCalendarIcons()
+
+
     }
 
     // 헤더 바인딩용 ViewContainer
@@ -277,11 +290,12 @@ class JournalFragment : Fragment() {
                 }
 
                 // 아이콘 표시 여부
-                itemBinding.dayIcon.visibility = View.VISIBLE
-                itemBinding.dayIcon.setImageResource(
-                    if (date in greenDates) R.drawable.ic_unit_24 else 0
-                )
-
+                if (date in greenDates) {
+                    itemBinding.dayIcon.visibility = View.VISIBLE
+                    itemBinding.dayIcon.setImageResource(R.drawable.ic_unit_24)
+                } else {
+                    itemBinding.dayIcon.visibility = View.INVISIBLE
+                }
             } else {
                 itemBinding.dayText.text = ""
                 itemBinding.dayIcon.visibility = View.INVISIBLE
@@ -291,3 +305,29 @@ class JournalFragment : Fragment() {
         }
     }
 }
+
+//// 이 부분은 JournalFragment 클래스 밖에 위치해야 합니다
+//class LogRecordAdapter(private val logs: List<LogRecord>) : RecyclerView.Adapter<LogRecordAdapter.LogRecordViewHolder>() {
+//
+//    // ViewHolder 생성
+//    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LogRecordViewHolder {
+//        val binding = ListItemLogBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+//        return LogRecordViewHolder(binding)
+//    }
+//
+//    // 데이터를 ViewHolder에 바인딩
+//    override fun onBindViewHolder(holder: LogRecordViewHolder, position: Int) {
+//        val log = logs[position]
+//        holder.binding.apply {
+//            logTitle.text = log.title
+//            logDate.text = log.dateId
+//            logDistance.text = "${log.distance} km"
+//        }
+//    }
+//
+//    // RecyclerView의 항목 개수 반환
+//    override fun getItemCount(): Int = logs.size
+//
+//    // ViewHolder 클래스
+//    class LogRecordViewHolder(val binding: ListItemLogBinding) : RecyclerView.ViewHolder(binding.root)
+//}
