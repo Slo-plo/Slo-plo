@@ -1,0 +1,73 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- 닫기 버튼 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="start">
+
+            <TextView
+                android:id="@+id/tv_region_close"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:clickable="true"
+                android:focusable="true"
+                android:padding="8dp"
+                android:text="X 창 닫기"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:fontFamily="@font/noto_sans_kr_semi_bold"
+                android:includeFontPadding="false"/>
+        </LinearLayout>
+
+        <!-- 리스트 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+
+            <ListView
+                android:id="@+id/list_region"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:background="#F0F0F0"
+                android:fontFamily="@font/noto_sans_kr_semi_bold"
+                android:includeFontPadding="false"/>
+
+            <ListView
+                android:id="@+id/list_subregion"
+                android:layout_width="0dp"
+                android:layout_weight="2"
+                android:layout_height="match_parent"
+                android:fontFamily="@font/noto_sans_kr_semi_bold"
+                android:includeFontPadding="false"/>
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- 버튼: 마진 없이 완전 꽉차게 -->
+    <android.widget.Button
+        android:id="@+id/btn_select_region"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="지역 선택"
+        android:background="#808080"
+        android:textColor="#FFFFFF"
+        android:fontFamily="@font/noto_sans_kr_semi_bold"
+        android:includeFontPadding="false"/>
+
+</LinearLayout>

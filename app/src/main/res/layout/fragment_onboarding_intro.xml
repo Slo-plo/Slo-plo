@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/main_color"
+    tools:context=".OnboardingIntroFragment">
+
+    <!-- 앱 아이콘 -->
+    <ImageView
+        android:id="@+id/ic_app_sloplo"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:src="@drawable/ic_app_default"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- 건너뛰기 버튼 -->
+    <FrameLayout
+        android:id="@+id/bg_intro_content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_square_white_grey_15"
+        android:layout_marginHorizontal="25dp"
+        android:layout_marginTop="25dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ic_app_sloplo">
+
+        <TextView
+            android:id="@+id/tv_intro_content"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_gravity="center"
+            android:text="우리는 매년 800만 톤의 플라스틱을\n바다에 버리고 있습니다.\n\n그 중 상당수는 길거리에\n무심코 버려진 쓰레기에서 시작돼요."
+            android:textSize="14sp"
+            android:fontFamily="@font/noto_sans_kr_medium"
+            android:includeFontPadding="false"
+            android:paddingVertical="40dp"/>
+    </FrameLayout>
+
+    <ImageView
+        android:id="@+id/iv_intro_content"
+        android:layout_width="300dp"
+        android:layout_height="280dp"
+        android:src="@drawable/bg_square_white_grey_15"
+        android:layout_marginTop="30dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/bg_intro_content" />
+
+    <!-- 버튼 영역 -->
+    <LinearLayout
+        android:id="@+id/layout_intro_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="30dp"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <!-- 건너뛰기 버튼 -->
+        <FrameLayout
+            android:id="@+id/btn_intro_skip"
+            android:layout_width="120dp"
+            android:layout_height="50dp"
+            android:layout_marginStart="25dp"
+            android:background="@drawable/bg_square_support_color_10">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:fontFamily="@font/noto_sans_kr_regular"
+                android:includeFontPadding="false"
+                android:text="건너뛰기"
+                android:textColor="@color/white"
+                android:textSize="16sp" />
+        </FrameLayout>
+
+        <!-- 계속하기 버튼 -->
+        <FrameLayout
+            android:id="@+id/btn_intro_continue"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="25dp"
+            android:layout_weight="1"
+            android:background="@drawable/bg_square_white_grey_10">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:fontFamily="@font/noto_sans_kr_bold"
+                android:includeFontPadding="false"
+                android:text="계속하기"
+                android:textSize="16sp" />
+        </FrameLayout>
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
