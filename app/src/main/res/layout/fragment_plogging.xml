@@ -23,42 +23,53 @@
         app:layout_constraintTop_toTopOf="parent"
         android:layout_margin="20dp"/>
 
-    <ImageView
-        android:id="@+id/iv_plogging_record"
+    <!-- 시간 & 거리 정보 박스 -->
+    <LinearLayout
+        android:id="@+id/layout_log_time_distance"
         android:layout_width="match_parent"
-        android:layout_height="80dp"
-        android:src="@drawable/bg_square_white_grey_10"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_square_white_grey_10"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:paddingVertical="25dp"
+        android:layout_marginTop="20dp"
         android:layout_marginHorizontal="15dp"
-        app:layout_constraintBottom_toBottomOf="@+id/tv_plogging_distance"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/tv_plogging_time" />
+        app:layout_constraintTop_toBottomOf="@id/btn_plogging_cancel">
 
-    <!-- 시간 텍스트 -->
-    <TextView
-        android:id="@+id/tv_plogging_time"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:fontFamily="@font/noto_sans_kr_medium"
-        android:includeFontPadding="false"
-        android:text="시간 - 00:00"
-        android:textSize="16sp"
-        android:layout_marginTop="40dp"
-        app:layout_constraintEnd_toEndOf="@+id/iv_plogging_record"
-        app:layout_constraintStart_toStartOf="@+id/iv_plogging_record"
-        app:layout_constraintTop_toBottomOf="@id/btn_plogging_cancel" />
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="1dp"
+            android:src="@drawable/ic_time" />
 
-    <!-- 이동거리 텍스트 -->
-    <TextView
-        android:id="@+id/tv_plogging_distance"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:fontFamily="@font/noto_sans_kr_medium"
-        android:includeFontPadding="false"
-        android:text="이동 거리 - 0m"
-        android:textSize="16sp"
-        app:layout_constraintEnd_toEndOf="@+id/iv_plogging_record"
-        app:layout_constraintStart_toStartOf="@+id/iv_plogging_record"
-        app:layout_constraintTop_toBottomOf="@id/tv_plogging_time" />
+        <TextView
+            android:id="@+id/tv_plogging_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
+            android:text="시간 - 00:00"
+            android:textSize="14sp" />
+
+        <Space
+            android:layout_width="20dp"
+            android:layout_height="wrap_content" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_distance" />
+
+        <TextView
+            android:id="@+id/tv_plogging_distance"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
+            android:layout_marginEnd="16dp"
+            android:text="이동거리 - 0m"
+            android:textSize="14sp" />
+    </LinearLayout>
 
     <!-- 플로깅 종료하기 버튼 -->
     <FrameLayout
