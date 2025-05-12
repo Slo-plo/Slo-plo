@@ -78,7 +78,12 @@ class HomeFragment : Fragment() {
         } else {
             val hours = minutes.toDouble() / 60.0
             val rounded = String.format(Locale.US, "%.1f", hours).toDouble()
-            val text = if (rounded % 1.0 == 0.0) rounded.toInt().toString() else rounded.toString()
+            val text = if (rounded % 1.0 == 0.0) {
+                // 1.0시간이라도 반드시 1시간으로 표시
+                rounded.toInt().toString()
+            } else {
+                rounded.toString()
+            }
             text to "시간"
         }
     }
@@ -87,10 +92,11 @@ class HomeFragment : Fragment() {
     private fun formatTimeForHistory(minutes: Int): String {
         val hours = minutes / 60
         val remainingMinutes = minutes % 60
-        return if (hours == 0) {
-            "총 시간: ${remainingMinutes}분"
-        } else {
-            "총 시간: ${hours}시간 ${remainingMinutes}분"
+
+        return when {
+            hours == 0 -> "총 시간: ${remainingMinutes}분"
+            remainingMinutes == 0 -> "총 시간: ${hours}시간 0분"  // 0분도 표시
+            else -> "총 시간: ${hours}시간 ${remainingMinutes}분"
         }
     }
 
