@@ -38,7 +38,7 @@
         android:layout_height="wrap_content"
         android:fontFamily="@font/noto_sans_kr_medium"
         android:includeFontPadding="false"
-        android:text="수거한 쓰레기"
+        android:text="수집한 쓰레기"
         android:textSize="14sp"
         app:layout_constraintEnd_toEndOf="@+id/layout_plogging_record_trash"
         app:layout_constraintStart_toStartOf="@+id/layout_plogging_record_trash"
