@@ -1,6 +1,7 @@
 package com.example.slo_plo
 
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
@@ -13,7 +14,6 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.fragment.navArgs
 import com.example.slo_plo.databinding.FragmentLogWriteBinding
 import com.example.slo_plo.model.LogRecord
 import com.example.slo_plo.utils.FirestoreRepository
@@ -97,23 +97,43 @@ class LogWriteFragment : Fragment() {
             findNavController().popBackStack()
         }
 
-        // 저장 버튼 클릭 리스너 안에서 uid 사용
-        binding.bottomButtons.buttonSave.setOnClickListener {
-            val userId = uid ?: run {
-                Toast.makeText(requireContext(),
-                    "사용자 정보가 없습니다.", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-            // LogRecord 생성
-            val record = LogRecord(
-                /* ... */
-            )
-            // userId 와 record 순서로 넘겨야 함
-            FirestoreRepository.saveLogRecord(userId, record) { success ->
-                if (success) { /* 저장 완료 */ }
-                else { /* 저장 실패 */ }
-            }
-        }
+//        // 저장 버튼 클릭 리스너 안에서 uid 사용
+//        binding.bottomButtons.btnSave.setOnClickListener {
+//            val userId = uid ?: run {
+//                Toast.makeText(
+//                    requireContext(),
+//                    "사용자 정보가 없습니다.", Toast.LENGTH_SHORT
+//                ).show()
+//                return@setOnClickListener
+//            }
+//            // LogRecord 생성
+//            val record = LogRecord(
+//                /* ... */
+//            )
+//            // userId 와 record 순서로 넘겨야 함
+//            FirestoreRepository.saveLogRecord(userId, record) { success ->
+//                if (success) { /* 저장 완료 */
+//                } else { /* 저장 실패 */
+//                }
+//            }
+//        }
+//        binding.btnBottom.btnLogSave.setOnClickListener {
+//            val title = binding.etLogTitle.text.toString()
+//            val content = binding.etLogContent.text.toString()
+//            val trash = binding.etLogTrash.text.toString()
+//
+//            showConfirmDialog(
+//                title = "일지 저장",
+//                message = "일지를 저장하시겠습니까?"
+//            ) {
+//                Toast.makeText(
+//                    requireContext(),
+//                    "제목: $title\n내용: $content\n쓰레기 개수: $trash",
+//                    Toast.LENGTH_SHORT
+//                ).show()
+//
+//                // Todo : DB에 저장 후 화면 전환
+//            }
 
         // 플로깅 기록 불러오기
         val args = requireArguments()
@@ -154,57 +174,64 @@ class LogWriteFragment : Fragment() {
         }
 
 
-        // 저장 버튼
-        binding.bottomButtons.buttonSave.setOnClickListener {
+        binding.bottomButtons.btnSave.setOnClickListener {
             val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return@setOnClickListener
             val dateId = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy.MM.dd"))
             val logsRef = FirebaseFirestore.getInstance()
                 .collection("users")
                 .document(userId)
                 .collection("plogging_logs")
+            val title = binding.etLogTitle.text.toString()
+            val content = binding.etLogContent.text.toString()
+            val trash = binding.etLogTrash.text.toString()
 
-            // 1. 기존 개수 세고
-            logsRef
-                .whereEqualTo("dateId", dateId)
-                .get()
-                .addOnSuccessListener { querySnapshot ->
-                    val count = querySnapshot.size()
-                    val newDocId = "${dateId}_${count + 1}"
+            showConfirmDialog(
+                title = "일지 저장",
+                message = "일지를 저장하시겠습니까?"
+            ) {
+                // 1. 기존 개수 세고
+                logsRef
+                    .whereEqualTo("dateId", dateId)
+                    .get()
+                    .addOnSuccessListener { querySnapshot ->
+                        val count = querySnapshot.size()
+                        val newDocId = "${dateId}_${count + 1}"
 
-                    // 2. 실제 저장할 데이터 구성
-                    val record = LogRecord(
-                        dateId = dateId,
-                        startAddress = startAddr,
-                        endAddress = endAddr,
-                        time = totalTime.toIntOrNull() ?: 0,
-                        distance = totalDist.toDoubleOrNull() ?: 0.0,
-                        trashCount = binding.editTrashCount.text.toString().toIntOrNull() ?: 0,
-                        title = binding.editTitle.text.toString(),
-                        body = binding.editContent.text.toString(),
-                        imageUrls = emptyList()
-                    )
+                        // 2. 실제 저장할 데이터 구성
+                        val record = LogRecord(
+                            dateId = dateId,
+                            startAddress = startAddr,
+                            endAddress = endAddr,
+                            time = totalTime.toIntOrNull() ?: 0,
+                            distance = totalDist.toDoubleOrNull() ?: 0.0,
+                            trashCount = trash.toIntOrNull() ?: 0,
+                            title = title,
+                            body = content,
+                            imageUrls = emptyList()
+                        )
 
-                    // 3. 저장
-                    logsRef.document(newDocId).set(record)
-                        .addOnSuccessListener {
-                            Toast.makeText(requireContext(), "저장 완료", Toast.LENGTH_SHORT).show()
-                            findNavController().previousBackStackEntry
-                                ?.savedStateHandle
-                                ?.set("needsRefresh", true)
-                            findNavController().popBackStack()
-                        }
-                        .addOnFailureListener {
-                            Toast.makeText(requireContext(), "저장 실패", Toast.LENGTH_SHORT).show()
-                        }
-                }
-                .addOnFailureListener {
-                    Toast.makeText(requireContext(), "기록 카운트 조회 실패", Toast.LENGTH_SHORT).show()
-                }
-
+                        // 3. 저장
+                        logsRef.document(newDocId).set(record)
+                            .addOnSuccessListener {
+                                Toast.makeText(requireContext(), "저장 완료", Toast.LENGTH_SHORT).show()
+                                findNavController().previousBackStackEntry
+                                    ?.savedStateHandle
+                                    ?.set("needsRefresh", true)
+                                findNavController().popBackStack()
+                            }
+                            .addOnFailureListener {
+                                Toast.makeText(requireContext(), "저장 실패", Toast.LENGTH_SHORT).show()
+                            }
+                    }
+                    .addOnFailureListener {
+                        Toast.makeText(requireContext(), "기록 카운트 조회 실패", Toast.LENGTH_SHORT).show()
+                    }
+            }
         }
+
     }
 
-    private fun openCamera() {
+        private fun openCamera() {
         val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
         cameraLauncher.launch(intent)
     }
@@ -212,6 +239,31 @@ class LogWriteFragment : Fragment() {
     private fun openGallery() {
         val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
         galleryLauncher.launch(intent)
+    }
+
+    fun showConfirmDialog(
+        title: String,
+        message: String,
+        onConfirm: () -> Unit
+    ) {
+        val binding = DialogDefaultBinding.inflate(layoutInflater)
+        val alertDialog = AlertDialog.Builder(requireContext())
+            .setView(binding.root)
+            .create()
+
+        binding.tvDefaultTitle.text = title
+        binding.tvDefaultContent.text = message
+
+        binding.btnDefaultYes.setOnClickListener {
+            onConfirm()
+            alertDialog.dismiss()
+        }
+
+        binding.btnDefaultNo.setOnClickListener {
+            alertDialog.dismiss()
+        }
+
+        alertDialog.show()
     }
 
     override fun onDestroyView() {

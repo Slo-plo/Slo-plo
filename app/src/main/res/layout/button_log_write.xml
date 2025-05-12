@@ -34,7 +34,7 @@
 
     <!-- 저장 -->
     <Button
-        android:id="@+id/button_save"
+        android:id="@+id/btnSave"
         android:layout_width="0dp"
         android:layout_height="48dp"
         android:layout_weight="1"

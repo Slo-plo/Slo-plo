@@ -32,7 +32,7 @@
 
             <!-- 제목 입력 -->
             <EditText
-                android:id="@+id/edit_title"
+                android:id="@+id/etLogTitle"
                 android:hint="제목을 입력하세요"
                 android:textSize="20sp"
                 android:textStyle="bold"
@@ -108,7 +108,7 @@
                     android:textSize="14sp"/>
 
                 <EditText
-                    android:id="@+id/edit_trash_count"
+                    android:id="@+id/etLogTrash"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
@@ -132,7 +132,7 @@
 
             <!-- 본문 입력 -->
             <EditText
-                android:id="@+id/edit_content"
+                android:id="@+id/etLogContent"
                 android:layout_marginTop="16dp"
                 android:hint="플로깅을 기록해보세요"
                 android:layout_width="match_parent"
