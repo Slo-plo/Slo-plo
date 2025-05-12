@@ -165,6 +165,7 @@ class LogWriteFragment : Fragment() {
 
         // 저장 버튼
         binding.btnBottom.btnLogSave.setOnClickListener {
+            val currentDateTime = LocalDateTime.now()
             val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return@setOnClickListener
             val dateId = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy.MM.dd"))
             val logsRef = FirebaseFirestore.getInstance()
@@ -174,6 +175,9 @@ class LogWriteFragment : Fragment() {
             val title = binding.etLogTitle.text.toString()
             val content = binding.etLogContent.text.toString()
             val trash = binding.etLogTrash.text.toString()
+            val writeDateTime = currentDateTime.format(
+                DateTimeFormatter.ofPattern("yyyy년 M월 d일 E요일 HH시 mm분", Locale.KOREA)
+            )
 
             showConfirmDialog(
                 context = requireContext(),
@@ -199,7 +203,9 @@ class LogWriteFragment : Fragment() {
                             trashCount = trash.toIntOrNull() ?: 0,
                             title = title,
                             body = content,
-                            imageUrls = emptyList()
+                            imageUrls = emptyList(),
+                            writeDateTime = writeDateTime,
+                            docId = newDocId
                         )
 
                         // 3. 저장

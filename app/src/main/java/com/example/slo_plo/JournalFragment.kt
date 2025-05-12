@@ -277,6 +277,7 @@ class JournalFragment : Fragment() {
                                     findNavController().navigate(R.id.logDetailFragment, bundle)
                                 }
 
+
                                 // ViewPager 연결
                                 binding.logViewPager.adapter = adapter
                                 binding.logViewPager.visibility = View.VISIBLE
