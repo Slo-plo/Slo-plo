@@ -7,6 +7,7 @@ plugins {
 //    id("com.android.application")
     id("com.android.application")
     alias(libs.plugins.kotlin.android)
+    id("com.google.gms.google-services")
 }
 
 var properties = Properties()
@@ -28,6 +29,8 @@ android {
         buildConfigField("String", "NAVER_CLIENT_ID", "\"${properties.getProperty("NAVER_CLIENT_ID")}\"")
         buildConfigField("String", "NAVER_GEO_CLIENT_ID", "\"${properties.getProperty("NAVER_GEO_CLIENT_ID")}\"")
         buildConfigField("String", "NAVER_GEO_CLIENT_SECRET", "\"${properties.getProperty("NAVER_GEO_CLIENT_SECRET")}\"")
+//        buildConfigField("String", "NAVER_CLIENT_ID", "\"${properties.getProperty("NAER_CLIENT_ID") ?: ""}\"")
+
     }
 
     buildTypes {
@@ -74,5 +77,10 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
     coreLibraryDesugaring(libs.core.desugaring)
     implementation(libs.kotlin.stdlib)
+    implementation ("com.kizitonwose.calendar:view:2.6.2")
+    implementation("com.google.firebase:firebase-firestore-ktx")
+    implementation(platform("com.google.firebase:firebase-bom:33.13.0"))
+    implementation("com.google.firebase:firebase-auth")
+    
 
 }

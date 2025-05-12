@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "696324424728",
+    "project_id": "slo-plo",
+    "storage_bucket": "slo-plo.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:696324424728:android:25d6f43f73d43acd05ef6d",
+        "android_client_info": {
+          "package_name": "com.example.slo_plo"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDfz0s_S-f0iJleHAhrbA4GLoyBVta5UFg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
