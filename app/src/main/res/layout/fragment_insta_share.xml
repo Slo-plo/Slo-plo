@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".InstaShareFragment"
+    android:background="#CC000000">
+
+
+    <!-- backgroundTint 제거 -->
+
+
+    <LinearLayout
+        android:id="@+id/img_sticker_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="88dp"
+        android:background="@drawable/bg_square_main_color_15"
+        android:orientation="vertical"
+        android:padding="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+
+        <ImageView
+            android:layout_width="208dp"
+            android:layout_height="124dp"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_app_default" />
+
+        <!-- 아래는 유지 -->
+        <ImageView
+            android:id="@+id/img_insta_share"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/img_temp_turtle" />
+
+        <TextView
+            android:id="@+id/tv_insta_share_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:fontFamily="@font/noto_sans_kr_bold"
+            android:includeFontPadding="false"
+            android:text="yyyy-mm-dd 플로깅 인증 (^ . ^)"
+            android:textSize="25sp" />
+
+        <TextView
+            android:id="@+id/tv_insta_share_distance"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:fontFamily="@font/noto_sans_kr_semi_bold"
+            android:includeFontPadding="false"
+            android:text="0 km 플로깅 성공 ~ !"
+            android:textSize="15dp" />
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/btn_insta_share"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="32dp"
+        android:text="Instagram에 공유하기"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/img_sticker_layout"
+        app:layout_constraintVertical_bias="0.238" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

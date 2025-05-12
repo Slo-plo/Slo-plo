@@ -14,8 +14,6 @@ import com.example.slo_plo.databinding.FragmentVolunteerBinding
 import com.example.slo_plo.databinding.BottomSheetLocationBinding
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.example.slo_plo.RecommendVolunteerAdapter
-import com.example.slo_plo.RecommendVolunteer
 
 class VolunteerFragment : Fragment() {
 
@@ -30,6 +28,13 @@ class VolunteerFragment : Fragment() {
     ): View {
         _binding = FragmentVolunteerBinding.inflate(inflater, container, false)
         val view = binding.root
+
+        binding.btnSharePage.setOnClickListener {
+            requireActivity().supportFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container_view, InstaShareFragment()) // Fragment 교체
+                .addToBackStack(null) // Back Stack에 추가
+                .commit() // 트랜잭션 실행
+        }
 
         // 'btnFindLocation' 버튼 클릭 리스너 설정
         binding.btnFindLocation.setOnClickListener {
