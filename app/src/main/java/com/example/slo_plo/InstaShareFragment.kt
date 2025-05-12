@@ -36,22 +36,32 @@ class InstaShareFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.tvInstaShareName.text = "2025-05-11 플로깅 인증 (^ . ^)"
-        binding.tvInstaShareDistance.text = "3.8 km 플로깅 성공 ~ !"
+        binding.imgInstaShare.post {
+            val width = binding.imgInstaShare.width
+            binding.imgInstaShare.layoutParams.height = width
+            binding.imgInstaShare.requestLayout()
+        }
+
+        binding.tvInstaShareDate.text = "2025일 05월 11일"
+        binding.tvInstaShareContent.text = "오늘은 서울여대에서 플로깅을 했는데 정말 재미있었다~~!! 최대 몇 줄까지 표시하는 게 좋을지 모르겠어서 최대한 길게 써보고 있는데 세 줄이면 적당나나나나나난나나나나나나나나나나나나나나ㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㄴ나나나나나나나나나나ㅏ나나나나나나나나나나난"
+        binding.tvInstaShareTitle.text = "서울여대에서 플로깅했다"
+        binding.imgInstaShare.setImageResource(R.drawable.img_temp_turtle)
 
         binding.btnInstaShare.setOnClickListener {
             // SVG 배경을 비트맵으로 생성
             val backgroundBitmap = drawVectorBackgroundBitmap()
 
-            // 스티커 레이어 캡처
-            val stickerBitmap = captureViewAsBitmap(binding.imgStickerLayout)
+            // 스티커 레이어 캡처 (뷰가 완전히 그려진 후에 캡처)
+            binding.imgStickerLayout.post {
+                val stickerBitmap = captureViewAsBitmap(binding.imgStickerLayout)
 
-            // 캐시 저장
-            val backgroundUri = saveBitmapToCache(backgroundBitmap, "background_image_${UUID.randomUUID()}.png")
-            val stickerUri = saveBitmapToCache(stickerBitmap, "sticker_image_${UUID.randomUUID()}.png")
+                // 캐시 저장
+                val backgroundUri = saveBitmapToCache(backgroundBitmap, "background_image_${UUID.randomUUID()}.png")
+                val stickerUri = saveBitmapToCache(stickerBitmap, "sticker_image_${UUID.randomUUID()}.png")
 
-            // 공유
-            shareToInstagramStory(backgroundUri, stickerUri)
+                // 공유
+                shareToInstagramStory(backgroundUri, stickerUri)
+            }
         }
     }
 
