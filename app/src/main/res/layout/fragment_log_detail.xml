@@ -16,7 +16,11 @@
         android:layout_height="wrap_content"
         android:src="@drawable/ic_arrow_back"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="8dp"
+        android:contentDescription="뒤로가기"
+        android:clickable="true"
+        android:focusable="true"/>
 
     <!-- 공유/삭제 버튼 -->
     <LinearLayout
@@ -24,6 +28,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:layout_marginTop="8dp"
         android:gravity="end"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
