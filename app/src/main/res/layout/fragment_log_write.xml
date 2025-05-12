@@ -1,204 +1,209 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/log_write_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true">
+    android:paddingTop="20dp"
+    android:paddingBottom="15dp"
+    android:paddingHorizontal="24dp">
 
     <!-- 뒤로가기 버튼 -->
-    <ImageButton
-        android:id="@+id/button_back"
+    <ImageView
+        android:id="@+id/btn_log_cancel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:src="@android:drawable/ic_menu_revert"
-        android:contentDescription="뒤로가기 버튼" />
+        android:src="@drawable/ic_arrow_back"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
-    <!-- 스크롤 가능한 전체 내용 -->
+    <!-- 스크롤 가능한 입력 영역 -->
     <androidx.core.widget.NestedScrollView
-        android:id="@+id/scroll_root"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="56dp"
-        android:layout_marginBottom="80dp"
-        android:padding="16dp"
-        android:fillViewport="true">
+        android:id="@+id/scroll_container"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        android:layout_marginTop="20dp"
+        app:layout_constraintTop_toBottomOf="@id/btn_log_cancel"
+        app:layout_constraintBottom_toTopOf="@id/btn_bottom"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
         <LinearLayout
-            android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
-            <!-- 제목 입력 -->
+            <!-- 제목 -->
             <EditText
-                android:id="@+id/etLogTitle"
-                android:hint="제목을 입력하세요"
-                android:textSize="20sp"
-                android:textStyle="bold"
+                android:id="@+id/et_log_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@android:color/transparent"/>
+                android:hint="제목을 입력하세요"
+                android:textSize="22sp"
+                android:fontFamily="@font/noto_sans_kr_semi_bold"
+                android:includeFontPadding="false"
+                android:background="@android:color/transparent" />
 
             <!-- 날짜 -->
             <TextView
-                android:id="@+id/text_date"
-                android:layout_marginTop="8dp"
-                android:text="날짜 로딩 중..."
-                android:textSize="16sp"
+                android:id="@+id/tv_log_date"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-
-<!--            &lt;!&ndash; 플로깅 정보 &ndash;&gt;-->
-<!--            <TextView-->
-<!--                android:id="@+id/text_info"-->
-<!--                android:layout_marginTop="8dp"-->
-<!--                android:text="출발지점: \n도착지점: \n시간: \n거리: "-->
-<!--                android:textSize="14sp"-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="wrap_content"/>-->
-            <!-- 출발지점 (한 줄, 말줄임) -->
-            <TextView
-                android:id="@+id/text_start_address"
-                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="시작지점: 서울시 영등포구 선유동 2로 7-12번지"
+                android:text="날짜 로딩 중"
                 android:textSize="14sp"
+                android:textColor="@color/text_grey"
+                android:fontFamily="@font/noto_sans_kr_regular"
+                android:includeFontPadding="false"
+                android:layout_marginTop="8dp" />
+
+            <!-- 출발/도착 주소 -->
+            <TextView
+                android:id="@+id/tv_start_address"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
                 android:maxLines="1"
-                android:ellipsize="end"/>
+                android:ellipsize="end"
+                android:text="출발지점: 주소 로딩 중..."
+                android:textSize="14sp" />
 
-            <!-- 도착지점 (한 줄, 말줄임) -->
             <TextView
-                android:id="@+id/text_end_address"
+                android:id="@+id/tv_end_address"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="종료지점: 서울시 송파구 문정동 어쩌구저쩌구 길어서 화랑초등학교 화단"
-                android:textSize="14sp"
+                android:layout_marginTop="4dp"
                 android:maxLines="1"
-                android:ellipsize="end"/>
+                android:ellipsize="end"
+                android:text="도착지점: 주소 로딩 중..."
+                android:textSize="14sp" />
 
-            <!-- 시간 -->
-            <TextView
-                android:id="@+id/text_time"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="시간: "
-                android:textSize="14sp"/>
-
-            <!-- 거리 -->
-            <TextView
-                android:id="@+id/text_distance"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="거리: "
-                android:textSize="14sp"/>
-
+            <!-- 시간 & 거리 정보 박스 -->
             <LinearLayout
+                android:id="@+id/layout_log_time_distance"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/bg_square_white_grey_10"
+                android:gravity="center"
                 android:orientation="horizontal"
-                android:gravity="center_vertical">
+                android:padding="20dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_end_address">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="1dp"
+                    android:src="@drawable/ic_time" />
 
                 <TextView
-                    android:id="@+id/text_trash_label"
+                    android:id="@+id/tv_log_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="6dp"
+                    android:text="시간 - 00:00"
+                    android:textSize="14sp" />
+
+                <Space
+                    android:layout_width="20dp"
+                    android:layout_height="wrap_content" />
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_distance" />
+
+                <TextView
+                    android:id="@+id/tv_log_distance"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="6dp"
+                    android:layout_marginEnd="16dp"
+                    android:text="이동거리 - 0m"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <!-- 쓰레기 입력 -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:orientation="horizontal">
+
+                <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="쓰레기 개수:"
                     android:textSize="14sp"/>
 
                 <EditText
-                    android:id="@+id/etLogTrash"
-                    android:layout_width="0dp"
+                    android:id="@+id/et_log_trash"
+                    android:layout_width="48dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:layout_weight="1"
+                    android:layout_marginStart="6dp"
+                    android:hint="0"
+                    android:gravity="center"
                     android:inputType="number"
-                    android:hint="입력"
-                    android:textSize="14sp"/>
+                    android:background="@drawable/bg_square_white_grey_15"
+                    android:textSize="14sp"
+                    android:fontFamily="@font/noto_sans_kr_medium"
+                    android:includeFontPadding="false"
+                    android:paddingVertical="4dp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    android:text="개"
+                    android:textSize="14sp" />
             </LinearLayout>
+
+            <View
+                android:id="@+id/view_line_log"
+                android:layout_width="wrap_content"
+                android:layout_height="1dp"
+                android:layout_gravity="center_horizontal"
+                android:background="@color/line_grey"
+                android:layout_marginTop="24dp" />
 
             <!-- 선택 이미지 -->
             <ImageView
-                android:id="@+id/image_selected"
-                android:layout_marginTop="16dp"
-                android:layout_width="match_parent"
+                android:id="@+id/iv_log_selected"
+                android:layout_width="150dp"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="25dp"
                 android:visibility="gone"
                 android:adjustViewBounds="true"
                 android:scaleType="fitCenter"
-                android:maxHeight="280dp"
-                android:contentDescription="선택된 이미지"/>
+                android:maxHeight="300dp"/>
 
             <!-- 본문 입력 -->
             <EditText
-                android:id="@+id/etLogContent"
-                android:layout_marginTop="16dp"
+                android:id="@+id/et_log_content"
                 android:hint="플로깅을 기록해보세요"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:minLines="8"
                 android:inputType="textMultiLine"
-                android:minLines="5"
+                android:scrollbars="vertical"
+                android:fontFamily="@font/noto_sans_kr_regular"
+                android:includeFontPadding="false"
+                android:textSize="14sp"
                 android:gravity="top"
+                android:padding="8dp"
                 android:background="@android:color/transparent"/>
-
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
-    <!-- 하단 버튼 레이아웃 include -->
+    <!-- 하단 버튼 include -->
     <include
-        android:id="@+id/bottom_buttons"
+        android:id="@+id/btn_bottom"
         layout="@layout/button_log_write"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom"/>
-
-
-<!--    &lt;!&ndash; 하단 버튼 &ndash;&gt;-->
-<!--    <LinearLayout-->
-<!--        android:id="@+id/bottom_buttons"-->
-<!--        android:layout_gravity="bottom"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:background="@android:color/white"-->
-<!--        android:padding="12dp"-->
-<!--        android:orientation="horizontal"-->
-<!--        android:gravity="center_vertical"-->
-<!--        android:weightSum="3">-->
-
-<!--        &lt;!&ndash; 카메라 버튼 &ndash;&gt;-->
-<!--        <ImageButton-->
-<!--            android:id="@+id/button_camera"-->
-<!--            android:layout_width="0dp"-->
-<!--            android:layout_height="48dp"-->
-<!--            android:layout_weight="1"-->
-<!--            android:background="@drawable/round_button"-->
-<!--            android:src="@drawable/ic_camera"-->
-<!--            android:scaleType="centerInside"-->
-<!--            android:contentDescription="카메라"-->
-<!--            android:padding="8dp" />-->
-
-<!--        &lt;!&ndash; 갤러리 버튼 &ndash;&gt;-->
-<!--        <ImageButton-->
-<!--            android:id="@+id/button_gallery"-->
-<!--            android:layout_width="0dp"-->
-<!--            android:layout_height="48dp"-->
-<!--            android:layout_weight="1"-->
-<!--            android:background="@drawable/round_button"-->
-<!--            android:src="@android:drawable/ic_menu_gallery"-->
-<!--            android:scaleType="centerInside"-->
-<!--            android:contentDescription="갤러리"-->
-<!--            android:padding="8dp" />-->
-
-<!--        &lt;!&ndash; 저장 버튼 &ndash;&gt;-->
-<!--        <Button-->
-<!--            android:id="@+id/button_save"-->
-<!--            android:layout_width="0dp"-->
-<!--            android:layout_height="48dp"-->
-<!--            android:layout_weight="1"-->
-<!--            android:background="@drawable/bg_square_sub_color_15"-->
-<!--            android:textColor="@android:color/white"-->
-<!--            android:text="저장" />-->
-<!--    </LinearLayout>-->
-</FrameLayout>
-
+        app:layout_constraintBottom_toBottomOf="parent"/>
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -30,6 +30,7 @@
         app:layout_constraintTop_toBottomOf="@+id/ic_app_sloplo">
 
         <include
+            android:id="@+id/item_home_plogging"
             layout="@layout/item_home_plogging"
             app:layout_constraintTop_toBottomOf="@+id/tv_home_title" />
 
@@ -39,9 +40,10 @@
     <ImageView
         android:id="@+id/iv_app_character"
         android:layout_width="150dp"
-        android:layout_height="150dp"
+        android:layout_height="0dp"
+        android:layout_marginVertical="30dp"
         android:src="@drawable/bg_square_white_grey_15"
-        android:layout_marginTop="55dp"
+        app:layout_constraintBottom_toTopOf="@+id/btn_home_plogging"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/layout_plogging_record" />
@@ -51,10 +53,10 @@
         android:id="@+id/btn_home_plogging"
         android:layout_width="180dp"
         android:layout_height="55dp"
-        android:layout_marginTop="40dp"
+        android:layout_marginBottom="140dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/iv_app_character">
+        app:layout_constraintBottom_toBottomOf="parent">
 
         <ImageView
             android:id="@+id/iv_home_challenge_button"

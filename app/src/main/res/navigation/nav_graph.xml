@@ -25,15 +25,15 @@
         android:label="외부봉사" />
 
     <fragment
-        android:id="@+id/ploggingFragment"
-        android:name="com.example.slo_plo.PloggingFragment"
-        tools:layout="@layout/fragment_plogging"
-        android:label="플로깅 활동" >
-        <action
-            android:id="@+id/action_plogging_to_logWrite"
-            app:destination="@id/logWriteFragment"
-            app:popUpTo="@id/ploggingFragment"
-            app:popUpToInclusive="true"/>
+      android:id="@+id/ploggingFragment"
+      android:name="com.example.slo_plo.PloggingFragment"
+      android:label="플로깅 활동"
+      tools:layout="@layout/fragment_plogging">
+    <action
+        android:id="@+id/action_plogging_to_logWrite"
+        app:destination="@id/logWriteFragment"
+        app:popUpTo="@id/ploggingFragment"
+        app:popUpToInclusive="true" />
     </fragment>
 
     <fragment
@@ -52,4 +52,23 @@
     </fragment>
 
 
+    <fragment
+        android:id="@+id/onboardingIntroFragment"
+        android:name="com.example.slo_plo.OnboardingIntroFragment"
+        android:label="온보딩 인트로"
+        tools:layout="@layout/fragment_onboarding_intro">
+        <action
+            android:id="@+id/action_onboardingIntroFragment_to_onboardingGuideFragment"
+            app:destination="@id/onboardingGuideFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/onboardingGuideFragment"
+        android:name="com.example.slo_plo.OnboardingGuideFragment"
+        android:label="온보딩 가이드"
+        tools:layout="@layout/fragment_onboarding_guide">
+        <action
+            android:id="@+id/action_onboardingGuideFragment_to_homeFragment"
+            app:destination="@id/homeFragment" />
+    </fragment>
 </navigation>
