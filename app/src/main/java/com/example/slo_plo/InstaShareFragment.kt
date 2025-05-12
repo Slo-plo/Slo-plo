@@ -16,6 +16,8 @@ import androidx.core.content.FileProvider
 import com.example.slo_plo.databinding.FragmentInstaShareBinding
 import java.io.File
 import java.io.FileOutputStream
+import java.util.UUID
+
 
 class InstaShareFragment : Fragment() {
 
@@ -45,23 +47,8 @@ class InstaShareFragment : Fragment() {
             val stickerBitmap = captureViewAsBitmap(binding.imgStickerLayout)
 
             // 배경과 스티커 각각 캐시로 저장
-            val backgroundUri = saveBitmapToCache(backgroundBitmap, "background_image.png")
-            val stickerUri = saveBitmapToCache(stickerBitmap, "sticker_image.png")
-
-            // Instagram 스토리로 배경과 스티커 이미지 각각 공유
-            shareToInstagramStory(backgroundUri, stickerUri)
-        }
-
-        binding.btnInstaShare.setOnClickListener {
-            // 흰색 배경을 비트맵으로 생성
-            val backgroundBitmap = drawBackgroundBitmap()
-
-            // 스티커 레이어 캡처
-            val stickerBitmap = captureViewAsBitmap(binding.imgStickerLayout)
-
-            // 배경과 스티커 각각 캐시로 저장
-            val backgroundUri = saveBitmapToCache(backgroundBitmap, "background_image.png")
-            val stickerUri = saveBitmapToCache(stickerBitmap, "sticker_image.png")
+            val backgroundUri = saveBitmapToCache(backgroundBitmap, "background_image_${UUID.randomUUID()}.png")
+            val stickerUri = saveBitmapToCache(stickerBitmap, "sticker_image_${UUID.randomUUID()}.png")
 
             // Instagram 스토리로 배경과 스티커 이미지 각각 공유
             shareToInstagramStory(backgroundUri, stickerUri)
