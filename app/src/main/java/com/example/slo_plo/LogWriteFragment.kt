@@ -8,6 +8,7 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.text.method.ScrollingMovementMethod
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -165,7 +166,12 @@ class LogWriteFragment : Fragment() {
 
         // 저장 버튼
         binding.btnBottom.btnLogSave.setOnClickListener {
-            val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return@setOnClickListener
+            val userId = FirebaseAuth.getInstance().currentUser?.uid
+            if (userId == null) {
+                Log.e("LogWriteFragment", "User ID is null. Are you logged in?")
+                Toast.makeText(requireContext(), "로그인이 필요합니다.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
             val dateId = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy.MM.dd"))
             val logsRef = FirebaseFirestore.getInstance()
                 .collection("users")
