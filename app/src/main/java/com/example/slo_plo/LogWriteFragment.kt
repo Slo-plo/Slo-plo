@@ -20,6 +20,10 @@ import androidx.navigation.fragment.findNavController
 import com.example.slo_plo.DialogUtils.showConfirmDialog
 import com.example.slo_plo.databinding.DialogDefaultBinding
 import com.example.slo_plo.databinding.FragmentLogWriteBinding
+import com.example.slo_plo.model.LogRecord
+import com.example.slo_plo.utils.FirestoreRepository
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -30,6 +34,9 @@ class LogWriteFragment : Fragment() {
     private var _binding: FragmentLogWriteBinding? = null
     private val binding get() = _binding!!
     private var selectedImageUri: Uri? = null
+
+    private lateinit var auth: FirebaseAuth
+    private var uid: String? = null
 
     // 카메라 권한 요청
     private val cameraPermissionLauncher = registerForActivityResult(
@@ -86,8 +93,9 @@ class LogWriteFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        auth = FirebaseAuth.getInstance()
+        uid = auth.currentUser?.uid
         binding.etLogContent.movementMethod = ScrollingMovementMethod()
-
 
         // 뒤로가기: 홈 화면으로 이동
         binding.btnLogCancel.setOnClickListener {
@@ -157,6 +165,12 @@ class LogWriteFragment : Fragment() {
 
         // 저장 버튼
         binding.btnBottom.btnLogSave.setOnClickListener {
+            val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return@setOnClickListener
+            val dateId = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy.MM.dd"))
+            val logsRef = FirebaseFirestore.getInstance()
+                .collection("users")
+                .document(userId)
+                .collection("plogging_logs")
             val title = binding.etLogTitle.text.toString()
             val content = binding.etLogContent.text.toString()
             val trash = binding.etLogTrash.text.toString()
@@ -167,15 +181,46 @@ class LogWriteFragment : Fragment() {
                 title = "일지 저장",
                 message = "일지를 저장하시겠습니까?"
             ) {
-                Toast.makeText(
-                    requireContext(),
-                    "제목: $title\n내용: $content\n쓰레기 개수: $trash",
-                    Toast.LENGTH_SHORT
-                ).show()
+                // 1. 기존 개수 세고
+                logsRef
+                    .whereEqualTo("dateId", dateId)
+                    .get()
+                    .addOnSuccessListener { querySnapshot ->
+                        val count = querySnapshot.size()
+                        val newDocId = "${dateId}_${count + 1}"
 
-                // Todo : DB에 저장 후 화면 전환
+                        // 2. 실제 저장할 데이터 구성
+                        val record = LogRecord(
+                            dateId = dateId,
+                            startAddress = startAddr,
+                            endAddress = endAddr,
+                            time = totalTime.toIntOrNull() ?: 0,
+                            distance = totalDist.toDoubleOrNull() ?: 0.0,
+                            trashCount = trash.toIntOrNull() ?: 0,
+                            title = title,
+                            body = content,
+                            imageUrls = emptyList()
+                        )
+
+                        // 3. 저장
+                        logsRef.document(newDocId).set(record)
+                            .addOnSuccessListener {
+                                Toast.makeText(requireContext(), "저장 완료", Toast.LENGTH_SHORT).show()
+                                findNavController().previousBackStackEntry
+                                    ?.savedStateHandle
+                                    ?.set("needsRefresh", true)
+                                findNavController().popBackStack()
+                            }
+                            .addOnFailureListener {
+                                Toast.makeText(requireContext(), "저장 실패", Toast.LENGTH_SHORT).show()
+                            }
+                    }
+                    .addOnFailureListener {
+                        Toast.makeText(requireContext(), "기록 카운트 조회 실패", Toast.LENGTH_SHORT).show()
+                    }
             }
         }
+
     }
 
     private fun openCamera() {
@@ -186,6 +231,31 @@ class LogWriteFragment : Fragment() {
     private fun openGallery() {
         val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
         galleryLauncher.launch(intent)
+    }
+
+    fun showConfirmDialog(
+        title: String,
+        message: String,
+        onConfirm: () -> Unit
+    ) {
+        val binding = DialogDefaultBinding.inflate(layoutInflater)
+        val alertDialog = AlertDialog.Builder(requireContext())
+            .setView(binding.root)
+            .create()
+
+        binding.tvDefaultTitle.text = title
+        binding.tvDefaultContent.text = message
+
+        binding.btnDefaultYes.setOnClickListener {
+            onConfirm()
+            alertDialog.dismiss()
+        }
+
+        binding.btnDefaultNo.setOnClickListener {
+            alertDialog.dismiss()
+        }
+
+        alertDialog.show()
     }
 
     override fun onDestroyView() {
