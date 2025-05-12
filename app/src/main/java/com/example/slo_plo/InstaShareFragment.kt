@@ -3,7 +3,6 @@ package com.example.slo_plo
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.drawable.Drawable
 import android.net.Uri
@@ -19,6 +18,7 @@ import com.example.slo_plo.databinding.FragmentInstaShareBinding
 import java.io.File
 import java.io.FileOutputStream
 import java.util.UUID
+
 
 class InstaShareFragment : Fragment() {
 
@@ -44,10 +44,13 @@ class InstaShareFragment : Fragment() {
 
         binding.tvInstaShareDate.text = "2025일 05월 11일"
         binding.tvInstaShareContent.text = "오늘은 서울여대에서 플로깅을 했는데 정말 재미있었다~~!! 최대 몇 줄까지 표시하는 게 좋을지 모르겠어서 최대한 길게 써보고 있는데 세 줄이면 적당나나나나나난나나나나나나나나나나나나나나ㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㄴ나나나나나나나나나나ㅏ나나나나나나나나나나난"
-        binding.tvInstaShareTitle.text = "서울여대에서 플로깅했다"
-        binding.imgInstaShare.setImageResource(R.drawable.img_temp_turtle)
+        binding.tvInstaShareTitle.text = "서울여대에서 플로깅을 했다"
+        binding.imgInstaShare.setImageResource(R.drawable.img_temp_insta)
 
         binding.btnInstaShare.setOnClickListener {
+            // UUID 생성 (중복 호출 방지)
+            val uuid = UUID.randomUUID().toString()
+
             // SVG 배경을 비트맵으로 생성
             val backgroundBitmap = drawVectorBackgroundBitmap()
 
@@ -56,8 +59,8 @@ class InstaShareFragment : Fragment() {
                 val stickerBitmap = captureViewAsBitmap(binding.imgStickerLayout)
 
                 // 캐시 저장
-                val backgroundUri = saveBitmapToCache(backgroundBitmap, "background_image_${UUID.randomUUID()}.png")
-                val stickerUri = saveBitmapToCache(stickerBitmap, "sticker_image_${UUID.randomUUID()}.png")
+                val backgroundUri = saveBitmapToCache(backgroundBitmap, "background_image_$uuid.png")
+                val stickerUri = saveBitmapToCache(stickerBitmap, "sticker_image_$uuid.png")
 
                 // 공유
                 shareToInstagramStory(backgroundUri, stickerUri)
@@ -65,7 +68,7 @@ class InstaShareFragment : Fragment() {
         }
     }
 
-    // 🔁 여기만 바뀜: VectorDrawable을 비트맵으로 렌더링하는 함수
+    // VectorDrawable을 비트맵으로 렌더링하는 함수
     private fun drawVectorBackgroundBitmap(): Bitmap {
         val width = resources.displayMetrics.widthPixels
         val height = resources.displayMetrics.heightPixels
@@ -80,6 +83,7 @@ class InstaShareFragment : Fragment() {
         return bitmap
     }
 
+    // 뷰를 비트맵으로 캡처하는 함수
     private fun captureViewAsBitmap(view: View): Bitmap {
         val bitmap = Bitmap.createBitmap(view.width, view.height, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
@@ -87,10 +91,16 @@ class InstaShareFragment : Fragment() {
         return bitmap
     }
 
+    // 비트맵을 캐시 디렉토리에 저장하고 URI 반환
     private fun saveBitmapToCache(bitmap: Bitmap, fileName: String): Uri {
         val file = File(requireContext().cacheDir, fileName)
-        FileOutputStream(file).use { out ->
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
+        try {
+            FileOutputStream(file).use { out ->
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Toast.makeText(requireContext(), "파일 저장에 실패했습니다.", Toast.LENGTH_SHORT).show()
         }
         return FileProvider.getUriForFile(
             requireContext(),
@@ -99,6 +109,7 @@ class InstaShareFragment : Fragment() {
         )
     }
 
+    // Instagram 스토리 공유 함수
     private fun shareToInstagramStory(backgroundUri: Uri, stickerUri: Uri) {
         val intent = Intent("com.instagram.share.ADD_TO_STORY").apply {
             setDataAndType(backgroundUri, "image/png")

@@ -16,7 +16,7 @@
         android:layout_width="300dp"
         android:layout_height="500dp"
         android:layout_marginTop="28dp"
-        android:background="@drawable/bg_square_white_grey_10"
+        android:background="@drawable/bg_square_white"
         android:orientation="vertical"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
