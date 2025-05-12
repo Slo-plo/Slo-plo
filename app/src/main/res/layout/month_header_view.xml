@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/titlesContainer"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="4dp"
+    android:gravity="center_horizontal">
+
+    <!-- 월 제목 -->
+    <TextView
+        android:id="@+id/textMonthTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="2025년 5월"
+        android:textStyle="bold"
+        android:textSize="16sp"
+        android:layout_marginBottom="8dp"/>
+
+    <!-- 요일 헤더 -->
+    <LinearLayout
+        android:id="@+id/dayOfWeekRow"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <!-- 요일 7개 -->
+        <TextView style="@style/CalendarDayHeaderStyle"/>
+        <TextView style="@style/CalendarDayHeaderStyle"/>
+        <TextView style="@style/CalendarDayHeaderStyle"/>
+        <TextView style="@style/CalendarDayHeaderStyle"/>
+        <TextView style="@style/CalendarDayHeaderStyle"/>
+        <TextView style="@style/CalendarDayHeaderStyle"/>
+        <TextView style="@style/CalendarDayHeaderStyle"/>
+    </LinearLayout>
+</LinearLayout>

@@ -135,8 +135,8 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="수거한 쓰레기"
-                    android:textSize="14sp" />
+                    android:text="쓰레기 개수:"
+                    android:textSize="14sp"/>
 
                 <EditText
                     android:id="@+id/et_log_trash"
@@ -180,14 +180,14 @@
                 android:scaleType="fitCenter"
                 android:maxHeight="300dp"/>
 
-            <!-- 본문 EditText -->
+            <!-- 본문 입력 -->
             <EditText
                 android:id="@+id/et_log_content"
+                android:hint="플로깅을 기록해보세요"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
                 android:minLines="8"
-                android:hint="내용을 입력하세요"
                 android:inputType="textMultiLine"
                 android:scrollbars="vertical"
                 android:fontFamily="@font/noto_sans_kr_regular"
