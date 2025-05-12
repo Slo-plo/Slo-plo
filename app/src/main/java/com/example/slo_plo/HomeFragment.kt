@@ -41,63 +41,19 @@ class HomeFragment : Fragment() {
         val dateFormatter = DateTimeFormatter.ofPattern("yyyy년 M월 d일", Locale.KOREA)
         binding.itemHomePlogging.tvHomeDate.text = currentDate.format(dateFormatter)
 
+        loadPloggingData()
+
         binding.itemHomePlogging.btnRecordChange.setOnClickListener {
             isToday = !isToday
-
-            if (isToday) {
-                binding.itemHomePlogging.tvHomeTitle.text = "오늘의 플로깅"
-                binding.itemHomePlogging.layoutPloggingRecordToday.root.visibility = View.VISIBLE
-                binding.itemHomePlogging.layoutPloggingRecordHistory.root.visibility = View.GONE
-
-                if (userId != null) {
-                    FirestoreRepository.loadLogRecordsForDate(userId, LocalDate.now()) { records ->
-                        val totalTime = records.sumOf { it.time }
-                        val totalDistance = records.sumOf { it.distance }
-                        val totalTrash = records.sumOf { it.trashCount }
-
-                        val displayDistance = formatDistance(totalDistance)
-                        val (displayTime, timeUnit) = formatTimeForToday(totalTime)
-
-                        binding.itemHomePlogging.layoutPloggingRecordToday.tvValueRecordTime.text =
-                            displayTime
-                        binding.itemHomePlogging.layoutPloggingRecordToday.tvUnitRecordTime.text =
-                            timeUnit
-                        binding.itemHomePlogging.layoutPloggingRecordToday.tvValueRecordDist.text =
-                            displayDistance
-                        binding.itemHomePlogging.layoutPloggingRecordToday.tvValueRecordTrash.text =
-                            "$totalTrash"
-                    }
-                }
-
-            } else {
-                binding.itemHomePlogging.tvHomeTitle.text = "역대의 플로깅"
-                binding.itemHomePlogging.layoutPloggingRecordToday.root.visibility = View.GONE
-                binding.itemHomePlogging.layoutPloggingRecordHistory.root.visibility = View.VISIBLE
-
-                if (userId != null) {
-                    FirestoreRepository.loadAllLogRecords(userId) { records ->
-                        val totalCount = records.size
-                        val totalTime = records.sumOf { it.time }
-                        val totalDistance = records.sumOf { it.distance }
-                        val totalTrash = records.sumOf { it.trashCount }
-
-                        val displayDistance = formatDistance(totalDistance)
-                        val displayTime = formatTimeForHistory(totalTime)
-                        val displayTrash = "수집한 쓰레기: ${totalTrash}개"
-
-                        binding.itemHomePlogging.layoutPloggingRecordHistory.tvValueRecordCount.text =
-                            "$totalCount"
-                        binding.itemHomePlogging.layoutPloggingRecordHistory.tvTotalTime.text =
-                            displayTime
-                        binding.itemHomePlogging.layoutPloggingRecordHistory.tvTotalDistance.text =
-                            "이동 거리: ${displayDistance}km"
-                        binding.itemHomePlogging.layoutPloggingRecordHistory.tvTotalTrash.text =
-                            displayTrash
-                    }
-                }
-            }
+            loadPloggingData()
         }
         return binding.root
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    override fun onResume() {
+        super.onResume()
+        loadPloggingData()
     }
 
     override fun onDestroyView() {
@@ -135,6 +91,61 @@ class HomeFragment : Fragment() {
             "총 시간: ${remainingMinutes}분"
         } else {
             "총 시간: ${hours}시간 ${remainingMinutes}분"
+        }
+    }
+
+    private fun loadPloggingData() {
+        if (isToday) {
+            binding.itemHomePlogging.tvHomeTitle.text = "오늘의 플로깅"
+            binding.itemHomePlogging.layoutPloggingRecordToday.root.visibility = View.VISIBLE
+            binding.itemHomePlogging.layoutPloggingRecordHistory.root.visibility = View.GONE
+
+            if (userId != null) {
+                FirestoreRepository.loadLogRecordsForDate(userId, LocalDate.now()) { records ->
+                    val totalTime = records.sumOf { it.time }
+                    val totalDistance = records.sumOf { it.distance }
+                    val totalTrash = records.sumOf { it.trashCount }
+
+                    val displayDistance = formatDistance(totalDistance)
+                    val (displayTime, timeUnit) = formatTimeForToday(totalTime)
+
+                    binding.itemHomePlogging.layoutPloggingRecordToday.tvValueRecordTime.text =
+                        displayTime
+                    binding.itemHomePlogging.layoutPloggingRecordToday.tvUnitRecordTime.text =
+                        timeUnit
+                    binding.itemHomePlogging.layoutPloggingRecordToday.tvValueRecordDist.text =
+                        displayDistance
+                    binding.itemHomePlogging.layoutPloggingRecordToday.tvValueRecordTrash.text =
+                        "$totalTrash"
+                }
+            }
+
+        } else {
+            binding.itemHomePlogging.tvHomeTitle.text = "역대의 플로깅"
+            binding.itemHomePlogging.layoutPloggingRecordToday.root.visibility = View.GONE
+            binding.itemHomePlogging.layoutPloggingRecordHistory.root.visibility = View.VISIBLE
+
+            if (userId != null) {
+                FirestoreRepository.loadAllLogRecords(userId) { records ->
+                    val totalCount = records.size
+                    val totalTime = records.sumOf { it.time }
+                    val totalDistance = records.sumOf { it.distance }
+                    val totalTrash = records.sumOf { it.trashCount }
+
+                    val displayDistance = formatDistance(totalDistance)
+                    val displayTime = formatTimeForHistory(totalTime)
+                    val displayTrash = "수집한 쓰레기: ${totalTrash}개"
+
+                    binding.itemHomePlogging.layoutPloggingRecordHistory.tvValueRecordCount.text =
+                        "$totalCount"
+                    binding.itemHomePlogging.layoutPloggingRecordHistory.tvTotalTime.text =
+                        displayTime
+                    binding.itemHomePlogging.layoutPloggingRecordHistory.tvTotalDistance.text =
+                        "이동 거리: ${displayDistance}km"
+                    binding.itemHomePlogging.layoutPloggingRecordHistory.tvTotalTrash.text =
+                        displayTrash
+                }
+            }
         }
     }
 }
