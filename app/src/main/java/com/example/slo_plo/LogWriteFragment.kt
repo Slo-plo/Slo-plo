@@ -127,24 +127,6 @@ class LogWriteFragment : Fragment() {
             }
         }
 
-        // 저장 버튼 클릭 리스너 안에서 uid 사용
-        binding.btnBottom.btnLogSave.setOnClickListener {
-            val userId = uid ?: run {
-                Toast.makeText(requireContext(),
-                    "사용자 정보가 없습니다.", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-            // LogRecord 생성
-            val record = LogRecord(
-                /* ... */
-            )
-            // userId 와 record 순서로 넘겨야 함
-            FirestoreRepository.saveLogRecord(userId, record) { success ->
-                if (success) { /* 저장 완료 */ }
-                else { /* 저장 실패 */ }
-            }
-        }
-
         // 플로깅 기록 불러오기
         val args = requireArguments()
         val startAddr = args.getString("startAddress") ?: ""

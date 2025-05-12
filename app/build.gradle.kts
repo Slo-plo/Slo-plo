@@ -12,13 +12,6 @@ plugins {
 
 var properties = Properties()
 properties.load(FileInputStream("local.properties"))
-//val properties = Properties()
-//val localFile = File("local.properties")
-//if (localFile.exists()) {
-//    properties.load(FileInputStream(localFile))
-//} else {
-//    println("⚠️ Warning: local.properties not found. API keys may be missing.")
-//}
 
 android {
     namespace = "com.example.slo_plo"
