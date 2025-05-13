@@ -19,6 +19,7 @@ import com.example.slo_plo.databinding.FragmentInstaShareBinding
 import java.io.File
 import java.io.FileOutputStream
 import java.util.UUID
+import android.view.ViewTreeObserver
 
 
 class InstaShareFragment : Fragment() {
@@ -63,24 +64,22 @@ class InstaShareFragment : Fragment() {
         }
 
         binding.btnInstaShare.setOnClickListener {
-            // UUID 생성 (중복 호출 방지)
             val uuid = UUID.randomUUID().toString()
-
-            // SVG 배경을 비트맵으로 생성
             val backgroundBitmap = drawVectorBackgroundBitmap()
 
-            // 스티커 레이어 캡처 (뷰가 완전히 그려진 후에 캡처)
-            binding.imgStickerLayout.post {
-                val stickerBitmap = captureViewAsBitmap(binding.imgStickerLayout)
+            binding.imgStickerLayout.viewTreeObserver.addOnPreDrawListener(object : ViewTreeObserver.OnPreDrawListener {
+                override fun onPreDraw(): Boolean {
+                    binding.imgStickerLayout.viewTreeObserver.removeOnPreDrawListener(this)
 
-                // 캐시 저장
-                val backgroundUri = saveBitmapToCache(backgroundBitmap, "background_image_$uuid.png")
-                val stickerUri = saveBitmapToCache(stickerBitmap, "sticker_image_$uuid.png")
-
-                // 공유
-                shareToInstagramStory(backgroundUri, stickerUri)
-            }
+                    val stickerBitmap = captureViewAsBitmap(binding.imgStickerLayout)
+                    val backgroundUri = saveBitmapToCache(backgroundBitmap, "background_image_$uuid.png")
+                    val stickerUri = saveBitmapToCache(stickerBitmap, "sticker_image_$uuid.png")
+                    shareToInstagramStory(backgroundUri, stickerUri)
+                    return true
+                }
+            })
         }
+
     }
 
     // VectorDrawable을 비트맵으로 렌더링하는 함수
