@@ -18,7 +18,7 @@ class LogSummaryPagerAdapter(
             binding.summaryTitle.text = log.title
             binding.summaryDateDistance.text = "${log.dateId} · ${log.distance}km"
             binding.summaryStartTime.text = "📍 ${log.startAddress} | ${log.time}분"
-            binding.summaryTrash.text = "쓰레기 개수: ${log.trashCount}개"
+            binding.summaryTrash.text = "수거한 쓰레기: ${log.trashCount}개"
 
             //️ 상세보기 버튼 클릭 처리
             binding.buttonDetail.setOnClickListener {

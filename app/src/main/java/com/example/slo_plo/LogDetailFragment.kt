@@ -52,7 +52,7 @@ class LogDetailFragment : Fragment() {
             binding.tvEndAddress.text = "도착지점: ${record.endAddress}"
             binding.tvLogTime.text = "시간 - ${record.time}"
             binding.tvLogDistance.text = "이동거리 - ${record.distance} m"
-            binding.tvLogTrash.text = "쓰레기 개수: ${record.trashCount}개"
+            binding.tvLogTrash.text = "수거한 쓰레기: ${record.trashCount}개"
             binding.tvLogContent.text = record.body
             // 이미지가 있을 경우
             val imageUrl = logRecord?.imageUrls?.firstOrNull()

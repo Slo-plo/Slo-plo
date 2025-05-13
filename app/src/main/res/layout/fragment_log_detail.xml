@@ -166,7 +166,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
                 android:layout_marginHorizontal="24dp"
-                android:text="쓰레기 개수: 0개"
+                android:text="수거한 쓰레기: 0개"
                 android:textSize="14sp" />
 
             <View
