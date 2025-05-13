@@ -19,7 +19,7 @@
             android:layout_height="wrap_content"
             android:fontFamily="@font/noto_sans_kr_semi_bold"
             android:includeFontPadding="false"
-            android:text="10"
+            android:text="0"
             android:textSize="35sp" />
 
         <TextView
@@ -38,7 +38,7 @@
         android:layout_height="wrap_content"
         android:fontFamily="@font/noto_sans_kr_medium"
         android:includeFontPadding="false"
-        android:text="수거한 쓰레기"
+        android:text="수집한 쓰레기"
         android:textSize="14sp"
         app:layout_constraintEnd_toEndOf="@+id/layout_plogging_record_trash"
         app:layout_constraintStart_toStartOf="@+id/layout_plogging_record_trash"
@@ -48,6 +48,7 @@
         android:id="@+id/layout_plogging_record_time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" >
 
@@ -57,7 +58,7 @@
             android:layout_height="wrap_content"
             android:fontFamily="@font/noto_sans_kr_semi_bold"
             android:includeFontPadding="false"
-            android:text="10"
+            android:text="0"
             android:textSize="35sp" />
 
         <TextView
@@ -86,6 +87,7 @@
         android:id="@+id/layout_plogging_record_dist"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" >
 
@@ -95,7 +97,7 @@
             android:layout_height="wrap_content"
             android:fontFamily="@font/noto_sans_kr_semi_bold"
             android:includeFontPadding="false"
-            android:text="0.1"
+            android:text="0"
             android:textSize="35sp" />
 
         <TextView

@@ -87,4 +87,14 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5" />
 
+    <!-- 인스타 공유 버튼 나중에 삭제해야 함 -->
+    <Button
+        android:id="@+id/btn_share_page"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="인스타 공유 페이지로 가기"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

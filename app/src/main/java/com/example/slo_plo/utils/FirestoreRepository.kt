@@ -56,5 +56,23 @@ object FirestoreRepository {
                 callback(emptyList())
             }
     }
-
+    
+    // 사용자의 모든 일지 정보
+    fun loadAllLogRecords(
+        userId: String,
+        callback: (List<LogRecord>) -> Unit
+    ) {
+        db.collection("users")
+            .document(userId)
+            .collection("plogging_logs")
+            .get()
+            .addOnSuccessListener { snap ->
+                val records = snap.documents
+                    .mapNotNull { it.toObject(LogRecord::class.java) }
+                callback(records)
+            }
+            .addOnFailureListener {
+                callback(emptyList())
+            }
+    }
 }
