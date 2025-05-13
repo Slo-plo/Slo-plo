@@ -20,6 +20,7 @@ import java.io.File
 import java.io.FileOutputStream
 import java.util.UUID
 import android.view.ViewTreeObserver
+import androidx.activity.OnBackPressedCallback
 
 
 class InstaShareFragment : Fragment() {
@@ -79,7 +80,6 @@ class InstaShareFragment : Fragment() {
                 }
             })
         }
-
     }
 
     // VectorDrawable을 비트맵으로 렌더링하는 함수
@@ -140,6 +140,16 @@ class InstaShareFragment : Fragment() {
         } catch (e: ActivityNotFoundException) {
             Toast.makeText(requireContext(), "Instagram 앱이 설치되어 있지 않습니다.", Toast.LENGTH_SHORT).show()
         }
+    }
+
+    private fun handleBackPressed() {
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                parentFragmentManager.beginTransaction()
+                    .replace(R.id.log_detail_root, VolunteerFragment())
+                    .commit()
+            }
+        })
     }
 
     override fun onDestroyView() {
