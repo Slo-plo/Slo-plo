@@ -160,7 +160,7 @@ class VolunteerFragment : Fragment() {
             // '지역 선택' 버튼 클릭 시
             sheetBinding.btnSelectRegion.setOnClickListener {
                 if (selectedRegion != null && selectedSubRegion != null) {
-                    val fullRegion = "$selectedRegion $selectedSubRegion"
+                    val fullRegion = "$selectedSubRegion"
 
                     val fragment = RegionVolunteerFragment().apply {
                         arguments = Bundle().apply {

@@ -46,7 +46,7 @@ class RegionVolunteerFragment : Fragment() {
         val filteredList = getVolunteerList().filter { it.location == region }
 
         // 리사이클러뷰 설정
-        recommendVolunteerAdapter = RecommendVolunteerAdapter(getVolunteerList())
+        recommendVolunteerAdapter = RecommendVolunteerAdapter(filteredList) // 필터된 리스트 전달
         binding.recyclerViewResionVolunteer.apply {
             layoutManager = LinearLayoutManager(requireContext())
             adapter = recommendVolunteerAdapter
@@ -86,3 +86,4 @@ class RegionVolunteerFragment : Fragment() {
         )
     }
 }
+
