@@ -40,10 +40,8 @@ class LogDetailFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        Log.d("LogDetailFragment", "✅ onViewCreated() 진입")
 
         binding.btnLogBack.setOnClickListener {
-            Log.d("LogDetailFragment", "뒤로가기 버튼 클릭됨")
             findNavController().popBackStack()
         }
 
@@ -52,8 +50,8 @@ class LogDetailFragment : Fragment() {
             binding.tvLogDate.text = record.writeDateTime
             binding.tvStartAddress.text = "출발지점: ${record.startAddress}"
             binding.tvEndAddress.text = "도착지점: ${record.endAddress}"
-            binding.tvLogTime.text = "시간 - ${record.time}분"
-            binding.tvLogDistance.text = "이동거리 - ${record.distance}km"
+            binding.tvLogTime.text = "시간 - ${record.time}"
+            binding.tvLogDistance.text = "이동거리 - ${record.distance} m"
             binding.tvLogTrash.text = "쓰레기 개수: ${record.trashCount}개"
             binding.tvLogContent.text = record.body
             // 이미지가 있을 경우
