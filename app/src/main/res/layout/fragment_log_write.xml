@@ -171,7 +171,7 @@
             <!-- 선택 이미지 -->
             <ImageView
                 android:id="@+id/iv_log_selected"
-                android:layout_width="150dp"
+                android:layout_width="200dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
                 android:layout_marginTop="25dp"
