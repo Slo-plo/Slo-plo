@@ -4,6 +4,7 @@ import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Canvas
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -11,8 +12,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.Fragment
 import androidx.core.content.FileProvider
+import androidx.fragment.app.Fragment
 import com.example.slo_plo.databinding.FragmentInstaShareBinding
 import java.io.File
 import java.io.FileOutputStream
@@ -35,42 +36,54 @@ class InstaShareFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // ✅ 더미 텍스트 설정 후에 일지 상세보기에서 번들로 넘겨받도록 수정
-        binding.tvInstaShareName.text = "2025-05-11 플로깅 인증 (^ . ^)"
-        binding.tvInstaShareDistance.text = "3.8 km 플로깅 성공 ~ !"
+        binding.imgInstaShare.post {
+            val width = binding.imgInstaShare.width
+            binding.imgInstaShare.layoutParams.height = width
+            binding.imgInstaShare.requestLayout()
+        }
+
+        binding.tvInstaShareDate.text = "2025일 05월 11일"
+        binding.tvInstaShareContent.text = "오늘은 서울여대에서 플로깅을 했는데 정말 재미있었다~~!! 최대 몇 줄까지 표시하는 게 좋을지 모르겠어서 최대한 길게 써보고 있는데 세 줄이면 적당나나나나나난나나나나나나나나나나나나나나ㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㄴ나나나나나나나나나나ㅏ나나나나나나나나나나난"
+        binding.tvInstaShareTitle.text = "서울여대에서 플로깅을 했다"
+        binding.imgInstaShare.setImageResource(R.drawable.img_temp_insta)
 
         binding.btnInstaShare.setOnClickListener {
-            // 흰색 배경을 비트맵으로 생성
-            val backgroundBitmap = drawBackgroundBitmap()
+            // UUID 생성 (중복 호출 방지)
+            val uuid = UUID.randomUUID().toString()
 
-            // 스티커 레이어 캡처
-            val stickerBitmap = captureViewAsBitmap(binding.imgStickerLayout)
+            // SVG 배경을 비트맵으로 생성
+            val backgroundBitmap = drawVectorBackgroundBitmap()
 
-            // 배경과 스티커 각각 캐시로 저장
-            val backgroundUri = saveBitmapToCache(backgroundBitmap, "background_image_${UUID.randomUUID()}.png")
-            val stickerUri = saveBitmapToCache(stickerBitmap, "sticker_image_${UUID.randomUUID()}.png")
+            // 스티커 레이어 캡처 (뷰가 완전히 그려진 후에 캡처)
+            binding.imgStickerLayout.post {
+                val stickerBitmap = captureViewAsBitmap(binding.imgStickerLayout)
 
-            // Instagram 스토리로 배경과 스티커 이미지 각각 공유
-            shareToInstagramStory(backgroundUri, stickerUri)
+                // 캐시 저장
+                val backgroundUri = saveBitmapToCache(backgroundBitmap, "background_image_$uuid.png")
+                val stickerUri = saveBitmapToCache(stickerBitmap, "sticker_image_$uuid.png")
+
+                // 공유
+                shareToInstagramStory(backgroundUri, stickerUri)
+            }
         }
     }
 
-    // 흰색 배경을 비트맵으로 나타내는 메서드
-    private fun drawBackgroundBitmap(): Bitmap {
-        val backgroundWidth = resources.displayMetrics.widthPixels
-        val backgroundHeight = resources.displayMetrics.heightPixels
+    // VectorDrawable을 비트맵으로 렌더링하는 함수
+    private fun drawVectorBackgroundBitmap(): Bitmap {
+        val width = resources.displayMetrics.widthPixels
+        val height = resources.displayMetrics.heightPixels
 
-        val backgroundBitmap = Bitmap.createBitmap(backgroundWidth, backgroundHeight, Bitmap.Config.ARGB_8888)
-        val canvas = Canvas(backgroundBitmap)
+        val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bitmap)
 
-        // 배경색을 흰색으로 설정
-        val bgColor = ContextCompat.getColor(requireContext(), android.R.color.white)
-        canvas.drawColor(bgColor)
+        val drawable: Drawable? = ContextCompat.getDrawable(requireContext(), R.drawable.bg_instagram_story)
+        drawable?.setBounds(0, 0, width, height)
+        drawable?.draw(canvas)
 
-        return backgroundBitmap
+        return bitmap
     }
 
-    // 특정 View를 비트맵으로 변환하는 함수
+    // 뷰를 비트맵으로 캡처하는 함수
     private fun captureViewAsBitmap(view: View): Bitmap {
         val bitmap = Bitmap.createBitmap(view.width, view.height, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
@@ -78,11 +91,16 @@ class InstaShareFragment : Fragment() {
         return bitmap
     }
 
-    // 비트맵을 캐시에 저장하고 URI를 반환
+    // 비트맵을 캐시 디렉토리에 저장하고 URI 반환
     private fun saveBitmapToCache(bitmap: Bitmap, fileName: String): Uri {
         val file = File(requireContext().cacheDir, fileName)
-        FileOutputStream(file).use { out ->
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
+        try {
+            FileOutputStream(file).use { out ->
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Toast.makeText(requireContext(), "파일 저장에 실패했습니다.", Toast.LENGTH_SHORT).show()
         }
         return FileProvider.getUriForFile(
             requireContext(),
@@ -91,29 +109,17 @@ class InstaShareFragment : Fragment() {
         )
     }
 
-    // Instagram 스토리로 배경과 스티커 이미지 각각 공유
+    // Instagram 스토리 공유 함수
     private fun shareToInstagramStory(backgroundUri: Uri, stickerUri: Uri) {
         val intent = Intent("com.instagram.share.ADD_TO_STORY").apply {
-            // 배경 이미지 URI 설정
             setDataAndType(backgroundUri, "image/png")
             flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
             putExtra("source_application", requireContext().packageName)
-
-            // 스티커 이미지 URI 설정
             putExtra("interactive_asset_uri", stickerUri)
         }
 
-        // Instagram에 권한 부여
-        requireContext().grantUriPermission(
-            "com.instagram.android",
-            backgroundUri,
-            Intent.FLAG_GRANT_READ_URI_PERMISSION
-        )
-        requireContext().grantUriPermission(
-            "com.instagram.android",
-            stickerUri,
-            Intent.FLAG_GRANT_READ_URI_PERMISSION
-        )
+        requireContext().grantUriPermission("com.instagram.android", backgroundUri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        requireContext().grantUriPermission("com.instagram.android", stickerUri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
 
         try {
             startActivity(intent)
