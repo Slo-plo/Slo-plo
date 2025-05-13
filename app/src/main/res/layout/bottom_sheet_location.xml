@@ -64,10 +64,11 @@
         android:id="@+id/btn_select_region"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="지역 선택"
         android:background="#808080"
-        android:textColor="#FFFFFF"
         android:fontFamily="@font/noto_sans_kr_semi_bold"
-        android:includeFontPadding="false"/>
+        android:includeFontPadding="false"
+        android:text="지역 선택"
+        android:textColor="#FFFFFF"
+        android:textSize="20dp"/>
 
 </LinearLayout>
