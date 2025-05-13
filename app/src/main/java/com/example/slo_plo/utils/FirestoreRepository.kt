@@ -37,28 +37,26 @@ object FirestoreRepository {
             .addOnFailureListener { callback(false) }
     }
 
-    fun loadLogRecordsForDate(
-        userId: String,
-        date: LocalDate,
-        callback: (List<LogRecord>) -> Unit
-    ) {
-        val dateId = date.format(DateTimeFormatter.ofPattern("yyyy.MM.dd"))
-        db.collection("users")
+    fun loadLogRecordsForDate(userId: String, date: LocalDate, callback: (List<LogRecord>) -> Unit) {
+        val dateStr = date.format(DateTimeFormatter.ofPattern("yyyy.MM.dd"))
+
+        FirebaseFirestore.getInstance()
+            .collection("users")
             .document(userId)
             .collection("plogging_logs")
-            .whereEqualTo("dateId", dateId)
+            .whereEqualTo("dateId", dateStr)
             .get()
-            .addOnSuccessListener { snap ->
-                val list = snap.documents
-                    .mapNotNull { it.toObject(LogRecord::class.java) }
-                    .sortedByDescending { it.dateId }
-                callback(list)
+            .addOnSuccessListener { snapshot ->
+                val records = snapshot.documents.mapNotNull { doc ->
+                    doc.toObject(LogRecord::class.java)?.copy(docId = doc.id) // ✅ 문서 ID를 직접 넣어줌
+                }
+                callback(records)
             }
             .addOnFailureListener {
                 callback(emptyList())
             }
     }
-
+    
     // 사용자의 모든 일지 정보
     fun loadAllLogRecords(
         userId: String,
@@ -77,5 +75,4 @@ object FirestoreRepository {
                 callback(emptyList())
             }
     }
-
 }

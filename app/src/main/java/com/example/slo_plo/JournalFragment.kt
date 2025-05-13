@@ -268,19 +268,18 @@ class JournalFragment : Fragment() {
                                 binding.logViewPager.visibility = View.GONE
                             } else {
                                 binding.logDateText.text = "${records.size}개의 기록이 있습니다"
-                                binding.logViewPager.adapter = LogSummaryPagerAdapter(records) { selectedRecord ->
+
+                                // 상세보기 버튼 클릭 시 LogDetailFragment로 이동
+                                val adapter = LogSummaryPagerAdapter(records) { selectedRecord ->
                                     val bundle = Bundle().apply {
                                         putSerializable("logRecord", selectedRecord)
                                     }
                                     findNavController().navigate(R.id.logDetailFragment, bundle)
                                 }
-                                binding.logViewPager.visibility = View.VISIBLE
-                                binding.logViewPager.adapter = LogSummaryPagerAdapter(records) { selectedRecord ->
-                                    val bundle = Bundle().apply {
-                                        putSerializable("logRecord", selectedRecord)
-                                    }
-                                    findNavController().navigate(R.id.logDetailFragment, bundle)
-                                }
+
+
+                                // ViewPager 연결
+                                binding.logViewPager.adapter = adapter
                                 binding.logViewPager.visibility = View.VISIBLE
                             }
                         }

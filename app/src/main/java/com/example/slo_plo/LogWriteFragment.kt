@@ -166,6 +166,7 @@ class LogWriteFragment : Fragment() {
 
         // 저장 버튼
         binding.btnBottom.btnLogSave.setOnClickListener {
+            val currentDateTime = LocalDateTime.now()
             val userId = FirebaseAuth.getInstance().currentUser?.uid
             if (userId == null) {
                 Log.e("LogWriteFragment", "User ID is null. Are you logged in?")
@@ -173,13 +174,18 @@ class LogWriteFragment : Fragment() {
                 return@setOnClickListener
             }
             val dateId = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy.MM.dd"))
-            val logsRef = FirebaseFirestore.getInstance()
-                .collection("users")
-                .document(userId)
-                .collection("plogging_logs")
+            val writeDateTime = currentDateTime.format(
+                DateTimeFormatter.ofPattern("yyyy년 M월 d일 E요일 HH시 mm분", Locale.KOREA)
+            )
+
             val title = binding.etLogTitle.text.toString()
             val content = binding.etLogContent.text.toString()
             val trash = binding.etLogTrash.text.toString()
+
+            val logsRef = FirebaseFirestore.getInstance()
+                .collection("users")
+                .document(uid!!)
+                .collection("plogging_logs")
 
             showConfirmDialog(
                 context = requireContext(),
@@ -188,25 +194,30 @@ class LogWriteFragment : Fragment() {
                 message = "일지를 저장하시겠습니까?"
             ) {
                 // 1. 기존 개수 세고
-                logsRef
-                    .whereEqualTo("dateId", dateId)
-                    .get()
-                    .addOnSuccessListener { querySnapshot ->
-                        val count = querySnapshot.size()
-                        val newDocId = "${dateId}_${count + 1}"
+                logsRef.get().addOnSuccessListener { querySnapshot ->
+                    val sameDateDocIds = querySnapshot.documents
+                        .mapNotNull { it.id }
+                        .filter { it.startsWith("${dateId}_") }
+                        .mapNotNull {
+                            it.removePrefix("${dateId}_").toIntOrNull()
+                        }
 
-                        // 2. 실제 저장할 데이터 구성
-                        val record = LogRecord(
-                            dateId = dateId,
-                            startAddress = startAddr,
-                            endAddress = endAddr,
-                            time = totalTime.toIntOrNull() ?: 0,
-                            distance = totalDist.toDoubleOrNull() ?: 0.0,
-                            trashCount = trash.toIntOrNull() ?: 0,
-                            title = title,
-                            body = content,
-                            imageUrls = emptyList()
-                        )
+                    val nextNumber = if (sameDateDocIds.isEmpty()) 1 else (sameDateDocIds.max()!! + 1)
+                    val newDocId = "${dateId}_$nextNumber"
+
+                    val record = LogRecord(
+                        dateId = dateId,
+                        startAddress = startAddr,
+                        endAddress = endAddr,
+                        time = totalTime.toIntOrNull() ?: 0,
+                        distance = totalDist.toDoubleOrNull() ?: 0.0,
+                        trashCount = trash.toIntOrNull() ?: 0,
+                        title = title,
+                        body = content,
+                        imageUrls = emptyList(), // 나중에 이미지 연동 시 수정
+                        writeDateTime = writeDateTime,
+                        docId = newDocId
+                    )
 
                         // 3. 저장
                         logsRef.document(newDocId).set(record)

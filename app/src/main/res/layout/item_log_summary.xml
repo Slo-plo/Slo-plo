@@ -60,7 +60,7 @@
             android:id="@+id/summaryTrash"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="쓰레기 개수: 50개"
+            android:text="수거한 쓰레기: 50개"
             android:textColor="#666666"
             android:textSize="14sp"
             android:layout_marginTop="2dp"/>

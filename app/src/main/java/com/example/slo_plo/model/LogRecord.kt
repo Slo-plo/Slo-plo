@@ -21,6 +21,9 @@ data class LogRecord(
     // 일지 제목·본문
     val title: String = "",
     val body: String = "",
+    // 일지 작성 시간
+    val writeDateTime: String = "",
     // 사진 URL 리스트
-    val imageUrls: List<String> = emptyList()
+    val imageUrls: List<String> = emptyList(),
+    val docId: String? = null
 ) : Serializable
