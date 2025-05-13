@@ -114,16 +114,11 @@ class LogDetailFragment : Fragment() {
                 putString("imageUrl", logRecord?.imageUrls?.firstOrNull() ?: "")
             }
 
-            val instaShareFragment = InstaShareFragment().apply {
-                arguments = bundle
-            }
-
-            requireActivity().supportFragmentManager.beginTransaction()
-                .replace(R.id.log_detail_root, instaShareFragment)
-                .addToBackStack(null)
-                .commit()
+            findNavController().navigate(
+                R.id.action_logDetailFragment_to_instaShareFragment,
+                bundle
+            )
         }
-
     }
 
     override fun onDestroyView() {

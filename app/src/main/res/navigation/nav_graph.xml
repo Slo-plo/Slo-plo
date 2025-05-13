@@ -49,6 +49,9 @@
         <argument
             android:name="logRecord"
             app:argType="com.example.slo_plo.model.LogRecord" />
+        <action
+            android:id="@+id/action_logDetailFragment_to_instaShareFragment"
+            app:destination="@id/instaShareFragment" />
     </fragment>
 
 
@@ -71,4 +74,11 @@
             android:id="@+id/action_onboardingGuideFragment_to_homeFragment"
             app:destination="@id/homeFragment" />
     </fragment>
+
+    <fragment
+        android:id="@+id/instaShareFragment"
+        android:name="com.example.slo_plo.InstaShareFragment"
+        android:label="Insta Share Fragment">
+    </fragment>
+
 </navigation>
