@@ -69,7 +69,8 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:paddingBottom="80dp">
 
             <!-- 제목 -->
             <TextView
@@ -178,14 +179,16 @@
             <!-- 이미지 -->
             <ImageView
                 android:id="@+id/iv_log_image"
-                android:layout_width="200dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:scaleType="fitCenter"
                 android:layout_marginHorizontal="24dp"
                 android:layout_marginStart="10dp"
-                android:layout_marginTop="25dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginTop="10dp"
                 android:adjustViewBounds="true"
-                android:scaleType="fitCenter"
-                android:maxHeight="300dp"
+                android:maxHeight="400dp"
+                android:layout_gravity="center"
                 android:visibility="visible" />
 
             <!-- 본문 -->

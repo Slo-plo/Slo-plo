@@ -203,7 +203,8 @@ class LogWriteFragment : Fragment() {
                             it.removePrefix("${dateId}_").toIntOrNull()
                         }
 
-                    val nextNumber = if (sameDateDocIds.isEmpty()) 1 else (sameDateDocIds.max()!! + 1)
+                    val nextNumber =
+                        if (sameDateDocIds.isEmpty()) 1 else (sameDateDocIds.max()!! + 1)
                     val newDocId = "${dateId}_$nextNumber"
 
                     if (selectedImageUri != null) {
@@ -226,18 +227,27 @@ class LogWriteFragment : Fragment() {
 
                                 logsRef.document(newDocId).set(record)
                                     .addOnSuccessListener {
-                                        Toast.makeText(requireContext(), "저장 완료", Toast.LENGTH_SHORT).show()
+                                        Toast.makeText(
+                                            requireContext(),
+                                            "저장 완료",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
                                         findNavController().previousBackStackEntry
                                             ?.savedStateHandle
                                             ?.set("needsRefresh", true)
                                         findNavController().popBackStack()
                                     }
                                     .addOnFailureListener {
-                                        Toast.makeText(requireContext(), "저장 실패", Toast.LENGTH_SHORT).show()
+                                        Toast.makeText(
+                                            requireContext(),
+                                            "저장 실패",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
                                     }
                             },
                             onFailure = {
-                                Toast.makeText(requireContext(), "이미지 업로드 실패", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(requireContext(), "이미지 업로드 실패", Toast.LENGTH_SHORT)
+                                    .show()
                             }
                         )
                     } else {
@@ -267,35 +277,7 @@ class LogWriteFragment : Fragment() {
                                 Toast.makeText(requireContext(), "저장 실패", Toast.LENGTH_SHORT).show()
                             }
                     }
-
-
-//                    val record = LogRecord(
-//                        dateId = dateId,
-//                        startAddress = startAddr,
-//                        endAddress = endAddr,
-//                        time = totalTime.toIntOrNull() ?: 0,
-//                        distance = totalDist.toDoubleOrNull() ?: 0.0,
-//                        trashCount = trash.toIntOrNull() ?: 0,
-//                        title = title,
-//                        body = content,
-//                        imageUrls = emptyList(), // 나중에 이미지 연동 시 수정
-//                        writeDateTime = writeDateTime,
-//                        docId = newDocId
-//                    )
-//
-//                        // 3. 저장
-//                        logsRef.document(newDocId).set(record)
-//                            .addOnSuccessListener {
-//                                Toast.makeText(requireContext(), "저장 완료", Toast.LENGTH_SHORT).show()
-//                                findNavController().previousBackStackEntry
-//                                    ?.savedStateHandle
-//                                    ?.set("needsRefresh", true)
-//                                findNavController().popBackStack()
-//                            }
-//                            .addOnFailureListener {
-//                                Toast.makeText(requireContext(), "저장 실패", Toast.LENGTH_SHORT).show()
-//                            }
-                    }
+                }
                     .addOnFailureListener {
                         Toast.makeText(requireContext(), "기록 카운트 조회 실패", Toast.LENGTH_SHORT).show()
                     }
