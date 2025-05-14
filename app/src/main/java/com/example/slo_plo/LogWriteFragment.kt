@@ -25,6 +25,7 @@ import com.example.slo_plo.model.LogRecord
 import com.example.slo_plo.utils.FirestoreRepository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -205,21 +206,55 @@ class LogWriteFragment : Fragment() {
                     val nextNumber = if (sameDateDocIds.isEmpty()) 1 else (sameDateDocIds.max()!! + 1)
                     val newDocId = "${dateId}_$nextNumber"
 
-                    val record = LogRecord(
-                        dateId = dateId,
-                        startAddress = startAddr,
-                        endAddress = endAddr,
-                        time = totalTime.toIntOrNull() ?: 0,
-                        distance = totalDist.toDoubleOrNull() ?: 0.0,
-                        trashCount = trash.toIntOrNull() ?: 0,
-                        title = title,
-                        body = content,
-                        imageUrls = emptyList(), // 나중에 이미지 연동 시 수정
-                        writeDateTime = writeDateTime,
-                        docId = newDocId
-                    )
+                    if (selectedImageUri != null) {
+                        uploadImageToFirebase(
+                            selectedImageUri!!,
+                            onSuccess = { imageUrl ->
+                                val record = LogRecord(
+                                    dateId = dateId,
+                                    startAddress = startAddr,
+                                    endAddress = endAddr,
+                                    time = totalTime.toIntOrNull() ?: 0,
+                                    distance = totalDist.toDoubleOrNull() ?: 0.0,
+                                    trashCount = trash.toIntOrNull() ?: 0,
+                                    title = title,
+                                    body = content,
+                                    imageUrls = listOf(imageUrl),
+                                    writeDateTime = writeDateTime,
+                                    docId = newDocId
+                                )
 
-                        // 3. 저장
+                                logsRef.document(newDocId).set(record)
+                                    .addOnSuccessListener {
+                                        Toast.makeText(requireContext(), "저장 완료", Toast.LENGTH_SHORT).show()
+                                        findNavController().previousBackStackEntry
+                                            ?.savedStateHandle
+                                            ?.set("needsRefresh", true)
+                                        findNavController().popBackStack()
+                                    }
+                                    .addOnFailureListener {
+                                        Toast.makeText(requireContext(), "저장 실패", Toast.LENGTH_SHORT).show()
+                                    }
+                            },
+                            onFailure = {
+                                Toast.makeText(requireContext(), "이미지 업로드 실패", Toast.LENGTH_SHORT).show()
+                            }
+                        )
+                    } else {
+                        val record = LogRecord(
+                            dateId = dateId,
+                            startAddress = startAddr,
+                            endAddress = endAddr,
+                            time = totalTime.toIntOrNull() ?: 0,
+                            distance = totalDist.toDoubleOrNull() ?: 0.0,
+                            trashCount = trash.toIntOrNull() ?: 0,
+                            title = title,
+                            body = content,
+                            imageUrls = emptyList(),
+                            writeDateTime = writeDateTime,
+                            docId = newDocId
+                        )
+
                         logsRef.document(newDocId).set(record)
                             .addOnSuccessListener {
                                 Toast.makeText(requireContext(), "저장 완료", Toast.LENGTH_SHORT).show()
@@ -231,6 +266,35 @@ class LogWriteFragment : Fragment() {
                             .addOnFailureListener {
                                 Toast.makeText(requireContext(), "저장 실패", Toast.LENGTH_SHORT).show()
                             }
+                    }
+
+
+//                    val record = LogRecord(
+//                        dateId = dateId,
+//                        startAddress = startAddr,
+//                        endAddress = endAddr,
+//                        time = totalTime.toIntOrNull() ?: 0,
+//                        distance = totalDist.toDoubleOrNull() ?: 0.0,
+//                        trashCount = trash.toIntOrNull() ?: 0,
+//                        title = title,
+//                        body = content,
+//                        imageUrls = emptyList(), // 나중에 이미지 연동 시 수정
+//                        writeDateTime = writeDateTime,
+//                        docId = newDocId
+//                    )
+//
+//                        // 3. 저장
+//                        logsRef.document(newDocId).set(record)
+//                            .addOnSuccessListener {
+//                                Toast.makeText(requireContext(), "저장 완료", Toast.LENGTH_SHORT).show()
+//                                findNavController().previousBackStackEntry
+//                                    ?.savedStateHandle
+//                                    ?.set("needsRefresh", true)
+//                                findNavController().popBackStack()
+//                            }
+//                            .addOnFailureListener {
+//                                Toast.makeText(requireContext(), "저장 실패", Toast.LENGTH_SHORT).show()
+//                            }
                     }
                     .addOnFailureListener {
                         Toast.makeText(requireContext(), "기록 카운트 조회 실패", Toast.LENGTH_SHORT).show()
@@ -249,6 +313,27 @@ class LogWriteFragment : Fragment() {
         val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
         galleryLauncher.launch(intent)
     }
+
+    private fun uploadImageToFirebase(
+        imageUri: Uri,
+        onSuccess: (String) -> Unit,
+        onFailure: () -> Unit
+    ) {
+        val storageRef = FirebaseStorage.getInstance().reference
+        val fileName = "images/${System.currentTimeMillis()}.jpg"
+        val imageRef = storageRef.child(fileName)
+
+        imageRef.putFile(imageUri)
+            .addOnSuccessListener {
+                imageRef.downloadUrl.addOnSuccessListener { uri ->
+                    onSuccess(uri.toString())
+                }
+            }
+            .addOnFailureListener {
+                onFailure()
+            }
+    }
+
 
     fun showConfirmDialog(
         title: String,
