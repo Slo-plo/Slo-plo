@@ -24,14 +24,10 @@ import com.example.slo_plo.databinding.FragmentLogWriteBinding
 import com.example.slo_plo.model.LogRecord
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import okhttp3.*
-import java.io.IOException
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
-import android.util.Base64
-import org.json.JSONObject
 
 class LogWriteFragment : Fragment() {
 
@@ -307,57 +303,6 @@ class LogWriteFragment : Fragment() {
         val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
         galleryLauncher.launch(intent)
     }
-
-//    private fun uploadImageToImgBB(imageUri: Uri, onSuccess: (String) -> Unit) {
-//        val apiKey = BuildConfig.IMGBB_API_KEY
-//        val inputStream = requireContext().contentResolver.openInputStream(imageUri)
-//        val imageBytes = inputStream?.readBytes()
-//        inputStream?.close()
-//
-//        if (imageBytes == null) {
-//            Toast.makeText(requireContext(), "이미지를 읽을 수 없습니다.", Toast.LENGTH_SHORT).show()
-//            return
-//        }
-//
-//        val encodedImage = Base64.encodeToString(imageBytes, Base64.NO_WRAP)
-//
-//        val requestBody = MultipartBody.Builder()
-//            .setType(MultipartBody.FORM)
-//            .addFormDataPart("image", encodedImage)
-//            .build()
-//
-//        val request = Request.Builder()
-//            .url("https://api.imgbb.com/1/upload?expiration=600&key=$apiKey")
-//            .post(requestBody)
-//            .build()
-//
-//        OkHttpClient().newCall(request).enqueue(object : Callback {
-//            override fun onFailure(call: Call, e: IOException) {
-//                requireActivity().runOnUiThread {
-//                    Toast.makeText(requireContext(), "이미지 업로드 실패", Toast.LENGTH_SHORT).show()
-//                }
-//            }
-//
-//            override fun onResponse(call: Call, response: Response) {
-//                response.use {
-//                    if (!response.isSuccessful) {
-//                        Log.e("ImgBB", "❌ 업로드 실패: ${response.code} - ${response.body?.string()}")
-//                        requireActivity().runOnUiThread {
-//                            Toast.makeText(requireContext(), "이미지 업로드 실패", Toast.LENGTH_SHORT).show()
-//                        }
-//                        return
-//                    }
-//                    val body = response.body?.string()
-//                    val imageUrl = JSONObject(body).getJSONObject("data").getString("url")
-//                    requireActivity().runOnUiThread {
-//                        onSuccess(imageUrl)
-//                    }
-//                }
-//            }
-//        })
-//    }
-
-
 
 
     fun showConfirmDialog(
