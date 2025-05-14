@@ -15,9 +15,11 @@ class LogSummaryPagerAdapter(
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(log: LogRecord) {
+            binding.summaryDate.text = "🗓️ ${log.dateId}"
             binding.summaryTitle.text = log.title
-            binding.summaryDateDistance.text = "${log.dateId} · ${log.distance} m"
-            binding.summaryStartTime.text = "📍 ${log.startAddress} | ${log.time}분"
+            binding.summaryTime.text = " ${log.time}분"
+            binding.summaryDistance.text = " ${log.distance} m"
+            binding.summaryAddress.text = "📍 ${log.startAddress}"
             binding.summaryTrash.text = "수거한 쓰레기: ${log.trashCount}개"
 
             //️ 상세보기 버튼 클릭 처리
