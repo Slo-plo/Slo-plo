@@ -1,59 +1,75 @@
 package com.example.slo_plo
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.slo_plo.LogListAdapter
+import com.example.slo_plo.databinding.FragmentLogListBinding
+import com.example.slo_plo.model.LogRecord
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [LogListFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class LogListFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
+    private var _binding: FragmentLogListBinding? = null
+    private val binding get() = _binding!!
+    private val db = FirebaseFirestore.getInstance()
+    private val auth = FirebaseAuth.getInstance()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_log_list, container, false)
+    ): View {
+        _binding = FragmentLogListBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment LogListFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            LogListFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        val userId = auth.currentUser?.uid ?: return
+        val logRef = db.collection("users").document(userId).collection("plogging_logs")
+
+        // 최신순으로 가져오기 (날짜 + 문서 ID 순으로 정렬)
+        logRef.orderBy("dateId", Query.Direction.DESCENDING)
+            .get()
+            .addOnSuccessListener { snapshot ->
+                val logList = snapshot.documents.mapNotNull { doc ->
+                    doc.toObject(LogRecord::class.java)?.apply {
+                        this.docId = doc.id
+                    }
                 }
+
+                val adapter = LogListAdapter(logList) { record ->
+                    val bundle = Bundle().apply {
+                        putSerializable("logRecord", record)
+                    }
+                    findNavController().navigate(R.id.action_logList_to_logDetail, bundle)
+                }
+
+
+                binding.logListRecycler.layoutManager = LinearLayoutManager(requireContext())
+                binding.logListRecycler.adapter = adapter
             }
+
+        // 캘린더 버튼 클릭 → 캘린더 화면 이동
+        binding.btnCalendar.setOnClickListener {
+            findNavController().navigate(R.id.action_logList_to_calendar)
+        }
+
+        // 뒤로가기
+        binding.btnBack.setOnClickListener {
+            findNavController().navigate(R.id.action_logList_to_home)
+        }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

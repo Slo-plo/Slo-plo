@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="16dp"
+    android:background="@android:color/white"
+    android:elevation="6dp"
+    android:radius="16dp">
+
+    <!-- 상세보기 버튼 -->
+    <ImageButton
+        android:id="@+id/buttonDetail"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_gravity="end"
+        android:padding="16dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginStart="16dp"
+        android:background="@android:color/transparent"
+        android:backgroundTint="@android:color/transparent"
+        android:contentDescription="상세보기"
+        android:src="@drawable/ic_arrow_forward" />
+
+    <LinearLayout
+        android:padding="10dp"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <!-- 날짜, 시간, 거리 -->
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp">
+            <TextView
+                android:id="@+id/summaryDate"
+                android:text="🗓️ 2025.04.11"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:layout_marginEnd="12dp"
+                android:textColor="@android:color/black" />
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:src="@drawable/ic_time" />
+            <TextView
+                android:id="@+id/summaryTime"
+                android:text=" 50분"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:layout_marginEnd="12dp"
+                android:textColor="@android:color/black" />
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:src="@drawable/ic_distance" />
+            <TextView
+                android:id="@+id/summaryDistance"
+                android:text=" 2.5km"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:textColor="@android:color/black" />
+        </LinearLayout>
+
+        <!-- 제목 -->
+        <TextView
+            android:id="@+id/summaryTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="담배꽁초 50개 주움"
+            android:textSize="16sp"
+            android:fontFamily="@font/noto_sans_kr_semi_bold"
+            android:includeFontPadding="false" />
+
+        <!-- 주소 -->
+        <TextView
+            android:id="@+id/summaryAddress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="📍 반포한강공원"
+            android:textSize="14sp"
+            android:layout_marginTop="4dp"/>
+
+        <!-- 쓰레기 개수 -->
+        <TextView
+            android:id="@+id/summaryTrash"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="수거한 쓰레기: 50개"
+            android:textColor="#666666"
+            android:textSize="14sp"
+            android:layout_marginTop="2dp"/>
+
+        <!-- 본문 미리보기 -->
+        <TextView
+            android:id="@+id/summaryContent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="오늘은 날씨가 좋아서 열심히 쓰레기를 주웠다. 담배꽁초가 유독 많았다..."
+            android:textSize="14sp"
+            android:textColor="#444444"
+            android:maxLines="2"
+            android:ellipsize="end"
+            android:layout_marginTop="6dp" />
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

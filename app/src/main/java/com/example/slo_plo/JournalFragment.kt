@@ -156,6 +156,12 @@ class JournalFragment : Fragment() {
             requireActivity().onBackPressedDispatcher.onBackPressed()
         }
 
+        // 목록 버튼 클릭 시 일지 모아보기 화면으로 이동
+        binding.buttonLogList.setOnClickListener {
+            findNavController().navigate(R.id.action_journal_to_logList)
+        }
+
+
         // 날짜 셀 그리기 정의
         binding.calendarView.dayBinder = object : MonthDayBinder<DayViewContainer> {
             override fun create(view: View) = DayViewContainer(view)
