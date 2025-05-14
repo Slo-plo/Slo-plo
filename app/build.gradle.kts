@@ -31,6 +31,8 @@ android {
         buildConfigField("String", "NAVER_GEO_CLIENT_SECRET", "\"${properties.getProperty("NAVER_GEO_CLIENT_SECRET")}\"")
 //        buildConfigField("String", "NAVER_CLIENT_ID", "\"${properties.getProperty("NAER_CLIENT_ID") ?: ""}\"")
 
+        val imgbbKey: String = project.findProperty("imgbb.api.key") as String? ?: ""
+        buildConfigField("String", "IMGBB_API_KEY", "\"$imgbbKey\"")
     }
 
     buildTypes {
@@ -81,6 +83,7 @@ dependencies {
     implementation("com.google.firebase:firebase-firestore-ktx")
     implementation(platform("com.google.firebase:firebase-bom:33.13.0"))
     implementation("com.google.firebase:firebase-auth")
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
 
 
 

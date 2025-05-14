@@ -16,7 +16,7 @@ class LogSummaryPagerAdapter(
 
         fun bind(log: LogRecord) {
             binding.summaryTitle.text = log.title
-            binding.summaryDateDistance.text = "${log.dateId} · ${log.distance}km"
+            binding.summaryDateDistance.text = "${log.dateId} · ${log.distance} m"
             binding.summaryStartTime.text = "📍 ${log.startAddress} | ${log.time}분"
             binding.summaryTrash.text = "수거한 쓰레기: ${log.trashCount}개"
 
