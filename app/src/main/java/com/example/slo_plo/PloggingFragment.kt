@@ -24,8 +24,11 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import com.bumptech.glide.Glide
 import com.example.slo_plo.databinding.DialogPloggingSummaryBinding
+import com.example.slo_plo.databinding.DialogTrashBinding
 import com.example.slo_plo.databinding.FragmentPloggingBinding
+import com.example.slo_plo.model.TrashBin
 import com.naver.maps.map.CameraUpdate
 import com.naver.maps.map.MapFragment
 import com.naver.maps.map.NaverMap
@@ -138,6 +141,8 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
         naverMap.uiSettings.isCompassEnabled = false
         naverMap.uiSettings.isScaleBarEnabled = false
         naverMap.uiSettings.isZoomControlEnabled = false
+
+        addTrashBinMarkers()
 
         // 권한 확인 후 위치 서비스 확인 및 위치 요청
         if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
@@ -668,4 +673,63 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
                 }
             }
     }
+
+    private fun addTrashBinMarkers() {
+        val trashBins = listOf(
+            TrashBin(
+                lat = 37.637022,
+                lng = 127.074771,
+                title = "버거투버거 앞 쓰레기통",
+                description = "일반 쓰레기",
+                photoUrl = "https://image.news1.kr/system/photos/2023/10/12/6262312/high.jpg"
+            ),
+            TrashBin(
+                lat = 37.636718,
+                lng = 127.074719,
+                title = "하계1동 길거리 쓰레기통",
+                description = "일반 + 재활용 쓰레기",
+                photoUrl = "https://cdn.emetro.co.kr/data2/content/image/2020/06/08/.cache/512/20200608500330.jpg"
+            )
+        )
+
+        trashBins.forEach { bin ->
+            val marker = Marker().apply {
+                position = LatLng(bin.lat, bin.lng)
+                icon = OverlayImage.fromResource(R.drawable.ic_trash_marker)
+                map = naverMap
+            }
+
+            marker.setOnClickListener {
+                showTrashDialog(bin)
+                true
+            }
+        }
+    }
+
+    private fun showTrashDialog(bin: TrashBin) {
+        val binding = DialogTrashBinding.inflate(LayoutInflater.from(requireContext()))
+
+        binding.tvTrashTitle.text = bin.title
+        binding.tvTrashDescription.text = bin.description ?: "설명 없음"
+
+        if (bin.photoUrl != null) {
+            Glide.with(this)
+                .load(bin.photoUrl)
+                .into(binding.ivTrashImage)
+        } else {
+            binding.ivTrashImage.visibility = View.GONE
+        }
+
+        val dialog = AlertDialog.Builder(requireContext())
+            .setView(binding.root)
+            .create()
+
+        binding.btnTrashOk.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.show()
+    }
+
+
 }
