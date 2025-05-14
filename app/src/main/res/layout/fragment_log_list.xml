@@ -47,9 +47,11 @@
         android:layout_height="0dp"
         android:padding="16dp"
         android:clipToPadding="false"
+        android:layout_marginBottom="100dp"
+        android:overScrollMode="never"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintTop_toBottomOf="@id/ic_app_sloplo"
-        app:layout_constraintBottom_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 

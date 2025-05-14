@@ -32,10 +32,12 @@ class LogListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val userId = auth.currentUser?.uid ?: return
-        val logRef = db.collection("users").document(userId).collection("plogging_logs")
+        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        val logRef = FirebaseFirestore.getInstance()
+            .collection("users")
+            .document(userId)
+            .collection("plogging_logs")
 
-        // 최신순으로 가져오기 (날짜 + 문서 ID 순으로 정렬)
         logRef.orderBy("dateId", Query.Direction.DESCENDING)
             .get()
             .addOnSuccessListener { snapshot ->
@@ -51,7 +53,6 @@ class LogListFragment : Fragment() {
                     }
                     findNavController().navigate(R.id.action_logList_to_logDetail, bundle)
                 }
-
 
                 binding.logListRecycler.layoutManager = LinearLayoutManager(requireContext())
                 binding.logListRecycler.adapter = adapter

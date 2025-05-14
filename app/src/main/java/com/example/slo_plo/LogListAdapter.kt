@@ -34,8 +34,8 @@ class LogListAdapter(
         val record = logList[position]
 
         holder.summaryDate.text = "🗓️ ${record.dateId}"
-        holder.summaryTime.text = " ${record.time}"
-        holder.summaryDistance.text = " ${record.distance}"
+        holder.summaryTime.text = " ${record.time} 분"
+        holder.summaryDistance.text = " ${record.distance} m"
         holder.summaryTitle.text = record.title
         holder.summaryAddress.text = "📍 ${record.startAddress}"
         holder.summaryTrash.text = "수거한 쓰레기: ${record.trashCount}개"
