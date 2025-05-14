@@ -28,14 +28,48 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <!-- 날짜 + 거리 -->
-        <TextView
-            android:id="@+id/summaryDateDistance"
+        <LinearLayout
+            android:orientation="horizontal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="2025.04.11 (금) 2.5km"
-            android:textSize="14sp"
-            android:textStyle="bold" />
+            android:layout_marginBottom="4dp">
+            <!-- 날짜 -->
+            <TextView
+                android:id="@+id/summaryDate"
+                android:text="🗓️ 2025.04.11"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:layout_marginEnd="12dp"
+                android:textColor="@android:color/black" />
+            <!-- 시간 -->
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:src="@drawable/ic_time" />
+            <TextView
+                android:id="@+id/summaryTime"
+                android:text=" 50분"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:layout_marginEnd="12dp"
+                android:textColor="@android:color/black" />
+            <!--거리-->
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:src="@drawable/ic_distance" />
+            <TextView
+                android:id="@+id/summaryDistance"
+                android:text=" 2.5km"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:textColor="@android:color/black" />
+        </LinearLayout>
 
         <!-- 제목 -->
         <TextView
@@ -44,14 +78,15 @@
             android:layout_height="wrap_content"
             android:text="담배꽁초 50개 주움"
             android:textSize="16sp"
-            android:layout_marginTop="4dp"/>
+            android:fontFamily="@font/noto_sans_kr_semi_bold"
+            android:includeFontPadding="false" />
 
-        <!-- 시작 주소 + 시간 -->
+        <!-- 시작 주소 -->
         <TextView
-            android:id="@+id/summaryStartTime"
+            android:id="@+id/summaryAddress"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="📍 반포한강공원 | 50분"
+            android:text="📍 반포한강공원"
             android:textSize="14sp"
             android:layout_marginTop="4dp"/>
 
