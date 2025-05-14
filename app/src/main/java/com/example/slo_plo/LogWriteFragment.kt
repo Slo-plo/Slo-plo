@@ -268,13 +268,14 @@ class LogWriteFragment : Fragment() {
 
     // 시간 문자열 MM:SS → 전체 분(Int)
     private fun parseDurationToMinutes(timeString: String): Int {
-        val parts = timeString.split(":")
+        val parts = timeString.split(":").map { it.trim() }
         return if (parts.size == 2) {
             val minutes = parts[0].toIntOrNull() ?: 0
             val seconds = parts[1].toIntOrNull() ?: 0
-            minutes + if (seconds >= 30) 1 else 0  // 반올림
+            minutes + if (seconds >= 30) 1 else 0  // 반올림 처리
         } else 0
     }
+
 
     private fun formatDistanceForDisplay(meters: Double): String {
         return if (meters < 1000) {
