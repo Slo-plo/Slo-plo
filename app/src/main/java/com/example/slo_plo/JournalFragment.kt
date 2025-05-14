@@ -151,9 +151,9 @@ class JournalFragment : Fragment() {
                 }
             }
 
-        // 뒤로가기 버튼 클릭 시 이전 화면으로 이동
+        // 뒤로가기 버튼 클릭 시 홈 화면으로 이동
         binding.btnBack.setOnClickListener {
-            requireActivity().onBackPressedDispatcher.onBackPressed()
+            findNavController().navigate(R.id.action_jouranl_to_home)
         }
 
         // 목록 버튼 클릭 시 일지 모아보기 화면으로 이동

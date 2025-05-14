@@ -12,6 +12,9 @@
     <action
         android:id="@+id/action_journal_to_logList"
         app:destination="@id/logListFragment" />
+        <action
+            android:id="@+id/action_jouranl_to_home"
+            app:destination="@id/homeFragment"/>
     </fragment>
 
     <fragment
