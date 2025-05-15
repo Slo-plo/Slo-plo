@@ -26,7 +26,9 @@
         android:src="@drawable/ic_arrow_forward" />
 
     <LinearLayout
-        android:padding="10dp"
+        android:paddingTop="7dp"
+        android:paddingBottom="7dp"
+        android:paddingLeft="12dp"
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -37,14 +39,20 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="4dp">
             <!-- 날짜 -->
+            <ImageView
+                android:layout_width="15dp"
+                android:layout_height="15dp"
+                android:layout_marginTop="5dp"
+                android:src="@drawable/ic_calendar_text" />
             <TextView
                 android:id="@+id/summaryDate"
-                android:text="🗓️ 2025.04.11"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="14sp"
                 android:layout_marginEnd="12dp"
-                android:textColor="@android:color/black" />
+                android:fontFamily="@font/tmoney_round_wind_regular"
+                android:text=" 2025.04.11"
+                android:textColor="@android:color/black"
+                android:textSize="13sp" />
             <!-- 시간 -->
             <ImageView
                 android:layout_width="wrap_content"
@@ -80,28 +88,53 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="담배꽁초 50개 주움"
-            android:textSize="16sp"
-            android:fontFamily="@font/noto_sans_kr_semi_bold"
+            android:textSize="15sp"
+            android:fontFamily="@font/noto_sans_kr_extra_bold"
             android:includeFontPadding="false" />
 
-        <!-- 시작 주소 -->
-        <TextView
-            android:id="@+id/summaryAddress"
+        <!-- 주소 -->
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="📍 반포한강공원"
-            android:textSize="14sp"
-            android:layout_marginTop="4dp"/>
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="15dp"
+                android:layout_height="15dp"
+                android:layout_marginTop="12dp"
+                android:src="@drawable/ic_address_text" />
+
+            <TextView
+                android:id="@+id/summaryAddress"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:fontFamily="@font/noto_sans_kr_regular"
+                android:includeFontPadding="false"
+                android:text=" 대한민국 서울특별시 영등포구 선유동 2로 42"
+                android:textSize="12sp" />
+        </LinearLayout>
 
         <!-- 쓰레기 개수 -->
-        <TextView
-            android:id="@+id/summaryTrash"
+        <LinearLayout
+            android:orientation="horizontal"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="수거한 쓰레기: 50개"
-            android:textColor="#666666"
-            android:textSize="14sp"
-            android:layout_marginTop="2dp"/>
+            android:layout_height="wrap_content">
+            <ImageView
+                android:layout_width="15dp"
+                android:layout_height="15dp"
+                android:layout_marginTop="10dp"
+                android:src="@drawable/ic_bin_text" />
+            <TextView
+                android:id="@+id/summaryTrash"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=" 수거한 쓰레기: 50개"
+                android:includeFontPadding="false"
+                android:fontFamily="@font/noto_sans_kr_medium"
+                android:textSize="13sp"
+                android:layout_marginTop="6dp"/>
+        </LinearLayout>
     </LinearLayout>
 
 </androidx.cardview.widget.CardView>
