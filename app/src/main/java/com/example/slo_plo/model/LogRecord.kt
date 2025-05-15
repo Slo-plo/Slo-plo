@@ -25,5 +25,5 @@ data class LogRecord(
     val writeDateTime: String = "",
     // 사진 URL 리스트
     val imageUrls: List<String> = emptyList(),
-    val docId: String? = null
+    var docId: String? = ""
 ) : Serializable
