@@ -25,12 +25,12 @@
         android:orientation="horizontal">
 
         <!-- 요일 7개 -->
+        <TextView style="@style/CalendarDayHeaderStyle" android:textColor="#E03220"/>
         <TextView style="@style/CalendarDayHeaderStyle"/>
         <TextView style="@style/CalendarDayHeaderStyle"/>
         <TextView style="@style/CalendarDayHeaderStyle"/>
         <TextView style="@style/CalendarDayHeaderStyle"/>
         <TextView style="@style/CalendarDayHeaderStyle"/>
-        <TextView style="@style/CalendarDayHeaderStyle"/>
-        <TextView style="@style/CalendarDayHeaderStyle"/>
+        <TextView style="@style/CalendarDayHeaderStyle" android:textColor="#2557A0"/>
     </LinearLayout>
 </LinearLayout>
