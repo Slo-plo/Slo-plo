@@ -16,6 +16,7 @@ import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
+import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.slo_plo.DialogUtils.showConfirmDialog
@@ -25,6 +26,7 @@ import com.example.slo_plo.model.LogRecord
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
+import java.io.File
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -35,6 +37,7 @@ class LogWriteFragment : Fragment() {
     private var _binding: FragmentLogWriteBinding? = null
     private val binding get() = _binding!!
     private var selectedImageUri: Uri? = null
+    private var cameraImageUri: Uri? = null
 
     private lateinit var auth: FirebaseAuth
     private var uid: String? = null
@@ -44,6 +47,8 @@ class LogWriteFragment : Fragment() {
     private var endAddr: String = ""
     private var totalTime: String = ""
     private var totalDist: String = ""
+
+    private var loadingDialog: AlertDialog? = null
 
 
     // 카메라 권한 요청
@@ -66,10 +71,9 @@ class LogWriteFragment : Fragment() {
     private val cameraLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            val bitmap = result.data?.extras?.get("data") as? android.graphics.Bitmap
+        if (result.resultCode == Activity.RESULT_OK && selectedImageUri != null) {
             binding.ivLogSelected.apply {
-                setImageBitmap(bitmap)
+                setImageURI(selectedImageUri)
                 visibility = View.VISIBLE
             }
         }
@@ -210,6 +214,8 @@ class LogWriteFragment : Fragment() {
                 title = "일지 저장",
                 message = "일지를 저장하시겠습니까?"
             ) {
+                showLoadingDialog()
+
                 // 1. 기존 개수 세고
                 logsRef.get().addOnSuccessListener { querySnapshot ->
                     val sameDateDocIds = querySnapshot.documents
@@ -243,6 +249,7 @@ class LogWriteFragment : Fragment() {
 
                                 logsRef.document(newDocId).set(record)
                                     .addOnSuccessListener {
+                                        hideLoadingDialog()
                                         Toast.makeText(
                                             requireContext(),
                                             "저장 완료",
@@ -254,6 +261,7 @@ class LogWriteFragment : Fragment() {
                                         findNavController().popBackStack()
                                     }
                                     .addOnFailureListener {
+                                        hideLoadingDialog()
                                         Toast.makeText(
                                             requireContext(),
                                             "저장 실패",
@@ -262,6 +270,7 @@ class LogWriteFragment : Fragment() {
                                     }
                             },
                             onFailure = {
+                                hideLoadingDialog()
                                 Toast.makeText(requireContext(), "이미지 업로드 실패", Toast.LENGTH_SHORT)
                                     .show()
                             }
@@ -283,6 +292,7 @@ class LogWriteFragment : Fragment() {
 
                         logsRef.document(newDocId).set(record)
                             .addOnSuccessListener {
+                                hideLoadingDialog()
                                 Toast.makeText(requireContext(), "저장 완료", Toast.LENGTH_SHORT).show()
                                 findNavController().previousBackStackEntry
                                     ?.savedStateHandle
@@ -290,11 +300,13 @@ class LogWriteFragment : Fragment() {
                                 findNavController().popBackStack()
                             }
                             .addOnFailureListener {
+                                hideLoadingDialog()
                                 Toast.makeText(requireContext(), "저장 실패", Toast.LENGTH_SHORT).show()
                             }
                     }
                 }
                     .addOnFailureListener {
+                        hideLoadingDialog()
                         Toast.makeText(requireContext(), "기록 카운트 조회 실패", Toast.LENGTH_SHORT).show()
                     }
             }
@@ -323,7 +335,7 @@ class LogWriteFragment : Fragment() {
         return if (meters < 1000) {
             "${meters.toInt()} m"
         } else {
-            String.format("%.2f km", meters / 1000)
+            String.format("%.1f km", meters / 1000)
         }
     }
 
@@ -338,12 +350,20 @@ class LogWriteFragment : Fragment() {
         }
     }
 
-
-
     private fun openCamera() {
-        val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+        val imageFile = File.createTempFile("camera_temp_", ".jpg", requireContext().cacheDir)
+        cameraImageUri = FileProvider.getUriForFile(
+            requireContext(),
+            "${requireContext().packageName}.fileprovider",
+            imageFile
+        )
+        val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE).apply {
+            putExtra(MediaStore.EXTRA_OUTPUT, cameraImageUri)
+        }
+        selectedImageUri = cameraImageUri  // 이 줄이 중요!
         cameraLauncher.launch(intent)
     }
+
 
     private fun openGallery() {
         val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
@@ -394,6 +414,22 @@ class LogWriteFragment : Fragment() {
         }
 
         alertDialog.show()
+    }
+
+    private fun showLoadingDialog() {
+        val view = layoutInflater.inflate(R.layout.dialog_loading, null)
+        loadingDialog = AlertDialog.Builder(requireContext())
+            .setView(view)
+            .setCancelable(false)
+            .create()
+        loadingDialog?.show()
+    }
+
+    private fun hideLoadingDialog() {
+        activity?.runOnUiThread {
+            loadingDialog?.dismiss()
+            loadingDialog = null
+        }
     }
 
     override fun onDestroyView() {
