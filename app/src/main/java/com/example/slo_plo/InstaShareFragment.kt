@@ -83,8 +83,15 @@ class InstaShareFragment : Fragment() {
         }
 
         binding.btnInstaShareClose.setOnClickListener {
-            findNavController().popBackStack()
+            parentFragmentManager.popBackStack()
         }
+
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                parentFragmentManager.popBackStack()
+            }
+        })
+
     }
 
     // VectorDrawable을 비트맵으로 렌더링하는 함수
