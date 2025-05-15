@@ -359,18 +359,22 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
 
     // 이전 위치와 현재 위치 사이의 거리를 계산하고 UI에 갱신
     private fun updateRecordDist(location: Location) {
-        prevLocation?.let { prevLoc ->
-            val distance = prevLoc.distanceTo(location)
-            totalDistance += distance
-
-            val displayDistance = if (totalDistance < 1000) {
-                "${totalDistance.toInt()} m"
-            } else {
-                String.format(Locale.KOREA, "%.1f km", totalDistance / 1000)
-            }
-
-            binding.tvPloggingDistance.text = "이동 거리 - $displayDistance"
+        if (prevLocation == null) {
+            binding.tvPloggingDistance.text = "이동 거리 - 0 m"
+            prevLocation = location
+            return
         }
+
+        val distance = prevLocation!!.distanceTo(location)
+        totalDistance += distance
+
+        val displayDistance = if (totalDistance < 1000) {
+            "${totalDistance.toInt()} m"
+        } else {
+            String.format(Locale.KOREA, "%.1f km", totalDistance / 1000)
+        }
+
+        binding.tvPloggingDistance.text = "이동 거리 - $displayDistance"
         prevLocation = location
     }
 
