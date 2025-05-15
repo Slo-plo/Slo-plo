@@ -9,9 +9,9 @@
         android:name="com.example.slo_plo.JournalFragment"
         android:label="캘린더"
         tools:layout="@layout/fragment_journal">
-    <action
-        android:id="@+id/action_journal_to_logList"
-        app:destination="@id/logListFragment" />
+        <action
+            android:id="@+id/action_journal_to_logList"
+            app:destination="@id/logListFragment" />
         <action
             android:id="@+id/action_jouranl_to_home"
             app:destination="@id/homeFragment"/>
@@ -57,9 +57,6 @@
         <argument
             android:name="logRecord"
             app:argType="com.example.slo_plo.model.LogRecord" />
-        <action
-            android:id="@+id/action_logDetailFragment_to_instaShareFragment"
-            app:destination="@id/instaShareFragment" />
     </fragment>
 
 
@@ -83,26 +80,26 @@
             app:destination="@id/homeFragment" />
     </fragment>
 
-   <fragment
-       android:id="@+id/instaShareFragment"
-       android:name="com.example.slo_plo.InstaShareFragment"
-       android:label="Insta Share Fragment">
-   </fragment>
+    <fragment
+        android:id="@+id/instaShareFragment"
+        android:name="com.example.slo_plo.InstaShareFragment"
+        android:label="Insta Share Fragment">
+    </fragment>
 
-   <fragment
-       android:id="@+id/logListFragment"
-       android:name="com.example.slo_plo.LogListFragment"
-       android:label="일지 목록"
-       tools:layout="@layout/fragment_log_list">
-       <action
-           android:id="@+id/action_logList_to_logDetail"
-           app:destination="@id/logDetailFragment" />
-       <action
-           android:id="@+id/action_logList_to_calendar"
-           app:destination="@id/journalFragment" />
-       <action
-           android:id="@+id/action_logList_to_home"
-           app:destination="@id/homeFragment"/>
-   </fragment>
+    <fragment
+        android:id="@+id/logListFragment"
+        android:name="com.example.slo_plo.LogListFragment"
+        android:label="일지 목록"
+        tools:layout="@layout/fragment_log_list">
+        <action
+            android:id="@+id/action_logList_to_logDetail"
+            app:destination="@id/logDetailFragment" />
+        <action
+            android:id="@+id/action_logList_to_calendar"
+            app:destination="@id/journalFragment" />
+        <action
+            android:id="@+id/action_logList_to_home"
+            app:destination="@id/homeFragment"/>
+    </fragment>
 
 </navigation>
