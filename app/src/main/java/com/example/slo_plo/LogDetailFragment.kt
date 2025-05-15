@@ -107,17 +107,19 @@ class LogDetailFragment : Fragment() {
 
         // 공유 버튼
         binding.btnLogShare.setOnClickListener {
-            val bundle = Bundle().apply {
-                putString("title", binding.tvLogTitle.text.toString())
-                putString("date", binding.tvLogDate.text.toString())
-                putString("content", binding.tvLogContent.text.toString())
-                putString("imageUrl", logRecord?.imageUrls?.firstOrNull() ?: "")
+            val fragment = InstaShareFragment().apply {
+                arguments = Bundle().apply {
+                    putString("title", binding.tvLogTitle.text.toString())
+                    putString("date", binding.tvLogDate.text.toString())
+                    putString("content", binding.tvLogContent.text.toString())
+                    putString("imageUrl", logRecord?.imageUrls?.firstOrNull() ?: "")
+                }
             }
 
-            findNavController().navigate(
-                R.id.action_logDetailFragment_to_instaShareFragment,
-                bundle
-            )
+            childFragmentManager.beginTransaction()
+                .add(R.id.insta_share_overlay_container, fragment)
+                .addToBackStack(null)
+                .commit()
         }
     }
 

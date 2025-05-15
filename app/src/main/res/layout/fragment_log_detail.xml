@@ -190,7 +190,7 @@
                 android:adjustViewBounds="true"
                 android:maxHeight="400dp"
                 android:layout_gravity="center"
-                android:visibility="visible" />
+                android:visibility="gone" />
 
             <!-- 본문 -->
             <TextView
@@ -206,4 +206,11 @@
                 android:lineSpacingExtra="6dp" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
+
+    <FrameLayout
+        android:id="@+id/insta_share_overlay_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/transparent" />
 </androidx.constraintlayout.widget.ConstraintLayout>
+

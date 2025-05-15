@@ -69,7 +69,8 @@ class MainActivity : AppCompatActivity() {
                 R.id.ploggingFragment,
                 R.id.logWriteFragment,
                 R.id.onboardingIntroFragment,
-                R.id.onboardingGuideFragment -> true
+                R.id.onboardingGuideFragment,
+                R.id.logDetailFragment-> true
                 else -> false
             }
             binding.bottomNavigationView.visibility = if (hideNav) View.GONE else View.VISIBLE
