@@ -39,10 +39,10 @@
     <!-- 캐릭터 이미지 -->
     <ImageView
         android:id="@+id/iv_app_character"
-        android:layout_width="150dp"
+        android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:layout_marginVertical="30dp"
-        android:src="@drawable/bg_square_white_grey_15"
+        android:src="@drawable/img_app_character"
         app:layout_constraintBottom_toTopOf="@+id/btn_home_plogging"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

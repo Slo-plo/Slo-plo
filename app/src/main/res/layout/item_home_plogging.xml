@@ -7,7 +7,7 @@
     android:paddingHorizontal="28dp"
     android:paddingTop="28dp"
     android:paddingBottom="35dp"
-    android:background="@drawable/bg_square_white_grey_15">
+    android:background="@drawable/bg_square_white">
 
     <TextView
         android:id="@+id/tv_home_date"
@@ -45,7 +45,8 @@
         android:id="@+id/layout_plogging_record_plogging"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="15dp"
+        android:layout_marginHorizontal="5dp"
+        android:layout_marginStart="3dp"
         android:layout_marginTop="15dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

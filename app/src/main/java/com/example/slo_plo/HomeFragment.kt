@@ -62,12 +62,15 @@ class HomeFragment : Fragment() {
     }
 
     // 이동 거리 포맷 함수
-    private fun formatDistance(km: Double): String {
-        return if (km < 0.05) {
-            "0"
-        } else {
-            val rounded = String.format(Locale.US, "%.1f", km).toDouble()
-            if (rounded % 1.0 == 0.0) rounded.toInt().toString() else rounded.toString()
+    private fun formatDistance(meters: Double): String {
+        val km = meters / 1000
+
+        return when {
+            meters <= 50 -> "0"
+            else -> {
+                val rounded = String.format(Locale.US, "%.1f", km).toDouble()
+                if (rounded % 1.0 == 0.0) rounded.toInt().toString() else rounded.toString()
+            }
         }
     }
 

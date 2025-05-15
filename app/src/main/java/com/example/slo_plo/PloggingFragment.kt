@@ -256,9 +256,6 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
                     // 위치 추적 모드 활성화
                     naverMap.locationTrackingMode = LocationTrackingMode.Follow
 
-                    // 시작 지점 마커
-                    showStartMarker(latLng)
-
                     // 시작 지점 주소 변환
                     getAddressFromLatLng(location.latitude, location.longitude) { address, error ->
                         if (error != null) {
@@ -325,9 +322,11 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
                         if (locationMarker != null) {
                             locationMarker?.position = latLng
                         } else {
-                            locationMarker = Marker()
-                            locationMarker?.position = latLng
-                            locationMarker?.map = naverMap
+                            locationMarker = Marker().apply {
+                                position = latLng
+                                icon = OverlayImage.fromResource(R.drawable.ic_progging_location)
+                                map = naverMap
+                            }
                         }
 
                         naverMap.moveCamera(CameraUpdate.scrollTo(latLng))
@@ -359,18 +358,22 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
 
     // 이전 위치와 현재 위치 사이의 거리를 계산하고 UI에 갱신
     private fun updateRecordDist(location: Location) {
-        prevLocation?.let { prevLoc ->
-            val distance = prevLoc.distanceTo(location)
-            totalDistance += distance
-
-            val displayDistance = if (totalDistance < 1000) {
-                "${totalDistance.toInt()} m"
-            } else {
-                String.format(Locale.KOREA, "%.1f km", totalDistance / 1000)
-            }
-
-            binding.tvPloggingDistance.text = "이동 거리 - $displayDistance"
+        if (prevLocation == null) {
+            binding.tvPloggingDistance.text = "이동 거리 - 0 m"
+            prevLocation = location
+            return
         }
+
+        val distance = prevLocation!!.distanceTo(location)
+        totalDistance += distance
+
+        val displayDistance = if (totalDistance < 1000) {
+            "${totalDistance.toInt()} m"
+        } else {
+            String.format(Locale.KOREA, "%.1f km", totalDistance / 1000)
+        }
+
+        binding.tvPloggingDistance.text = "이동 거리 - $displayDistance"
         prevLocation = location
     }
 
@@ -408,18 +411,6 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
         val minutes = elapsedTime / 60
         val seconds = elapsedTime % 60
         binding.tvPloggingTime.text = String.format(Locale.KOREA, "시간 - %02d : %02d", minutes, seconds)
-    }
-
-    // 시작 지점 마커 표시 함수
-    private fun showStartMarker(latLng: LatLng) {
-        if (startMarker == null) {
-            startMarker = Marker().apply {
-                position = latLng
-                icon = OverlayImage.fromResource(R.drawable.ic_start_marker)
-                captionText = "start"
-                map = naverMap
-            }
-        }
     }
 
     // 싱글톤으로 OkHttpClient 관리
