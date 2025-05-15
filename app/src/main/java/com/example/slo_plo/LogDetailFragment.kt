@@ -50,7 +50,7 @@ class LogDetailFragment : Fragment() {
             binding.tvLogDate.text = record.writeDateTime
             binding.tvStartAddress.text = "출발지점: ${record.startAddress}"
             binding.tvEndAddress.text = "도착지점: ${record.endAddress}"
-            binding.tvLogTime.text = "시간 - ${record.time}"
+            binding.tvLogTime.text = "시간 - ${record.time} 분"
             binding.tvLogDistance.text = "이동거리 - ${record.distance} m"
             binding.tvLogTrash.text = "수거한 쓰레기: ${record.trashCount}개"
             binding.tvLogContent.text = record.body

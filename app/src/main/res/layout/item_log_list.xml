@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_height="wrap_content"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
     android:layout_margin="16dp"
     android:background="@android:color/white"
+    card_view:cardElevation="4dp"
+    card_view:cardCornerRadius="16dp"
     android:elevation="6dp"
-    android:radius="16dp"
-    app:cardElevation="0dp"
-    app:cardCornerRadius="16dp">
+    android:radius="16dp">
 
-    <!-- 상세보기 버튼-->
+    <!-- 상세보기 버튼 -->
     <ImageButton
         android:id="@+id/buttonDetail"
         android:layout_width="32dp"
@@ -29,14 +29,14 @@
         android:padding="10dp"
         android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content">
 
+        <!-- 날짜, 시간, 거리 -->
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="4dp">
-            <!-- 날짜 -->
             <TextView
                 android:id="@+id/summaryDate"
                 android:text="🗓️ 2025.04.11"
@@ -45,7 +45,6 @@
                 android:textSize="14sp"
                 android:layout_marginEnd="12dp"
                 android:textColor="@android:color/black" />
-            <!-- 시간 -->
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -59,7 +58,6 @@
                 android:textSize="14sp"
                 android:layout_marginEnd="12dp"
                 android:textColor="@android:color/black" />
-            <!--거리-->
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -84,7 +82,7 @@
             android:fontFamily="@font/noto_sans_kr_semi_bold"
             android:includeFontPadding="false" />
 
-        <!-- 시작 주소 -->
+        <!-- 주소 -->
         <TextView
             android:id="@+id/summaryAddress"
             android:layout_width="wrap_content"
@@ -102,6 +100,18 @@
             android:textColor="#666666"
             android:textSize="14sp"
             android:layout_marginTop="2dp"/>
+
+        <!-- 본문 미리보기 -->
+        <TextView
+            android:id="@+id/summaryContent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="오늘은 날씨가 좋아서 열심히 쓰레기를 주웠다. 담배꽁초가 유독 많았다..."
+            android:textSize="14sp"
+            android:textColor="@color/text_grey"
+            android:maxLines="2"
+            android:ellipsize="end"
+            android:layout_marginTop="6dp" />
     </LinearLayout>
 
 </androidx.cardview.widget.CardView>

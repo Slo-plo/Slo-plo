@@ -22,9 +22,9 @@ import com.example.slo_plo.DialogUtils.showConfirmDialog
 import com.example.slo_plo.databinding.DialogDefaultBinding
 import com.example.slo_plo.databinding.FragmentLogWriteBinding
 import com.example.slo_plo.model.LogRecord
-import com.example.slo_plo.utils.FirestoreRepository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -38,6 +38,13 @@ class LogWriteFragment : Fragment() {
 
     private lateinit var auth: FirebaseAuth
     private var uid: String? = null
+
+    // 플로깅 측정 데이터
+    private var startAddr: String = ""
+    private var endAddr: String = ""
+    private var totalTime: String = ""
+    private var totalDist: String = ""
+
 
     // 카메라 권한 요청
     private val cameraPermissionLauncher = registerForActivityResult(
@@ -130,10 +137,14 @@ class LogWriteFragment : Fragment() {
 
         // 플로깅 기록 불러오기
         val args = requireArguments()
-        val startAddr = args.getString("startAddress") ?: ""
-        val endAddr = args.getString("endAddress") ?: ""
-        val totalTime = args.getString("totalTime") ?: ""
-        val totalDist = args.getString("totalDistance") ?: ""
+        startAddr = args.getString("startAddress") ?: ""
+        endAddr = args.getString("endAddress") ?: ""
+        totalTime = args.getString("totalTime") ?: ""
+        totalDist = args.getString("totalDistance") ?: ""
+
+        // 거리/시간 숫자로 변환
+        val parsedMinutes = parseDurationToMinutes(totalTime)
+        val parsedDistance = parseDistanceToMeters(totalDist)
 
         // 날짜 및 시간 설정
         val currentDateTime = LocalDateTime.now()
@@ -142,6 +153,12 @@ class LogWriteFragment : Fragment() {
             Locale.KOREA
         )
         binding.tvLogDate.text = currentDateTime.format(formatter)
+
+        // 플로깅 정보 반영 (UI 표시용 함수 사용)
+        binding.tvStartAddress.text = "출발지점: $startAddr"
+        binding.tvEndAddress.text = "도착지점: $endAddr"
+        binding.tvLogTime.text = "시간 - ${formatTimeForDisplay(parsedMinutes)}"
+        binding.tvLogDistance.text = "이동 거리 - ${formatDistanceForDisplay(parsedDistance)}"
 
         // 플로깅 정보 반영
         binding.tvStartAddress.text = "출발지점: $startAddr"
@@ -202,24 +219,68 @@ class LogWriteFragment : Fragment() {
                             it.removePrefix("${dateId}_").toIntOrNull()
                         }
 
-                    val nextNumber = if (sameDateDocIds.isEmpty()) 1 else (sameDateDocIds.max()!! + 1)
+                    val nextNumber =
+                        if (sameDateDocIds.isEmpty()) 1 else (sameDateDocIds.max()!! + 1)
                     val newDocId = "${dateId}_$nextNumber"
 
-                    val record = LogRecord(
-                        dateId = dateId,
-                        startAddress = startAddr,
-                        endAddress = endAddr,
-                        time = totalTime.toIntOrNull() ?: 0,
-                        distance = totalDist.toDoubleOrNull() ?: 0.0,
-                        trashCount = trash.toIntOrNull() ?: 0,
-                        title = title,
-                        body = content,
-                        imageUrls = emptyList(), // 나중에 이미지 연동 시 수정
-                        writeDateTime = writeDateTime,
-                        docId = newDocId
-                    )
+                    if (selectedImageUri != null) {
+                        uploadImageToFirebase(
+                            selectedImageUri!!,
+                            onSuccess = { imageUrl ->
+                                val record = LogRecord(
+                                    dateId = dateId,
+                                    startAddress = startAddr,
+                                    endAddress = endAddr,
+                                    time = parsedMinutes,
+                                    distance = parsedDistance,
+                                    trashCount = trash.toIntOrNull() ?: 0,
+                                    title = title,
+                                    body = content,
+                                    imageUrls = listOf(imageUrl),
+                                    writeDateTime = writeDateTime,
+                                    docId = newDocId
+                                )
 
-                        // 3. 저장
+                                logsRef.document(newDocId).set(record)
+                                    .addOnSuccessListener {
+                                        Toast.makeText(
+                                            requireContext(),
+                                            "저장 완료",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                        findNavController().previousBackStackEntry
+                                            ?.savedStateHandle
+                                            ?.set("needsRefresh", true)
+                                        findNavController().popBackStack()
+                                    }
+                                    .addOnFailureListener {
+                                        Toast.makeText(
+                                            requireContext(),
+                                            "저장 실패",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
+                            },
+                            onFailure = {
+                                Toast.makeText(requireContext(), "이미지 업로드 실패", Toast.LENGTH_SHORT)
+                                    .show()
+                            }
+                        )
+                    } else {
+                        val record = LogRecord(
+                            dateId = dateId,
+                            startAddress = startAddr,
+                            endAddress = endAddr,
+                            time = totalTime.toIntOrNull() ?: 0,
+                            distance = totalDist.toDoubleOrNull() ?: 0.0,
+                            trashCount = trash.toIntOrNull() ?: 0,
+                            title = title,
+                            body = content,
+                            imageUrls = emptyList(),
+                            writeDateTime = writeDateTime,
+                            docId = newDocId
+                        )
+
                         logsRef.document(newDocId).set(record)
                             .addOnSuccessListener {
                                 Toast.makeText(requireContext(), "저장 완료", Toast.LENGTH_SHORT).show()
@@ -232,6 +293,7 @@ class LogWriteFragment : Fragment() {
                                 Toast.makeText(requireContext(), "저장 실패", Toast.LENGTH_SHORT).show()
                             }
                     }
+                }
                     .addOnFailureListener {
                         Toast.makeText(requireContext(), "기록 카운트 조회 실패", Toast.LENGTH_SHORT).show()
                     }
@@ -239,6 +301,44 @@ class LogWriteFragment : Fragment() {
         }
 
     }
+
+    // 거리 문자열 → m 단위 Double
+    private fun parseDistanceToMeters(distanceString: String): Double {
+        val numberOnly = distanceString.replace("[^\\d.]".toRegex(), "")
+        return numberOnly.toDoubleOrNull() ?: 0.0
+    }
+
+    // 시간 문자열 MM:SS → 전체 분(Int)
+    private fun parseDurationToMinutes(timeString: String): Int {
+        val parts = timeString.split(":").map { it.trim() }
+        return if (parts.size == 2) {
+            val minutes = parts[0].toIntOrNull() ?: 0
+            val seconds = parts[1].toIntOrNull() ?: 0
+            minutes + if (seconds >= 30) 1 else 0  // 반올림 처리
+        } else 0
+    }
+
+
+    private fun formatDistanceForDisplay(meters: Double): String {
+        return if (meters < 1000) {
+            "${meters.toInt()} m"
+        } else {
+            String.format("%.2f km", meters / 1000)
+        }
+    }
+
+    private fun formatTimeForDisplay(minutes: Int): String {
+        return if (minutes < 60) {
+            "${minutes}분"
+        } else {
+            val hours = minutes / 60
+            val remainMinutes = minutes % 60
+            if (remainMinutes == 0) "${hours}시간"
+            else "${hours}시간 ${remainMinutes}분"
+        }
+    }
+
+
 
     private fun openCamera() {
         val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
@@ -249,6 +349,27 @@ class LogWriteFragment : Fragment() {
         val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
         galleryLauncher.launch(intent)
     }
+
+    private fun uploadImageToFirebase(
+        imageUri: Uri,
+        onSuccess: (String) -> Unit,
+        onFailure: () -> Unit
+    ) {
+        val storageRef = FirebaseStorage.getInstance().reference
+        val fileName = "images/${System.currentTimeMillis()}.jpg"
+        val imageRef = storageRef.child(fileName)
+
+        imageRef.putFile(imageUri)
+            .addOnSuccessListener {
+                imageRef.downloadUrl.addOnSuccessListener { uri ->
+                    onSuccess(uri.toString())
+                }
+            }
+            .addOnFailureListener {
+                onFailure()
+            }
+    }
+
 
     fun showConfirmDialog(
         title: String,
