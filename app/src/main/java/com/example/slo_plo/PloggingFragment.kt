@@ -256,9 +256,6 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
                     // 위치 추적 모드 활성화
                     naverMap.locationTrackingMode = LocationTrackingMode.Follow
 
-                    // 시작 지점 마커
-                    showStartMarker(latLng)
-
                     // 시작 지점 주소 변환
                     getAddressFromLatLng(location.latitude, location.longitude) { address, error ->
                         if (error != null) {
@@ -412,18 +409,6 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
         val minutes = elapsedTime / 60
         val seconds = elapsedTime % 60
         binding.tvPloggingTime.text = String.format(Locale.KOREA, "시간 - %02d : %02d", minutes, seconds)
-    }
-
-    // 시작 지점 마커 표시 함수
-    private fun showStartMarker(latLng: LatLng) {
-        if (startMarker == null) {
-            startMarker = Marker().apply {
-                position = latLng
-                icon = OverlayImage.fromResource(R.drawable.ic_start_marker)
-                captionText = "start"
-                map = naverMap
-            }
-        }
     }
 
     // 싱글톤으로 OkHttpClient 관리
