@@ -29,12 +29,14 @@ class VolunteerFragment : Fragment() {
         _binding = FragmentVolunteerBinding.inflate(inflater, container, false)
         val view = binding.root
 
+        /* 인스타 공유 버튼 로직
         binding.btnSharePage.setOnClickListener {
             requireActivity().supportFragmentManager.beginTransaction()
                 .replace(R.id.fragment_container_view, InstaShareFragment()) // Fragment 교체
                 .addToBackStack(null) // Back Stack에 추가
                 .commit() // 트랜잭션 실행
         }
+        */
 
         // 'btnFindLocation' 버튼 클릭 리스너 설정
         binding.btnFindLocation.setOnClickListener {

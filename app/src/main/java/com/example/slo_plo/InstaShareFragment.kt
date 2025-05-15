@@ -14,10 +14,14 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
+import com.bumptech.glide.Glide
 import com.example.slo_plo.databinding.FragmentInstaShareBinding
 import java.io.File
 import java.io.FileOutputStream
 import java.util.UUID
+import android.view.ViewTreeObserver
+import androidx.activity.OnBackPressedCallback
+import androidx.navigation.fragment.findNavController
 
 
 class InstaShareFragment : Fragment() {
@@ -36,35 +40,50 @@ class InstaShareFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val title = arguments?.getString("title") ?: ""
+        val date = arguments?.getString("date") ?: ""
+        val content = arguments?.getString("content") ?: ""
+        val imageUrl = arguments?.getString("imageUrl")
+
+        binding.tvInstaShareTitle.text = title
+        binding.tvInstaShareDate.text = date
+        binding.tvInstaShareContent.text = content
+
+        if (!imageUrl.isNullOrBlank()) {
+            Glide.with(requireContext())
+                .load(imageUrl)
+                .into(binding.imgInstaShare)
+        } else {
+            binding.imgInstaShare.setImageResource(R.drawable.ic_app_default)
+            // 이미지 null일 경우 기본 이미지
+        }
+
+        // 이미지 정사각형으로 유지
         binding.imgInstaShare.post {
             val width = binding.imgInstaShare.width
             binding.imgInstaShare.layoutParams.height = width
             binding.imgInstaShare.requestLayout()
         }
 
-        binding.tvInstaShareDate.text = "2025일 05월 11일"
-        binding.tvInstaShareContent.text = "오늘은 서울여대에서 플로깅을 했는데 정말 재미있었다~~!! 최대 몇 줄까지 표시하는 게 좋을지 모르겠어서 최대한 길게 써보고 있는데 세 줄이면 적당나나나나나난나나나나나나나나나나나나나나ㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㄴ나나나나나나나나나나ㅏ나나나나나나나나나나난"
-        binding.tvInstaShareTitle.text = "서울여대에서 플로깅을 했다"
-        binding.imgInstaShare.setImageResource(R.drawable.img_temp_insta)
-
         binding.btnInstaShare.setOnClickListener {
-            // UUID 생성 (중복 호출 방지)
             val uuid = UUID.randomUUID().toString()
-
-            // SVG 배경을 비트맵으로 생성
             val backgroundBitmap = drawVectorBackgroundBitmap()
 
-            // 스티커 레이어 캡처 (뷰가 완전히 그려진 후에 캡처)
-            binding.imgStickerLayout.post {
-                val stickerBitmap = captureViewAsBitmap(binding.imgStickerLayout)
+            binding.imgStickerLayout.viewTreeObserver.addOnPreDrawListener(object : ViewTreeObserver.OnPreDrawListener {
+                override fun onPreDraw(): Boolean {
+                    binding.imgStickerLayout.viewTreeObserver.removeOnPreDrawListener(this)
 
-                // 캐시 저장
-                val backgroundUri = saveBitmapToCache(backgroundBitmap, "background_image_$uuid.png")
-                val stickerUri = saveBitmapToCache(stickerBitmap, "sticker_image_$uuid.png")
+                    val stickerBitmap = captureViewAsBitmap(binding.imgStickerLayout)
+                    val backgroundUri = saveBitmapToCache(backgroundBitmap, "background_image_$uuid.png")
+                    val stickerUri = saveBitmapToCache(stickerBitmap, "sticker_image_$uuid.png")
+                    shareToInstagramStory(backgroundUri, stickerUri)
+                    return true
+                }
+            })
+        }
 
-                // 공유
-                shareToInstagramStory(backgroundUri, stickerUri)
-            }
+        binding.btnInstaShareClose.setOnClickListener {
+            findNavController().popBackStack()
         }
     }
 

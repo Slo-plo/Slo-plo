@@ -105,6 +105,20 @@ class LogDetailFragment : Fragment() {
                 .show()
         }
 
+        // 공유 버튼
+        binding.btnLogShare.setOnClickListener {
+            val bundle = Bundle().apply {
+                putString("title", binding.tvLogTitle.text.toString())
+                putString("date", binding.tvLogDate.text.toString())
+                putString("content", binding.tvLogContent.text.toString())
+                putString("imageUrl", logRecord?.imageUrls?.firstOrNull() ?: "")
+            }
+
+            findNavController().navigate(
+                R.id.action_logDetailFragment_to_instaShareFragment,
+                bundle
+            )
+        }
     }
 
     override fun onDestroyView() {
