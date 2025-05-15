@@ -322,9 +322,11 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
                         if (locationMarker != null) {
                             locationMarker?.position = latLng
                         } else {
-                            locationMarker = Marker()
-                            locationMarker?.position = latLng
-                            locationMarker?.map = naverMap
+                            locationMarker = Marker().apply {
+                                position = latLng
+                                icon = OverlayImage.fromResource(R.drawable.ic_progging_location)
+                                map = naverMap
+                            }
                         }
 
                         naverMap.moveCamera(CameraUpdate.scrollTo(latLng))
