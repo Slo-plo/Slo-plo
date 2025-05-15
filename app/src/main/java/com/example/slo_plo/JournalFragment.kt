@@ -295,7 +295,7 @@ class JournalFragment : Fragment() {
                 // 아이콘 표시 여부
                 if (date in greenDates) {
                     itemBinding.dayIcon.visibility = View.VISIBLE
-                    itemBinding.dayIcon.setImageResource(R.drawable.ic_unit_24)
+                    itemBinding.dayIcon.setImageResource(R.drawable.ic_star_one)
                 } else {
                     itemBinding.dayIcon.visibility = View.INVISIBLE
                 }
