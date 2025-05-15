@@ -16,6 +16,7 @@ import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
+import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.slo_plo.DialogUtils.showConfirmDialog
@@ -25,6 +26,7 @@ import com.example.slo_plo.model.LogRecord
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
+import java.io.File
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -66,10 +68,9 @@ class LogWriteFragment : Fragment() {
     private val cameraLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            val bitmap = result.data?.extras?.get("data") as? android.graphics.Bitmap
+        if (result.resultCode == Activity.RESULT_OK && selectedImageUri != null) {
             binding.ivLogSelected.apply {
-                setImageBitmap(bitmap)
+                setImageURI(selectedImageUri)
                 visibility = View.VISIBLE
             }
         }
@@ -271,8 +272,8 @@ class LogWriteFragment : Fragment() {
                             dateId = dateId,
                             startAddress = startAddr,
                             endAddress = endAddr,
-                            time = totalTime.toIntOrNull() ?: 0,
-                            distance = totalDist.toDoubleOrNull() ?: 0.0,
+                            time = parsedMinutes,
+                            distance = parsedDistance,
                             trashCount = trash.toIntOrNull() ?: 0,
                             title = title,
                             body = content,
@@ -323,7 +324,7 @@ class LogWriteFragment : Fragment() {
         return if (meters < 1000) {
             "${meters.toInt()} m"
         } else {
-            String.format("%.2f km", meters / 1000)
+            String.format("%.1f km", meters / 1000)
         }
     }
 
@@ -339,11 +340,22 @@ class LogWriteFragment : Fragment() {
     }
 
 
+    private var cameraImageUri: Uri? = null // 클래스 멤버로 추가
 
     private fun openCamera() {
-        val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+        val imageFile = File.createTempFile("camera_temp_", ".jpg", requireContext().cacheDir)
+        cameraImageUri = FileProvider.getUriForFile(
+            requireContext(),
+            "${requireContext().packageName}.fileprovider",
+            imageFile
+        )
+        val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE).apply {
+            putExtra(MediaStore.EXTRA_OUTPUT, cameraImageUri)
+        }
+        selectedImageUri = cameraImageUri  // 이 줄이 중요!
         cameraLauncher.launch(intent)
     }
+
 
     private fun openGallery() {
         val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
