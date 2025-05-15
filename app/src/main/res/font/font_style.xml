@@ -36,4 +36,12 @@
         android:font="@font/noto_sans_kr_black"
         android:fontStyle="normal"
         android:fontWeight="900"/>
+    <font
+        android:font="@font/tmoney_round_wind_extra_bold"
+        android:fontStyle="normal"
+        android:fontWeight="800"/>
+    <font
+        android:font="@font/tmoney_round_wind_regular"
+        android:fontStyle="normal"
+        android:fontWeight="400"/>
 </font-family>

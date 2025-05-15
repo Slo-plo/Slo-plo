@@ -26,7 +26,7 @@
         android:src="@drawable/ic_arrow_forward" />
 
     <LinearLayout
-        android:padding="10dp"
+        android:padding="15dp"
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -37,38 +37,49 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="4dp">
+
+            <ImageView
+                android:layout_width="15dp"
+                android:layout_height="15dp"
+                android:layout_marginTop="1dp"
+                android:src="@drawable/ic_calendar_text" />
             <TextView
                 android:id="@+id/summaryDate"
-                android:text="🗓️ 2025.04.11"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="14sp"
                 android:layout_marginEnd="12dp"
-                android:textColor="@android:color/black" />
+                android:fontFamily="@font/tmoney_round_wind_regular"
+                android:text=" 2025.04.11"
+                android:textColor="@android:color/black"
+                android:textSize="13sp" />
+
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
+                android:layout_marginTop="2dp"
                 android:src="@drawable/ic_time" />
             <TextView
                 android:id="@+id/summaryTime"
                 android:text=" 50분"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="14sp"
+                android:textSize="13sp"
                 android:layout_marginEnd="12dp"
+                android:fontFamily="@font/tmoney_round_wind_regular"
                 android:textColor="@android:color/black" />
+
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
+                android:layout_marginTop="2dp"
                 android:src="@drawable/ic_distance" />
             <TextView
                 android:id="@+id/summaryDistance"
                 android:text=" 2.5km"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="14sp"
+                android:fontFamily="@font/tmoney_round_wind_regular"
+                android:textSize="13sp"
                 android:textColor="@android:color/black" />
         </LinearLayout>
 
@@ -77,29 +88,55 @@
             android:id="@+id/summaryTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:fontFamily="@font/noto_sans_kr_extra_bold"
             android:text="담배꽁초 50개 주움"
-            android:textSize="16sp"
-            android:fontFamily="@font/noto_sans_kr_semi_bold"
-            android:includeFontPadding="false" />
+            android:includeFontPadding="false"
+            android:textSize="16sp" />
 
         <!-- 주소 -->
-        <TextView
-            android:id="@+id/summaryAddress"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="📍 반포한강공원"
-            android:textSize="14sp"
-            android:layout_marginTop="4dp"/>
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="15dp"
+                android:layout_height="15dp"
+                android:layout_marginTop="14dp"
+                android:src="@drawable/ic_address_text" />
+
+            <TextView
+                android:id="@+id/summaryAddress"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:fontFamily="@font/noto_sans_kr_regular"
+                android:includeFontPadding="false"
+                android:text=" 대한민국 서울특별시 영등포구 선유동 2로 42"
+                android:textSize="12sp" />
+        </LinearLayout>
+
 
         <!-- 쓰레기 개수 -->
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <ImageView
+            android:layout_width="15dp"
+            android:layout_height="15dp"
+            android:layout_marginTop="10dp"
+            android:src="@drawable/ic_bin_text" />
         <TextView
             android:id="@+id/summaryTrash"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="수거한 쓰레기: 50개"
-            android:textColor="#666666"
-            android:textSize="14sp"
-            android:layout_marginTop="2dp"/>
+            android:text=" 수거한 쓰레기: 50개"
+            android:includeFontPadding="false"
+            android:fontFamily="@font/noto_sans_kr_medium"
+            android:textSize="13sp"
+            android:layout_marginTop="6dp"/>
+    </LinearLayout>
 
         <!-- 본문 미리보기 -->
         <TextView
@@ -108,9 +145,12 @@
             android:layout_height="wrap_content"
             android:text="오늘은 날씨가 좋아서 열심히 쓰레기를 주웠다. 담배꽁초가 유독 많았다..."
             android:textSize="14sp"
+            android:fontFamily="@font/noto_sans_kr_regular"
             android:textColor="@color/text_grey"
             android:maxLines="2"
             android:ellipsize="end"
+            android:includeFontPadding="false"
+            android:lineSpacingExtra="0dp"
             android:layout_marginTop="6dp" />
     </LinearLayout>
 
