@@ -556,10 +556,14 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
 
                         val displayTime = binding.tvPloggingTime.text.toString()
                             .replace("시간 - ", "")
-                        val displayDist = binding.tvPloggingDistance.text.toString()
-                            .replace("이동 거리 - ", "")
-                        showPloggingSummaryDialog(startAddress, endAddress, displayTime, displayDist)
-                    }
+                        val distanceForDB = totalDistance.toInt().toString() + " m"  // <-- m 단위로 원본 값 전달
+                        val displayDist = if (totalDistance < 1000) {
+                            "${totalDistance.toInt()} m"
+                        } else {
+                            String.format(Locale.KOREA, "%.1f km", totalDistance / 1000)
+                        }
+                        showPloggingSummaryDialog(startAddress, endAddress, displayTime, displayDist, distanceForDB)
+}
                 } else {
                     Log.w("종료 주소 오류", "종료 시 위치 정보 없음")
                     Toast.makeText(requireContext(), "위치 정보를 확인할 수 없습니다.", Toast.LENGTH_SHORT).show()
@@ -586,14 +590,15 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
         startAddress: String,
         endAddress: String,
         totalTime: String,
-        totalDistance: String
+        displayDistance: String,
+        rawDistance: String  // <-- 추가
     ) {
         val binding = DialogPloggingSummaryBinding.inflate(LayoutInflater.from(requireContext()))
 
         binding.tvSummaryStart.text = "시작 지점: $startAddress"
         binding.tvSummaryEnd.text = "종료 지점: $endAddress"
         binding.tvSummaryTime.text = "시간: $totalTime"
-        binding.tvSummaryDistance.text = "이동 거리: $totalDistance"
+        binding.tvSummaryDistance.text = "이동 거리: $displayDistance"
 
         val dialog = AlertDialog.Builder(requireContext())
             .setView(binding.root)
@@ -607,7 +612,7 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
                 putString("startAddress", startAddress)
                 putString("endAddress",   endAddress)
                 putString("totalTime",    totalTime)
-                putString("totalDistance", totalDistance)
+                putString("totalDistance", rawDistance)  // <-- 이 부분 수정
             }
 
             // nav_graph.xml 에 정의된 action ID로 네비게이트
@@ -655,7 +660,9 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
                     // 플로깅 종료 팝업(요약) 다시 띄우기
                     val displayTime = binding.tvPloggingTime.text.toString().replace("시간 - ", "")
                     val displayDist = binding.tvPloggingDistance.text.toString().replace("이동 거리 - ", "")
-                    showPloggingSummaryDialog(startAddress, endAddress, displayTime, displayDist)
+                    val rawDistance = totalDistance.toInt().toString() + " m"
+
+                    showPloggingSummaryDialog(startAddress, endAddress, displayTime, displayDist, rawDistance)
 
                     // 한번만 실행되도록 플래그 제거
                     findNavController().currentBackStackEntry
