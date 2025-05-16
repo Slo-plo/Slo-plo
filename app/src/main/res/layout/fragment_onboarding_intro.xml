@@ -17,40 +17,42 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- 건너뛰기 버튼 -->
-    <FrameLayout
-        android:id="@+id/bg_intro_content"
+    <ImageView
+        android:id="@+id/iv_intro_background"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/bg_square_white_grey_15"
+        android:layout_height="0dp"
         android:layout_marginHorizontal="25dp"
-        android:layout_marginTop="25dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ic_app_sloplo">
+        android:layout_marginTop="30dp"
+        android:layout_marginBottom="40dp"
+        android:background="@drawable/bg_square_white_grey_15"
+        app:layout_constraintBottom_toTopOf="@+id/layout_intro_btn"
+        app:layout_constraintTop_toBottomOf="@+id/ic_app_sloplo"/>
 
-        <TextView
-            android:id="@+id/tv_intro_content"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:layout_gravity="center"
-            android:text="우리는 매년 800만 톤의 플라스틱을\n바다에 버리고 있습니다.\n\n그 중 상당수는 길거리에\n무심코 버려진 쓰레기에서 시작돼요."
-            android:textSize="14sp"
-            android:fontFamily="@font/noto_sans_kr_medium"
-            android:includeFontPadding="false"
-            android:paddingVertical="40dp"/>
-    </FrameLayout>
+    <TextView
+        android:id="@+id/tv_intro_content"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/noto_sans_kr_semi_bold"
+        android:gravity="center"
+        android:includeFontPadding="false"
+        android:text="우리는 매년 800만 톤의 플라스틱을\n바다에 버리고 있습니다.\n\n그 중 상당수는 길거리에\n무심코 버려진 쓰레기에서 시작돼요."
+        android:textSize="14sp"
+        android:layout_marginTop="40dp"
+        app:layout_constraintBottom_toTopOf="@+id/iv_intro_content"
+        app:layout_constraintEnd_toEndOf="@+id/iv_intro_background"
+        app:layout_constraintStart_toStartOf="@+id/iv_intro_background"
+        app:layout_constraintTop_toTopOf="@+id/iv_intro_background" />
 
     <ImageView
         android:id="@+id/iv_intro_content"
-        android:layout_width="300dp"
-        android:layout_height="280dp"
-        android:src="@drawable/bg_square_white_grey_15"
-        android:layout_marginTop="30dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/bg_intro_content" />
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:src="@drawable/img_intro_character"
+        android:layout_marginVertical="20dp"
+        app:layout_constraintTop_toBottomOf="@id/tv_intro_content"
+        app:layout_constraintBottom_toBottomOf="@+id/iv_intro_background"
+        app:layout_constraintStart_toStartOf="@+id/iv_intro_background"
+        app:layout_constraintEnd_toEndOf="@+id/iv_intro_background"/>
 
     <!-- 버튼 영역 -->
     <LinearLayout
