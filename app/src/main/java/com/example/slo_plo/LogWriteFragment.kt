@@ -164,12 +164,6 @@ class LogWriteFragment : Fragment() {
         binding.tvLogTime.text = "시간 - ${formatTimeForDisplay(parsedMinutes)}"
         binding.tvLogDistance.text = "이동 거리 - ${formatDistanceForDisplay(parsedDistance)}"
 
-        // 플로깅 정보 반영
-        binding.tvStartAddress.text = "출발지점: $startAddr"
-        binding.tvEndAddress.text = "도착지점: $endAddr"
-        binding.tvLogTime.text = "시간 - $totalTime"
-        binding.tvLogDistance.text = "이동 거리 - $totalDist"
-
         // 카메라 버튼
         binding.btnBottom.btnLogCamera.setOnClickListener {
             cameraPermissionLauncher.launch(android.Manifest.permission.CAMERA)

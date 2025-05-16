@@ -18,16 +18,25 @@ class LogSummaryPagerAdapter(
             binding.summaryDate.text = " ${log.dateId}"
             binding.summaryTitle.text = log.title
             binding.summaryTime.text = " ${log.time}분"
-            binding.summaryDistance.text = " ${log.distance} m"
+            binding.summaryDistance.text = " ${formatDistance(log.distance)}"
             binding.summaryAddress.text = " ${log.startAddress}"
             binding.summaryTrash.text = " 수거한 쓰레기: ${log.trashCount}개"
 
-            //️ 상세보기 버튼 클릭 처리
             binding.buttonDetail.setOnClickListener {
                 onDetailClick(log)
             }
         }
+
     }
+
+    private fun formatDistance(meters: Double): String {
+        return if (meters < 1000) {
+            "${meters.toInt()} m"
+        } else {
+            String.format("%.1f km", meters / 1000)
+        }
+    }
+
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LogViewHolder {
         val binding = ItemLogSummaryBinding.inflate(LayoutInflater.from(parent.context), parent, false)
