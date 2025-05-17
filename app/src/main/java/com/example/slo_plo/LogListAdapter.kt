@@ -24,7 +24,7 @@ class LogListAdapter(
 
         b.summaryDate.text = " ${record.dateId}"
         b.summaryTime.text = " ${record.time}분"
-        b.summaryDistance.text = " ${record.distance} m"
+        b.summaryDistance.text = formatDistance(record.distance)
         b.summaryTitle.text = record.title
         b.summaryTrash.text = " ${record.trashCount}개"
         b.summaryContent.text = record.body
@@ -35,4 +35,13 @@ class LogListAdapter(
     }
 
     override fun getItemCount(): Int = logList.size
+
+    private fun formatDistance(meters: Double): String {
+        return if (meters < 1000) {
+            "${meters.toInt()} m"
+        } else {
+            String.format("%.1f km", meters / 1000)
+        }
+    }
+
 }
