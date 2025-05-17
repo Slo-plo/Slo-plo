@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
+import com.example.slo_plo.databinding.DialogDefaultBinding
 import com.example.slo_plo.databinding.FragmentLogDetailBinding
 import com.example.slo_plo.model.LogRecord
 import com.google.firebase.auth.FirebaseAuth
@@ -72,38 +73,46 @@ class LogDetailFragment : Fragment() {
 
 
         binding.btnLogDelete.setOnClickListener {
-            Log.d("삭제 테스트", "버튼 클릭됨")
-            Log.d("삭제 테스트", "docId: ${logRecord?.docId}")
-            AlertDialog.Builder(requireContext())
-                .setTitle("일지 삭제")
-                .setMessage("일지를 삭제하시겠습니까?")
-                .setNegativeButton("취소") { dialog, _ ->
-                    dialog.dismiss()
-                }
-                .setPositiveButton("확인") { dialog, _ ->
-                    // 실제 삭제 수행
-                    val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return@setPositiveButton
-                    val docId = logRecord?.docId ?: return@setPositiveButton
+            val dialogBinding = DialogDefaultBinding.inflate(layoutInflater)
 
-                    Log.d("LogDetailFragment", "삭제 시도할 문서 ID: $docId")
+            // 텍스트 동적 설정
+            dialogBinding.tvDefaultTitle.text = "일지 삭제"
+            dialogBinding.tvDefaultContent.text = "해당 일지를 정말 삭제하시겠습니까?"
 
-                    FirebaseFirestore.getInstance()
-                        .collection("users")
-                        .document(userId)
-                        .collection("plogging_logs")
-                        .document(docId)
-                        .delete()
-                        .addOnSuccessListener {
-                            Toast.makeText(requireContext(), "일지가 삭제되었습니다.", Toast.LENGTH_SHORT).show()
-                            findNavController().popBackStack()
-                        }
-                        .addOnFailureListener {e ->
-                            Toast.makeText(requireContext(), "삭제에 실패했습니다.: ${e.message}\"", Toast.LENGTH_SHORT).show()
-                        }
+            val dialog = AlertDialog.Builder(requireContext())
+                .setView(dialogBinding.root)
+                .create()
 
-                }
-                .show()
+            // 아니오 버튼: 단순 닫기
+            dialogBinding.btnDefaultNo.setOnClickListener {
+                dialog.dismiss()
+            }
+
+            // 예 버튼: 실제 삭제 실행
+            dialogBinding.btnDefaultYes.setOnClickListener {
+                val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return@setOnClickListener
+                val docId = logRecord?.docId ?: return@setOnClickListener
+
+                FirebaseFirestore.getInstance()
+                    .collection("users")
+                    .document(userId)
+                    .collection("plogging_logs")
+                    .document(docId)
+                    .delete()
+                    .addOnSuccessListener {
+                        Toast.makeText(requireContext(), "일지가 삭제되었습니다.", Toast.LENGTH_SHORT).show()
+                        dialog.dismiss()
+                        findNavController().popBackStack()
+                    }
+                    .addOnFailureListener { e ->
+                        Toast.makeText(requireContext(), "삭제 실패: ${e.message}", Toast.LENGTH_SHORT).show()
+                        dialog.dismiss()
+                    }
+            }
+
+            dialog.show()
         }
+
 
         // 공유 버튼
         binding.btnLogShare.setOnClickListener {
