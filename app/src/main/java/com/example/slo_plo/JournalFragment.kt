@@ -1,13 +1,10 @@
 package com.example.slo_plo
 
-import android.graphics.Color.BLACK
-import android.graphics.Color.WHITE
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
@@ -23,7 +20,6 @@ import com.kizitonwose.calendar.core.DayPosition
 import com.kizitonwose.calendar.view.MonthDayBinder
 import com.kizitonwose.calendar.view.MonthHeaderFooterBinder
 import com.kizitonwose.calendar.view.ViewContainer
-import java.io.File
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
@@ -31,9 +27,7 @@ import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import java.util.Locale
 import com.example.slo_plo.model.LogRecord
-import androidx.core.os.bundleOf
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.RecyclerView
 import com.example.slo_plo.utils.FirestoreRepository
 import com.google.firebase.auth.FirebaseAuth
 
@@ -151,11 +145,6 @@ class JournalFragment : Fragment() {
                 }
             }
 
-        // 뒤로가기 버튼 클릭 시 홈 화면으로 이동
-        binding.btnBack.setOnClickListener {
-            findNavController().navigate(R.id.action_jouranl_to_home)
-        }
-
         // 목록 버튼 클릭 시 일지 모아보기 화면으로 이동
         binding.buttonLogList.setOnClickListener {
             findNavController().navigate(R.id.action_journal_to_logList)
@@ -259,7 +248,6 @@ class JournalFragment : Fragment() {
 
                 // 날짜 클릭 시 기록 불러오기 + ViewPager 연결
                 view.setOnClickListener {
-                    // 선택 날짜 변경
                     if (selectedDate != date) {
                         val oldDate = selectedDate
                         selectedDate = date
@@ -269,13 +257,17 @@ class JournalFragment : Fragment() {
 
                     uid?.let { user ->
                         FirestoreRepository.loadLogRecordsForDate(user, date) { records ->
+                            Log.d("DEBUG", "📌 날짜 클릭됨: $date")
+                            Log.d("DEBUG", "📦 기록 개수: ${records.size}")
+
                             if (records.isEmpty()) {
                                 binding.logDateText.text = "기록 없음"
                                 binding.logViewPager.visibility = View.GONE
+                                binding.circleIndicator.visibility = View.GONE
+                                Log.d("DEBUG", "🛑 기록 없음 - ViewPager/Gone, Indicator/Gone")
                             } else {
                                 binding.logDateText.text = "${records.size}개의 기록이 있습니다"
 
-                                // 상세보기 버튼 클릭 시 LogDetailFragment로 이동
                                 val adapter = LogSummaryPagerAdapter(records) { selectedRecord ->
                                     val bundle = Bundle().apply {
                                         putSerializable("logRecord", selectedRecord)
@@ -283,14 +275,20 @@ class JournalFragment : Fragment() {
                                     findNavController().navigate(R.id.logDetailFragment, bundle)
                                 }
 
-
-                                // ViewPager 연결
                                 binding.logViewPager.adapter = adapter
                                 binding.logViewPager.visibility = View.VISIBLE
+                                binding.circleIndicator.visibility = View.VISIBLE
+
+                                Log.d("DEBUG", "✅ Adapter 연결됨 - itemCount: ${adapter.itemCount}")
+                                Log.d("DEBUG", "📍 ViewPager visibility: ${binding.logViewPager.visibility}")
+                                Log.d("DEBUG", "📍 Indicator visibility: ${binding.circleIndicator.visibility}")
+
+                                binding.circleIndicator.setViewPager(binding.logViewPager)
+                                Log.d("DEBUG", "✅ setViewPager 호출됨")
                             }
                         }
                     }
-                }
+            }
 
                 // 아이콘 표시 여부
                 if (date in greenDates) {

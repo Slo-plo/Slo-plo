@@ -72,6 +72,7 @@ dependencies {
     implementation(libs.androidx.core.i18n)
     implementation(libs.androidx.ui.text.android)
     implementation(libs.androidx.navigation.fragment.ktx)
+    implementation (libs.relex.circleindicator)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
