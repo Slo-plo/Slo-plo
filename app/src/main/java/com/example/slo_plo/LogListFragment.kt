@@ -62,11 +62,6 @@ class LogListFragment : Fragment() {
         binding.btnCalendar.setOnClickListener {
             findNavController().navigate(R.id.action_logList_to_calendar)
         }
-
-        // 뒤로가기
-        binding.btnBack.setOnClickListener {
-            findNavController().navigate(R.id.action_logList_to_home)
-        }
     }
 
     override fun onDestroyView() {
