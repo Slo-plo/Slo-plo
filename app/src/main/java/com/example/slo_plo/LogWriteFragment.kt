@@ -182,12 +182,6 @@ class LogWriteFragment : Fragment() {
         // 저장 버튼
         binding.btnBottom.btnLogSave.setOnClickListener {
             val currentDateTime = LocalDateTime.now()
-            val userId = FirebaseAuth.getInstance().currentUser?.uid
-            if (userId == null) {
-                Log.e("LogWriteFragment", "User ID is null. Are you logged in?")
-                Toast.makeText(requireContext(), "로그인이 필요합니다.", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
             val dateId = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy.MM.dd"))
             val writeDateTime = currentDateTime.format(
                 DateTimeFormatter.ofPattern("yyyy년 M월 d일 E요일 HH시 mm분", Locale.KOREA)
