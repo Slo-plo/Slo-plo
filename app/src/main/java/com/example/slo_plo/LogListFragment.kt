@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.slo_plo.LogListAdapter
 import com.example.slo_plo.databinding.FragmentLogListBinding
 import com.example.slo_plo.model.LogRecord
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
@@ -62,6 +63,11 @@ class LogListFragment : Fragment() {
         binding.btnCalendar.setOnClickListener {
             findNavController().navigate(R.id.action_logList_to_calendar)
         }
+
+        // 바텀 네비에서 '일지' 탭 선택 표시 유지
+        val navView = requireActivity().findViewById<BottomNavigationView>(R.id.bottomNavigationView)
+        navView.menu.findItem(R.id.journalFragment)?.isChecked = true
+
     }
 
     override fun onDestroyView() {
