@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -14,6 +15,7 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.example.slo_plo.databinding.ActivityMainBinding
 import com.google.firebase.FirebaseApp
+import com.google.firebase.auth.FirebaseAuth
 
 class MainActivity : AppCompatActivity() {
 
@@ -22,11 +24,28 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
 
         // 앱에서 파이어베이스 초기화
         FirebaseApp.initializeApp(this)
+
+        val binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
+        // 익명 로그인 자동 수행
+        val auth = FirebaseAuth.getInstance()
+        if (auth.currentUser == null) {
+            auth.signInAnonymously()
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        Log.d("MainActivity", "익명 로그인 성공: ${auth.currentUser?.uid}")
+                    } else {
+                        Log.e("MainActivity", "익명 로그인 실패", task.exception)
+                    }
+                }
+        } else {
+            Log.d("MainActivity", "기존 로그인 사용자: ${auth.currentUser?.uid}")
+        }
+
 
         // Android 13+ 알림 권한 요청
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
