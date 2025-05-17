@@ -15,14 +15,14 @@ class LogSummaryPagerAdapter(
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(log: LogRecord) {
-            binding.summaryDate.text = " ${log.dateId}"
             binding.summaryTitle.text = log.title
+            binding.summaryContent.text = log.body
             binding.summaryTime.text = " ${log.time}분"
             binding.summaryDistance.text = " ${formatDistance(log.distance)}"
-            binding.summaryAddress.text = " ${log.startAddress}"
-            binding.summaryTrash.text = " 수거한 쓰레기: ${log.trashCount}개"
+            // binding.summaryAddress.text = " ${log.startAddress}"
+            binding.summaryTrash.text = "${log.trashCount}개"
 
-            binding.buttonDetail.setOnClickListener {
+            binding.layoutLogSummary.setOnClickListener {
                 onDetailClick(log)
             }
         }

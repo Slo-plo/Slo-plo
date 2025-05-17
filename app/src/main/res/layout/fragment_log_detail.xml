@@ -197,13 +197,14 @@
                 android:id="@+id/tv_log_content"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="10dp"
                 android:layout_marginHorizontal="24dp"
                 android:text="기록 로딩 중..."
                 android:fontFamily="@font/noto_sans_kr_regular"
+                android:includeFontPadding="false"
                 android:textSize="14sp"
                 android:gravity="top"
-                android:lineSpacingExtra="6dp" />
+                android:lineSpacingExtra="2dp" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 

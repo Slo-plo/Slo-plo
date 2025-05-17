@@ -19,16 +19,6 @@
         app:layout_constraintTop_toTopOf="parent"
         android:includeFontPadding="false"/>
 
-    <!-- 뒤로가기 버튼 -->
-    <ImageView
-        android:id="@+id/btn_back"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/ic_arrow_back"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_margin="20dp"/>
-
     <!-- 일지 모아보기 이동 버튼 -->
     <ImageView
         android:id="@+id/buttonLogList"
@@ -46,10 +36,9 @@
         android:id="@+id/calendarCard"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
+        android:layout_marginHorizontal="16dp"
         android:layout_marginTop="15dp"
-        app:cardCornerRadius="16dp"
+        app:cardCornerRadius="10dp"
         app:cardElevation="0dp"
         app:layout_constraintTop_toBottomOf="@id/ic_app_sloplo"
         app:layout_constraintStart_toStartOf="parent"
@@ -80,9 +69,9 @@
         android:text="기록을 확인할 날짜를 선택해 주세요"
         android:textSize="14sp"
         android:fontFamily="@font/noto_sans_kr_medium"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="5dp"
         android:layout_marginStart="25dp"
-        android:layout_marginBottom="10dp"
+        android:textColor="@color/white"
         app:layout_constraintTop_toBottomOf="@id/calendarCard"
         app:layout_constraintStart_toStartOf="parent"/>
 
@@ -91,8 +80,18 @@
         android:id="@+id/logViewPager"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="26dp"
         app:layout_constraintTop_toBottomOf="@id/logDateText"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <me.relex.circleindicator.CircleIndicator3
+        android:id="@+id/circleIndicator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        app:layout_constraintTop_toBottomOf="@id/logViewPager"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
