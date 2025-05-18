@@ -46,6 +46,9 @@ class RecommendVolunteerAdapter(initialList: List<RecommendVolunteer>) :
 
     // showCustomMessageBox 함수 (기존 코드 그대로 유지)
     private fun showCustomMessageBox(context: Context, link: String) {
+        // 함수 시작 시 넘어온 link 값 로깅
+        Log.d("LinkDebug", "showCustomMessageBox called with link: '$link'") // <-- 이 라인 추가
+
         // dialog_default.xml 레이아웃을 인플레이트
         val dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_default, null)
 
@@ -64,36 +67,40 @@ class RecommendVolunteerAdapter(initialList: List<RecommendVolunteer>) :
 
         // 네 버튼 클릭 시 링크로 이동
         confirmButton.setOnClickListener {
+            // 유효성 검사 전 link 값 다시 로깅
+            Log.d("LinkDebug", "Confirm clicked. Validating link: '$link'") // <-- 이 라인 추가
+
             // 링크가 비어있거나 null인지, 또는 유효한 URL 형식인지 간단히 확인
             if (link.isNullOrEmpty() || !android.util.Patterns.WEB_URL.matcher(link).matches()) {
+                Log.w("LinkDebug", "Link validation failed for: '$link'") // <-- 이 라인 추가
                 Toast.makeText(context, "유효한 링크 정보가 없습니다.", Toast.LENGTH_SHORT).show()
                 dialog.dismiss()
             } else {
+                Log.d("LinkDebug", "Link validation successful for: '$link'") // <-- 이 라인 추가
                 try {
                     // 유효한 경우에만 Intent 실행
                     val intent = Intent(Intent.ACTION_VIEW, Uri.parse(link))
                     context.startActivity(intent)
                     dialog.dismiss()
                 } catch (e: ActivityNotFoundException) {
-                    // 혹시 Intent를 처리할 앱이 정말 없을 경우를 대비 (드문 경우)
+                    Log.e("LinkDebug", "Activity not found for URL: '$link'", e) // <-- 이 라인 수정
                     Toast.makeText(context, "링크를 열 앱을 찾을 수 없습니다.", Toast.LENGTH_SHORT).show()
                     dialog.dismiss()
-                    Log.e("Adapter", "Activity not found for URL: $link", e)
                 } catch (e: Exception) {
-                    // 그 외 다른 오류 처리
+                    Log.e("LinkDebug", "Error opening URL: '$link'", e) // <-- 이 라인 수정
                     Toast.makeText(context, "링크 열기 중 오류 발생.", Toast.LENGTH_SHORT).show()
                     dialog.dismiss()
-                    Log.e("Adapter", "Error opening URL: $link", e)
                 }
             }
         }
 
-        // 아니오 버튼 클릭 시 다이얼로그 닫기
+        // 아니오 버튼 클릭 시 다이얼로그 닫기 (기존 코드 유지)
         cancelButton.setOnClickListener {
+            Log.d("LinkDebug", "Cancel clicked.") // <-- 이 라인 추가
             dialog.dismiss()
         }
 
-        // 다이얼로그 표시
+        // 다이얼로그 표시 (기존 코드 유지)
         dialog.show()
     }
 

@@ -236,16 +236,16 @@ class VolunteerFragment : Fragment() {
         volunteersCollection
             .get() // get() 메서드로 컬렉션의 모든 문서를 한 번 가져옵니다.
             .addOnSuccessListener { querySnapshot: QuerySnapshot? ->
-                // 데이터 로드 성공
                 val volunteers = mutableListOf<RecommendVolunteer>()
                 if (querySnapshot != null) {
                     for (document in querySnapshot.documents) {
-                        // 각 DocumentSnapshot을 RecommendVolunteer 객체로 변환
-                        // RecommendVolunteer 데이터 클래스의 필드 이름과 Firestore 문서의 필드 이름이 정확히 일치해야 합니다.
                         try {
                             val volunteer = document.toObject(RecommendVolunteer::class.java)
                             if (volunteer != null) {
+                                Log.d("LinkConvertDebug", "Document ID: ${document.id}, Converted link: '${volunteer.link}'")
                                 volunteers.add(volunteer)
+                            } else {
+                                Log.w("LinkConvertDebug", "Document ${document.id} converted to null.")
                             }
                         } catch (e: Exception) {
                             Log.e("Firebase", "Error converting document to RecommendVolunteer: ${document.id}", e)
@@ -255,8 +255,6 @@ class VolunteerFragment : Fragment() {
                 }
 
                 // 가져온 데이터로 리사이클러뷰 어댑터 업데이트
-                // RecommendVolunteerAdapter에 updateData(newList: List<RecommendVolunteer>) 함수가 있다고 가정합니다.
-                // 만약 없다면 어댑터에 이 함수를 추가해야 합니다.
                 recommendVolunteerAdapter.updateData(volunteers) // 어댑터 업데이트 함수 호출
 
                 // TODO: 로딩 상태 표시를 숨깁니다.
@@ -280,28 +278,4 @@ class VolunteerFragment : Fragment() {
         _binding = null
         // TODO: 만약 addSnapshotListener를 사용했다면 여기서 리스너를 제거해야 메모리 누수를 방지할 수 있습니다.
     }
-
-    // RecommendVolunteerAdapter 클래스에 데이터를 업데이트하는 함수가 필요합니다.
-    // 예를 들어, RecommendVolunteerAdapter 안에 다음과 같은 함수를 추가합니다:
-    /*
-    class RecommendVolunteerAdapter(...) : RecyclerView.Adapter<...>() {
-        private var volunteerList: List<RecommendVolunteer> = emptyList()
-
-        constructor(initialList: List<RecommendVolunteer>) {
-            volunteerList = initialList
-        }
-
-        // 이 함수를 추가하여 외부에서 데이터를 업데이트할 수 있도록 합니다.
-        fun updateData(newList: List<RecommendVolunteer>) {
-            volunteerList = newList
-            notifyDataSetChanged() // 데이터가 변경되었음을 어댑터에 알려 리사이클러뷰를 갱신합니다.
-            // TODO: 데이터 변경 효율을 위해 DiffUtil 사용을 고려해볼 수 있습니다.
-        }
-
-        // getItemCount, onCreateViewHolder, onBindViewHolder 등 기존 코드는 volunteerList를 사용하도록 유지
-        override fun getItemCount(): Int = volunteerList.size
-
-        // ... onCreateViewHolder, onBindViewHolder ...
-    }
-    */
 }
