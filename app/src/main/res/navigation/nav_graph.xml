@@ -68,6 +68,9 @@
         <argument
             android:name="logRecord"
             app:argType="com.example.slo_plo.model.LogRecord" />
+        <action
+            android:id="@+id/action_logDetail_to_imageFullScreen"
+            app:destination="@id/imageFullScreenFragment" />
     </fragment>
 
 
@@ -112,5 +115,15 @@
             android:id="@+id/action_logList_to_home"
             app:destination="@id/homeFragment"/>
     </fragment>
+
+    <fragment
+        android:id="@+id/imageFullScreenFragment"
+        android:name="com.example.slo_plo.ImageFullScreenFragment"
+        android:label="사진 전체 화면" >
+        <argument
+            android:name="imageUrl"
+            app:argType="string" />
+    </fragment>
+
 
 </navigation>

@@ -23,6 +23,9 @@ class LogDetailFragment : Fragment() {
 
     private var logRecord: LogRecord? = null
 
+    private var imageUrl: String? = null
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         @Suppress("DEPRECATION")
@@ -41,7 +44,7 @@ class LogDetailFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-
+        // 뒤로가기 버튼
         binding.btnLogBack.setOnClickListener {
             findNavController().popBackStack()
         }
@@ -56,8 +59,8 @@ class LogDetailFragment : Fragment() {
             binding.tvLogTrash.text = "수거한 쓰레기: ${record.trashCount}개"
             binding.tvLogContent.text = record.body
             // 이미지가 있을 경우
-            val imageUrl = logRecord?.imageUrls?.firstOrNull()
-            if (!imageUrl.isNullOrBlank() && imageUrl.startsWith("http")) {
+            imageUrl = logRecord?.imageUrls?.firstOrNull()
+            if (!imageUrl.isNullOrBlank() && imageUrl!!.startsWith("http")) {
                 binding.ivLogImage.visibility = View.VISIBLE
                 try {
                     Glide.with(requireContext())
@@ -71,7 +74,19 @@ class LogDetailFragment : Fragment() {
             }
         }
 
+        // 사진 전체화면으로 보기 연결
+        binding.ivLogImage.setOnClickListener {
+            imageUrl?.let { url ->  // null이 아닐 때만 실행
+                val bundle = Bundle().apply {
+                    putString("imageUrl", url)
+                }
+                findNavController().navigate(R.id.action_logDetail_to_imageFullScreen, bundle)
+            } ?: run {
+                Toast.makeText(requireContext(), "이미지가 없습니다.", Toast.LENGTH_SHORT).show()
+            }
+        }
 
+        // 일지 삭제 버튼
         binding.btnLogDelete.setOnClickListener {
             val dialogBinding = DialogDefaultBinding.inflate(layoutInflater)
 
