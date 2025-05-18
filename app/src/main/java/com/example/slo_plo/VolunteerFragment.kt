@@ -16,6 +16,7 @@ import com.example.slo_plo.databinding.BottomSheetLocationBinding
 import com.example.slo_plo.model.RecommendVolunteer // 데이터 클래스 임포트 확인
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import androidx.navigation.fragment.findNavController
 
 // Firebase Firestore 관련 임포트 추가
 import com.google.firebase.firestore.FirebaseFirestore
@@ -40,15 +41,6 @@ class VolunteerFragment : Fragment() {
     ): View {
         _binding = FragmentVolunteerBinding.inflate(inflater, container, false)
         val view = binding.root
-
-        /* 인스타 공유 버튼 로직
-        binding.btnSharePage.setOnClickListener {
-            requireActivity().supportFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container_view, InstaShareFragment()) // Fragment 교체
-                .addToBackStack(null) // Back Stack에 추가
-                .commit() // 트랜잭션 실행
-        }
-        */
 
         // 'btnFindLocation' 버튼 클릭 리스너 설정 (기존 로직 유지)
         binding.btnFindLocation.setOnClickListener {
@@ -175,23 +167,26 @@ class VolunteerFragment : Fragment() {
             // '지역 선택' 버튼 클릭 시
             sheetBinding.btnSelectRegion.setOnClickListener {
                 if (selectedRegion != null && selectedSubRegion != null) {
-                    val fullRegion = "$selectedSubRegion"
+                    // RegionVolunteerFragment로 전달할 지역명 준비
+                    val fullRegion = selectedSubRegion // 또는 필요한 형식으로 조합
 
-                    // TODO: RegionVolunteerFragment에서도 Firebase 데이터를 해당 지역으로 필터링하여 가져와야 합니다.
-                    // 이 부분의 로직도 추후 Firebase 연동에 맞게 수정이 필요합니다.
-                    val fragment = RegionVolunteerFragment().apply {
-                        arguments = Bundle().apply {
-                            putString("region", fullRegion)
-                        }
+                    // RegionVolunteerFragment로 전달할 데이터를 Bundle에 담음
+                    val bundle = Bundle().apply {
+                        putString("region", fullRegion) // 키는 RegionVolunteerFragment에서 가져올 때 사용할 이름("region")과 일치해야 함
                     }
 
-                    requireActivity().supportFragmentManager.beginTransaction()
-                        .replace(R.id.fragment_container_view, fragment)
-                        .addToBackStack(null)
-                        .commit()
+                    // Navigation Component의 findNavController() 사용
+                    val navController = findNavController()
 
-                    dialog.dismiss()
+                    // 네비게이션 그래프에 정의된 액션 ID를 사용하여 이동
+                    // R.id.action_volunteerFragment_to_regionVolunteerFragment 는 navigation.xml에 추가한 액션의 ID
+                    // bundle에는 전달할 인자(region)가 담겨 있음
+                    navController.navigate(R.id.action_volunteerFragment_to_regionVolunteerFragment, bundle)
+
+                    dialog.dismiss() // 바텀시트 다이얼로그 닫기 (기존 코드 유지)
+
                 } else {
+                    // 지역 선택 안 했을 때 토스트 메시지 (기존 코드 유지)
                     Toast.makeText(requireContext(), "지역을 선택해주세요.", Toast.LENGTH_SHORT).show()
                 }
             }
@@ -202,7 +197,7 @@ class VolunteerFragment : Fragment() {
 
 
         // 리사이클러뷰 설정
-        // 어댑터를 초기화할 때 빈 리스트를 넘겨줍니다.
+        // 어댑터를 초기화할 때 빈 리스트를 넘겨줌
         recommendVolunteerAdapter = RecommendVolunteerAdapter(emptyList())
         binding.recyclerViewRecommendVolunteer.apply {
             layoutManager = LinearLayoutManager(requireContext())
@@ -221,15 +216,6 @@ class VolunteerFragment : Fragment() {
 
         return view
     }
-
-    // 하드코딩된 데이터를 가져오는 함수는 이제 필요 없으므로 제거합니다.
-    /*
-    private fun getVolunteerList(): List<RecommendVolunteer> {
-        // ... 기존 하드코딩 데이터 ...
-        return listOf(...)
-    }
-    */
-
 
     // Firebase Firestore에서 봉사활동 데이터를 가져오는 함수
     private fun loadVolunteersFromFirebase() {
@@ -259,14 +245,8 @@ class VolunteerFragment : Fragment() {
 
                 // TODO: 로딩 상태 표시를 숨깁니다.
                 // binding.progressBar.visibility = View.GONE
-
-                Log.d("Firebase", "Successfully loaded ${volunteers.size} volunteers from Firebase.")
-
             }
             .addOnFailureListener { exception: Exception ->
-                // 데이터 로드 실패
-                Log.w("Firebase", "Error getting documents from Firebase: ", exception)
-                // TODO: 로드 실패 시 사용자에게 알림 (Toast 등) 또는 오류 상태 표시
                 Toast.makeText(requireContext(), "데이터 로드 실패: ${exception.message}", Toast.LENGTH_SHORT).show()
                 // TODO: 로딩 상태 표시를 숨깁니다.
                 // binding.progressBar.visibility = View.GONE

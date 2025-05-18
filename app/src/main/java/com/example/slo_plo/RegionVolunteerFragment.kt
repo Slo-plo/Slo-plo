@@ -6,8 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast // 오류 메시지 표시를 위해 추가
-import androidx.activity.OnBackPressedCallback
-import androidx.fragment.app.Fragment
+import androidx.fragment.app.Fragment // Fragment import 유지
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.slo_plo.databinding.FragmentRegionVolunteerBinding
@@ -18,7 +17,6 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.FirebaseFirestoreException
 
-
 class RegionVolunteerFragment : Fragment() {
 
     private var _binding: FragmentRegionVolunteerBinding? = null
@@ -28,7 +26,7 @@ class RegionVolunteerFragment : Fragment() {
 
     // Firebase Firestore 인스턴스 선언
     private val db = FirebaseFirestore.getInstance()
-    // 데이터가 저장된 컬렉션 이름 (스크린샷에서 확인된 이름 사용)
+    // 데이터가 저장된 컬렉션 이름
     private val volunteersCollection = db.collection("volunteer_lists") // 컬렉션 이름 확인 및 수정 필요
 
     override fun onCreateView(
@@ -43,12 +41,9 @@ class RegionVolunteerFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // 뒤로가기 버튼 처리 (기존 로직 유지)
-        handleBackPressed()
-
-        // 인자로 전달받은 지역명 가져오기
-        val region = arguments?.getString("region") ?: "지역명 오류"
-        binding.btnSelectRegion.text = region // 버튼 텍스트 업데이트
+        // 인자로 전달받은 지역명 가져오기 (VolunteerFragment에서 Bundle로 넘긴 "region" 키 사용)
+        val region = arguments?.getString("region") ?: "지역명 오류" // <-- Bundle에서 값을 가져옵니다.
+        binding.btnSelectRegion.text = region // 버튼 텍스트 업데이트 (UI 확인용)
 
         // 리사이클러뷰 설정 (초기에는 빈 데이터로 설정)
         setupRecyclerView()
@@ -56,29 +51,13 @@ class RegionVolunteerFragment : Fragment() {
         // Firebase에서 필터링된 데이터 로드
         loadFilteredVolunteersFromFirebase(region)
 
-        // TODO: 로딩 상태 표시 (예: ProgressBar)를 여기에 추가할 수 있습니다.
-        // binding.progressBar.visibility = View.VISIBLE
+        // TODO: 로딩 상태 표시 (예: ProgressBar) 초기 숨김/표시 설정은 setupRecyclerView나 loadFilteredVolunteersFromFirebase 시작 부분에서 합니다.
     }
 
-    private fun handleBackPressed() {
-        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                // 이전 VolunteerFragment로 돌아가기
-                parentFragmentManager.popBackStack() // Back Stack에서 Fragment를 제거하여 이전 화면으로 돌아감
-                // 또는 replace를 사용하여 명시적으로 VolunteerFragment로 이동
-                /*
-                parentFragmentManager.beginTransaction()
-                    .replace(R.id.fragment_container_view, VolunteerFragment())
-                    .commit()
-                 */
-            }
-        })
-    }
 
-    // 리사이클러뷰 초기 설정 함수
+    //리사이클러뷰 초기 설정 함수
     private fun setupRecyclerView() {
-        // 어댑터를 초기화할 때 빈 리스트를 넘겨줍니다.
-        recommendVolunteerAdapter = RecommendVolunteerAdapter(emptyList())
+        recommendVolunteerAdapter = RecommendVolunteerAdapter(emptyList()) // 어댑터를 초기화할 때 빈 리스트를 넘겨줍니다.
 
         binding.recyclerViewResionVolunteer.apply {
             layoutManager = LinearLayoutManager(requireContext())
@@ -88,81 +67,84 @@ class RegionVolunteerFragment : Fragment() {
             )
         }
 
-        // 초기에는 Empty Message 숨김
+        // 로딩 상태 UI 초기 설정
+        binding.recyclerViewResionVolunteer.visibility = View.GONE
         binding.tvEmptyMessage.visibility = View.GONE
+        // binding.progressBar.visibility = View.VISIBLE // ProgressBar가 있다면 로딩 시작 시 표시
     }
 
 
-    // Firebase Firestore에서 지역별 봉사활동 데이터를 가져오는 함수
+    //Firebase Firestore에서 지역별 봉사활동 데이터를 가져오는 함수
     private fun loadFilteredVolunteersFromFirebase(region: String) {
+        // 데이터 로드 시작 시 로딩 표시
+        // binding.progressBar.visibility = View.VISIBLE // ProgressBar가 있다면
+        binding.recyclerViewResionVolunteer.visibility = View.GONE
+        binding.tvEmptyMessage.visibility = View.GONE
+
         volunteersCollection
-            // 'location' 필드가 전달받은 region 값과 같은 문서를 필터링합니다.
+            // 'location' 필드가 전달받은 region 값과 같은 문서를 필터링
             .whereEqualTo("location", region)
-            .get() // 필터링된 문서를 한 번 가져옵니다.
+            .get() // 필터링된 문서를 한 번 가져옴 (실시간 업데이트는 addSnapshotListener 사용)
             .addOnSuccessListener { querySnapshot: QuerySnapshot? ->
-                // 데이터 로드 성공
+                // 데이터 로드 성공 시 로딩 숨김
+                // binding.progressBar.visibility = View.GONE // ProgressBar가 있다면
+
                 val volunteers = mutableListOf<RecommendVolunteer>()
                 if (querySnapshot != null) {
                     for (document in querySnapshot.documents) {
-                        // 각 DocumentSnapshot을 RecommendVolunteer 객체로 변환
+                        // toObject 변환 시 오류 발생 가능성 대비
                         try {
                             val volunteer = document.toObject(RecommendVolunteer::class.java)
                             if (volunteer != null) {
                                 volunteers.add(volunteer)
+                            } else {
+                                Log.w("RegionVolunteer", "Failed to convert document ${document.id} to RecommendVolunteer (object is null).")
                             }
                         } catch (e: Exception) {
-                            Log.e("Firebase", "Error converting document to RecommendVolunteer: ${document.id}", e)
-                            // 데이터 변환 오류 시 로그 출력 (Firestore 필드 이름/타입 불일치 가능성)
-                            // RecommendVolunteer 데이터 클래스에 기본값이 설정되었는지 다시 확인하세요.
+                            // 데이터 구조 불일치 등으로 변환 실패 시
+                            Log.e("RegionVolunteer", "Error converting document ${document.id} to RecommendVolunteer", e)
+                            // 필요하다면 사용자에게 오류 알림 추가
                         }
                     }
                 }
 
                 // 가져온 데이터로 리사이클러뷰 어댑터 업데이트
-                recommendVolunteerAdapter.updateData(volunteers) // 어댑터 업데이트 함수 호출
+                recommendVolunteerAdapter.updateData(volunteers)
 
                 // 데이터 로드 후 Empty View 처리
                 if (volunteers.isEmpty()) {
                     binding.recyclerViewResionVolunteer.visibility = View.GONE
-                    binding.tvEmptyMessage.visibility = View.VISIBLE // "아직 등록된 봉사활동이 없어요" 텍스트뷰
+                    binding.tvEmptyMessage.visibility = View.VISIBLE // Empty Message 표시
+                    binding.tvEmptyMessage.text = "해당 지역의 봉사활동이 아직 없습니다." // 기본 메시지 또는 지역에 맞는 메시지 설정
                 } else {
                     binding.recyclerViewResionVolunteer.visibility = View.VISIBLE
-                    binding.tvEmptyMessage.visibility = View.GONE
+                    binding.tvEmptyMessage.visibility = View.GONE // Empty Message 숨김
                 }
 
-
-                // TODO: 로딩 상태 표시를 숨깁니다.
-                // binding.progressBar.visibility = View.GONE
-
-                Log.d("Firebase", "Successfully loaded ${volunteers.size} filtered volunteers for $region.")
+                Log.d("RegionVolunteer", "Successfully loaded ${volunteers.size} filtered volunteers for $region.")
 
             }
             .addOnFailureListener { exception: Exception ->
                 // 데이터 로드 실패
-                Log.w("Firebase", "Error getting filtered documents from Firebase: ", exception)
-                // TODO: 로드 실패 시 사용자에게 알림 (Toast 등) 또는 오류 상태 표시
-                Toast.makeText(requireContext(), "${region} 데이터 로드 실패: ${exception.message}", Toast.LENGTH_SHORT).show()
+                // binding.progressBar.visibility = View.GONE // ProgressBar가 있다면
 
-                // 데이터 로드 실패 시 Empty View 표시 (선택 사항)
+                Log.w("RegionVolunteer", "Error getting filtered documents for $region: ", exception)
+                // 로드 실패 시 사용자에게 알림
+                Toast.makeText(requireContext(), "데이터 로드 실패: ${exception.message}", Toast.LENGTH_SHORT).show()
+
+                // 데이터 로드 실패 시 Empty View 또는 오류 메시지 표시
                 binding.recyclerViewResionVolunteer.visibility = View.GONE
-                binding.tvEmptyMessage.visibility = View.VISIBLE // 오류 메시지 대신 empty 메시지를 보여주거나, 별도 오류 메시지 텍스트뷰를 사용할 수 있습니다.
-
-
-                // TODO: 로딩 상태 표시를 숨깁니다.
-                // binding.progressBar.visibility = View.GONE
+                binding.tvEmptyMessage.visibility = View.VISIBLE
+                binding.tvEmptyMessage.text = "데이터를 불러오는데 실패했습니다.\n(${exception.message})" // 실패 메시지로 변경
             }
     }
-
-    // 하드코딩된 데이터를 가져오는 함수는 이제 필요 없으므로 제거합니다.
-    /*
-    private fun getVolunteerList(): List<RecommendVolunteer> {
-        return listOf(...) // 하드코딩된 데이터
-    }
-    */
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-        // TODO: 만약 실시간 업데이트를 위해 addSnapshotListener를 사용했다면 여기서 리스너를 제거해야 합니다.
+        // TODO: 만약 addSnapshotListener를 사용했다면 여기서 리스너 제거 코드가 필수입니다.
     }
+
+    // Fragment가 View를 가지고 있지 않을 때 Firebase 작업 등을 취소해야 할 수 있습니다.
+    // 필요하다면 onStop 또는 onPause에서 Firebase 리스너 해제, onDestroy에서 리스너 제거 등 생명주기 관리를 합니다.
 }

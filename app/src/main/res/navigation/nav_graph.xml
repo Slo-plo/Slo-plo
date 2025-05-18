@@ -30,7 +30,18 @@
     <fragment
         android:id="@+id/volunteerFragment"
         android:name="com.example.slo_plo.VolunteerFragment"
-        android:label="외부봉사" />
+        android:label="외부봉사">
+        <action
+            android:id="@+id/action_volunteerFragment_to_regionVolunteerFragment"
+            app:destination="@id/regionVolunteerFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/regionVolunteerFragment"
+        android:name="com.example.slo_plo.RegionVolunteerFragment"
+        android:label="선택 지역 봉사활동"
+        tools:layout="@layout/fragment_region_volunteer">
+    </fragment>
 
     <fragment
       android:id="@+id/ploggingFragment"
