@@ -72,8 +72,7 @@ dependencies {
     implementation(libs.androidx.core.i18n)
     implementation(libs.androidx.ui.text.android)
     implementation(libs.androidx.navigation.fragment.ktx)
-    //implementation (libs.relex.circleindicator) 여기서 자꾸 싱크 오류나서...
-    implementation("me.relex:circleindicator:2.1.6")
+    implementation (libs.relex.circleindicator)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

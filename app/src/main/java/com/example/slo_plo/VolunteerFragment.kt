@@ -2,7 +2,7 @@ package com.example.slo_plo
 
 import android.graphics.Color
 import android.os.Bundle
-import android.util.Log // Logcat 출력을 위해 추가
+// import android.util.Log // Logcat 출력을 위해 추가 -> 요청에 따라 삭제
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -228,13 +228,13 @@ class VolunteerFragment : Fragment() {
                         try {
                             val volunteer = document.toObject(RecommendVolunteer::class.java)
                             if (volunteer != null) {
-                                Log.d("LinkConvertDebug", "Document ID: ${document.id}, Converted link: '${volunteer.link}'")
+                                // Log.d("LinkConvertDebug", "Document ID: ${document.id}, Converted link: '${volunteer.link}'") // 로그 삭제
                                 volunteers.add(volunteer)
                             } else {
-                                Log.w("LinkConvertDebug", "Document ${document.id} converted to null.")
+                                // Log.w("LinkConvertDebug", "Document ${document.id} converted to null.") // 로그 삭제
                             }
                         } catch (e: Exception) {
-                            Log.e("Firebase", "Error converting document to RecommendVolunteer: ${document.id}", e)
+                            // Log.e("Firebase", "Error converting document to RecommendVolunteer: ${document.id}", e) // 로그 삭제
                             // 데이터 변환 오류 시 로그 출력 (Firestore 필드 이름/타입 불일치 가능성)
                         }
                     }

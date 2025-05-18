@@ -1,7 +1,7 @@
 package com.example.slo_plo
 
+// import android.util.Log // 로그를 위해 추가 -> 요청에 따라 삭제
 import android.os.Bundle
-import android.util.Log // 로그를 위해 추가
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.slo_plo.databinding.FragmentRegionVolunteerBinding
 import com.example.slo_plo.model.RecommendVolunteer // 데이터 클래스 임포트 확인
 
-// Firebase Firestore 관련 임포트 추가
+// Firebase Firestore 관련 임포트
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.FirebaseFirestoreException
@@ -98,11 +98,10 @@ class RegionVolunteerFragment : Fragment() {
                             if (volunteer != null) {
                                 volunteers.add(volunteer)
                             } else {
-                                Log.w("RegionVolunteer", "Failed to convert document ${document.id} to RecommendVolunteer (object is null).")
+                                // Log.w("RegionVolunteer", "Failed to convert document ${document.id} to RecommendVolunteer (object is null).") // 로그 삭제
                             }
                         } catch (e: Exception) {
-                            // 데이터 구조 불일치 등으로 변환 실패 시
-                            Log.e("RegionVolunteer", "Error converting document ${document.id} to RecommendVolunteer", e)
+                            // Log.e("RegionVolunteer", "Error converting document ${document.id} to RecommendVolunteer", e) // 로그 삭제
                             // 필요하다면 사용자에게 오류 알림 추가
                         }
                     }
@@ -121,14 +120,14 @@ class RegionVolunteerFragment : Fragment() {
                     binding.tvEmptyMessage.visibility = View.GONE // Empty Message 숨김
                 }
 
-                Log.d("RegionVolunteer", "Successfully loaded ${volunteers.size} filtered volunteers for $region.")
+                // Log.d("RegionVolunteer", "Successfully loaded ${volunteers.size} filtered volunteers for $region.") // 로그 삭제
 
             }
             .addOnFailureListener { exception: Exception ->
                 // 데이터 로드 실패
                 // binding.progressBar.visibility = View.GONE // ProgressBar가 있다면
 
-                Log.w("RegionVolunteer", "Error getting filtered documents for $region: ", exception)
+                // Log.w("RegionVolunteer", "Error getting filtered documents for $region: ", exception) // 로그 삭제
                 // 로드 실패 시 사용자에게 알림
                 Toast.makeText(requireContext(), "데이터 로드 실패: ${exception.message}", Toast.LENGTH_SHORT).show()
 
