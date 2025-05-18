@@ -29,6 +29,7 @@ import com.example.slo_plo.databinding.DialogPloggingSummaryBinding
 import com.example.slo_plo.databinding.DialogTrashBinding
 import com.example.slo_plo.databinding.FragmentPloggingBinding
 import com.example.slo_plo.model.TrashBin
+import com.example.slo_plo.utils.FirestoreRepository
 import com.naver.maps.map.CameraUpdate
 import com.naver.maps.map.MapFragment
 import com.naver.maps.map.NaverMap
@@ -673,33 +674,25 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun addTrashBinMarkers() {
-        val trashBins = listOf(
-            TrashBin(
-                lat = 37.637022,
-                lng = 127.074771,
-                title = "버거투버거 앞 쓰레기통",
-                description = "일반 쓰레기",
-                photoUrl = "https://image.news1.kr/system/photos/2023/10/12/6262312/high.jpg"
-            ),
-            TrashBin(
-                lat = 37.636718,
-                lng = 127.074719,
-                title = "하계1동 길거리 쓰레기통",
-                description = "일반 + 재활용 쓰레기",
-                photoUrl = "https://cdn.emetro.co.kr/data2/content/image/2020/06/08/.cache/512/20200608500330.jpg"
-            )
-        )
+        Log.d("TrashBin", "addTrashBinMarkers() 호출됨")
 
-        trashBins.forEach { bin ->
-            val marker = Marker().apply {
-                position = LatLng(bin.lat, bin.lng)
-                icon = OverlayImage.fromResource(R.drawable.ic_trash_marker)
-                map = naverMap
-            }
+        FirestoreRepository.loadTrashBins { trashBins ->
+            Log.d("TrashBin", "가져온 쓰레기통 개수: ${trashBins.size}")
 
-            marker.setOnClickListener {
-                showTrashDialog(bin)
-                true
+            trashBins.forEach { bin ->
+                Log.d("TrashBin", "마커 생성 중: ${bin.title} (${bin.lat}, ${bin.lng})")
+
+                val marker = Marker().apply {
+                    position = LatLng(bin.lat, bin.lng)
+                    icon = OverlayImage.fromResource(R.drawable.ic_trash_marker)
+                    map = naverMap
+                }
+
+                marker.setOnClickListener {
+                    Log.d("TrashBin", "마커 클릭됨: ${bin.title}")
+                    showTrashDialog(bin)
+                    true
+                }
             }
         }
     }
@@ -709,14 +702,6 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
 
         binding.tvTrashTitle.text = bin.title
         binding.tvTrashDescription.text = bin.description ?: "설명 없음"
-
-        if (bin.photoUrl != null) {
-            Glide.with(this)
-                .load(bin.photoUrl)
-                .into(binding.ivTrashImage)
-        } else {
-            binding.ivTrashImage.visibility = View.GONE
-        }
 
         val dialog = AlertDialog.Builder(requireContext())
             .setView(binding.root)
@@ -728,6 +713,4 @@ class PloggingFragment : Fragment(), OnMapReadyCallback {
 
         dialog.show()
     }
-
-
 }

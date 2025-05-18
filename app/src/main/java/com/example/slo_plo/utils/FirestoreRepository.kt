@@ -1,5 +1,8 @@
 package com.example.slo_plo.utils
+import android.util.Log
 import com.example.slo_plo.model.LogRecord
+import com.example.slo_plo.model.TrashBin
+import com.google.firebase.Firebase
 import com.google.firebase.firestore.FirebaseFirestore
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -75,4 +78,24 @@ object FirestoreRepository {
                 callback(emptyList())
             }
     }
+
+    fun loadTrashBins(callback: (List<TrashBin>) -> Unit) {
+        FirebaseFirestore.getInstance()
+            .collection("trash")
+            .get()
+            .addOnSuccessListener { snapshot ->
+                Log.d("TrashBin", "문서 수: ${snapshot.size()}")
+                val bins = snapshot.documents.mapNotNull { doc ->
+                    val bin = doc.toObject(TrashBin::class.java)
+                    Log.d("TrashBin", "매핑된 쓰레기통: $bin")
+                    bin
+                }
+                Log.d("TrashBin", "최종 마커 수: ${bins.size}")
+                callback(bins)
+            }
+            .addOnFailureListener { e ->
+                Log.e("TrashBin", "Firestore 가져오기 실패: ${e.message}", e)
+            }
+    }
+
 }
