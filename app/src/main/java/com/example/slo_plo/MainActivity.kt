@@ -89,6 +89,7 @@ class MainActivity : AppCompatActivity() {
                 R.id.logWriteFragment,
                 R.id.onboardingIntroFragment,
                 R.id.onboardingGuideFragment,
+                R.id.imageFullScreenFragment,
                 R.id.logDetailFragment-> true
                 else -> false
             }

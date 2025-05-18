@@ -24,6 +24,7 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
         maven("https://repository.map.naver.com/archive/maven")
+        maven("https://jitpack.io")
     }
 }
 
