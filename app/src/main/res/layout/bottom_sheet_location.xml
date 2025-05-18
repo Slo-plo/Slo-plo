@@ -61,7 +61,7 @@
 
     <!-- 버튼: 마진 없이 완전 꽉차게 -->
     <android.widget.Button
-        android:id="@+id/btn_select_region"
+        android:id="@+id/btn_bs_select_region"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="#808080"

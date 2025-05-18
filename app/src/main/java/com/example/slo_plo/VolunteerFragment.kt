@@ -165,7 +165,7 @@ class VolunteerFragment : Fragment() {
             sheetBinding.tvRegionClose.setOnClickListener { dialog.dismiss() }
 
             // '지역 선택' 버튼 클릭 시
-            sheetBinding.btnSelectRegion.setOnClickListener {
+            sheetBinding.btnBsSelectRegion.setOnClickListener {
                 if (selectedRegion != null && selectedSubRegion != null) {
                     // RegionVolunteerFragment로 전달할 지역명 준비
                     val fullRegion = selectedSubRegion // 또는 필요한 형식으로 조합
