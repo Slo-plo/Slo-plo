@@ -1,17 +1,31 @@
 package com.example.slo_plo
 
+import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.example.slo_plo.databinding.ItemRecomendVolunteerBinding
+import com.example.slo_plo.model.RecommendVolunteer // 데이터 클래스 임포트 확인
 
-class RecommendVolunteerAdapter(private val recommendVolunteerList: List<RecommendVolunteer>) :
+class RecommendVolunteerAdapter(initialList: List<RecommendVolunteer>) :
     RecyclerView.Adapter<RecommendVolunteerAdapter.VolunteerViewHolder>() {
+
+    // 데이터를 저장할 리스트를 val에서 var로 변경하고 초기 데이터를 받습니다.
+    private var recommendVolunteerList: List<RecommendVolunteer> = initialList
+
+    // 데이터를 새로 받아와서 리사이클러뷰를 업데이트하는 함수 추가
+    fun updateData(newList: List<RecommendVolunteer>) {
+        recommendVolunteerList = newList // 새로운 리스트로 데이터 갱신
+        notifyDataSetChanged() // 데이터가 변경되었음을 어댑터에 알려 리사이클러뷰를 새로고침 (간단한 방식)
+        // 참고: 대량의 데이터 변경 시 성능 향상을 위해 DiffUtil 사용을 고려해볼 수 있습니다.
+    }
 
     inner class VolunteerViewHolder(private val binding: ItemRecomendVolunteerBinding) :
         RecyclerView.ViewHolder(binding.root) {
@@ -22,7 +36,7 @@ class RecommendVolunteerAdapter(private val recommendVolunteerList: List<Recomme
             binding.tvRecommendLocation.text = recommendVolunteer.location
             binding.tvRecommendDate.text = recommendVolunteer.date
 
-            // 클릭 이벤트 처리
+            // 클릭 이벤트 처리 (기존 코드 그대로 유지)
             binding.root.setOnClickListener {
                 // 외부 링크로 이동할지 여부를 묻는 메시지 박스
                 showCustomMessageBox(it.context, recommendVolunteer.link)
@@ -30,7 +44,11 @@ class RecommendVolunteerAdapter(private val recommendVolunteerList: List<Recomme
         }
     }
 
+    // showCustomMessageBox 함수 (기존 코드 그대로 유지)
     private fun showCustomMessageBox(context: Context, link: String) {
+        // 함수 시작 시 넘어온 link 값 로깅
+        Log.d("LinkDebug", "showCustomMessageBox called with link: '$link'") // <-- 이 라인 추가
+
         // dialog_default.xml 레이아웃을 인플레이트
         val dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_default, null)
 
@@ -49,17 +67,40 @@ class RecommendVolunteerAdapter(private val recommendVolunteerList: List<Recomme
 
         // 네 버튼 클릭 시 링크로 이동
         confirmButton.setOnClickListener {
-            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(link))
-            context.startActivity(intent)
-            dialog.dismiss()
+            // 유효성 검사 전 link 값 다시 로깅
+            Log.d("LinkDebug", "Confirm clicked. Validating link: '$link'") // <-- 이 라인 추가
+
+            // 링크가 비어있거나 null인지, 또는 유효한 URL 형식인지 간단히 확인
+            if (link.isNullOrEmpty() || !android.util.Patterns.WEB_URL.matcher(link).matches()) {
+                Log.w("LinkDebug", "Link validation failed for: '$link'") // <-- 이 라인 추가
+                Toast.makeText(context, "유효한 링크 정보가 없습니다.", Toast.LENGTH_SHORT).show()
+                dialog.dismiss()
+            } else {
+                Log.d("LinkDebug", "Link validation successful for: '$link'") // <-- 이 라인 추가
+                try {
+                    // 유효한 경우에만 Intent 실행
+                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(link))
+                    context.startActivity(intent)
+                    dialog.dismiss()
+                } catch (e: ActivityNotFoundException) {
+                    Log.e("LinkDebug", "Activity not found for URL: '$link'", e) // <-- 이 라인 수정
+                    Toast.makeText(context, "링크를 열 앱을 찾을 수 없습니다.", Toast.LENGTH_SHORT).show()
+                    dialog.dismiss()
+                } catch (e: Exception) {
+                    Log.e("LinkDebug", "Error opening URL: '$link'", e) // <-- 이 라인 수정
+                    Toast.makeText(context, "링크 열기 중 오류 발생.", Toast.LENGTH_SHORT).show()
+                    dialog.dismiss()
+                }
+            }
         }
 
-        // 아니오 버튼 클릭 시 다이얼로그 닫기
+        // 아니오 버튼 클릭 시 다이얼로그 닫기 (기존 코드 유지)
         cancelButton.setOnClickListener {
+            Log.d("LinkDebug", "Cancel clicked.") // <-- 이 라인 추가
             dialog.dismiss()
         }
 
-        // 다이얼로그 표시
+        // 다이얼로그 표시 (기존 코드 유지)
         dialog.show()
     }
 
@@ -69,8 +110,9 @@ class RecommendVolunteerAdapter(private val recommendVolunteerList: List<Recomme
     }
 
     override fun onBindViewHolder(holder: VolunteerViewHolder, position: Int) {
+        // var로 변경된 recommendVolunteerList를 사용
         holder.bind(recommendVolunteerList[position])
     }
 
-    override fun getItemCount() = recommendVolunteerList.size
+    override fun getItemCount() = recommendVolunteerList.size // var로 변경된 recommendVolunteerList를 사용
 }

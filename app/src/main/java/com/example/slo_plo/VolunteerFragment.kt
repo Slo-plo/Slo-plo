@@ -1,10 +1,11 @@
 package com.example.slo_plo
 
+import android.graphics.Color
 import android.os.Bundle
+// import android.util.Log // Logcat 출력을 위해 추가 -> 요청에 따라 삭제
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.graphics.Color
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -12,8 +13,15 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.example.slo_plo.databinding.FragmentVolunteerBinding
 import com.example.slo_plo.databinding.BottomSheetLocationBinding
+import com.example.slo_plo.model.RecommendVolunteer // 데이터 클래스 임포트 확인
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import androidx.navigation.fragment.findNavController
+
+// Firebase Firestore 관련 임포트 추가
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.QuerySnapshot
+import com.google.firebase.firestore.FirebaseFirestoreException
 
 class VolunteerFragment : Fragment() {
 
@@ -22,6 +30,11 @@ class VolunteerFragment : Fragment() {
 
     private lateinit var recommendVolunteerAdapter: RecommendVolunteerAdapter
 
+    // Firebase Firestore 인스턴스 선언 (늦은 초기화 또는 lazy 초기화)
+    private val db = FirebaseFirestore.getInstance()
+    // 데이터가 저장된 컬렉션 이름 (3단계에서 설계한 이름 사용)
+    private val volunteersCollection = db.collection("volunteer_lists") // 컬렉션 이름 확인 및 수정 필요
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -29,17 +42,9 @@ class VolunteerFragment : Fragment() {
         _binding = FragmentVolunteerBinding.inflate(inflater, container, false)
         val view = binding.root
 
-        /* 인스타 공유 버튼 로직
-        binding.btnSharePage.setOnClickListener {
-            requireActivity().supportFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container_view, InstaShareFragment()) // Fragment 교체
-                .addToBackStack(null) // Back Stack에 추가
-                .commit() // 트랜잭션 실행
-        }
-        */
-
-        // 'btnFindLocation' 버튼 클릭 리스너 설정
+        // 'btnFindLocation' 버튼 클릭 리스너 설정 (기존 로직 유지)
         binding.btnFindLocation.setOnClickListener {
+            // ... (바텀시트 관련 기존 코드 그대로 유지) ...
 
             // 바텀시트 다이얼로그 생성
             val dialog = BottomSheetDialog(requireContext())
@@ -74,7 +79,7 @@ class VolunteerFragment : Fragment() {
                 })
             }
 
-            // 지역 리스트 정의 및 맵핑
+            // 지역 리스트 정의 및 맵핑 (기존 데이터 유지)
             val regions = listOf("서울", "경기", "인천", "강원", "대전", "대구", "부산", "울산", "경상", "광주", "전라", "충청", "대전", "제주")
             val regionMap = mapOf(
                 "서울" to listOf("강남구", "강동구", "강북구", "강서구", "관악구", "구로구", "금천구", "노원구",
@@ -160,23 +165,28 @@ class VolunteerFragment : Fragment() {
             sheetBinding.tvRegionClose.setOnClickListener { dialog.dismiss() }
 
             // '지역 선택' 버튼 클릭 시
-            sheetBinding.btnSelectRegion.setOnClickListener {
+            sheetBinding.btnBsSelectRegion.setOnClickListener {
                 if (selectedRegion != null && selectedSubRegion != null) {
-                    val fullRegion = "$selectedSubRegion"
+                    // RegionVolunteerFragment로 전달할 지역명 준비
+                    val fullRegion = selectedSubRegion // 또는 필요한 형식으로 조합
 
-                    val fragment = RegionVolunteerFragment().apply {
-                        arguments = Bundle().apply {
-                            putString("region", fullRegion)
-                        }
+                    // RegionVolunteerFragment로 전달할 데이터를 Bundle에 담음
+                    val bundle = Bundle().apply {
+                        putString("region", fullRegion) // 키는 RegionVolunteerFragment에서 가져올 때 사용할 이름("region")과 일치해야 함
                     }
 
-                    requireActivity().supportFragmentManager.beginTransaction()
-                        .replace(R.id.fragment_container_view, fragment)
-                        .addToBackStack(null)
-                        .commit()
+                    // Navigation Component의 findNavController() 사용
+                    val navController = findNavController()
 
-                    dialog.dismiss()
+                    // 네비게이션 그래프에 정의된 액션 ID를 사용하여 이동
+                    // R.id.action_volunteerFragment_to_regionVolunteerFragment 는 navigation.xml에 추가한 액션의 ID
+                    // bundle에는 전달할 인자(region)가 담겨 있음
+                    navController.navigate(R.id.action_volunteerFragment_to_regionVolunteerFragment, bundle)
+
+                    dialog.dismiss() // 바텀시트 다이얼로그 닫기 (기존 코드 유지)
+
                 } else {
+                    // 지역 선택 안 했을 때 토스트 메시지 (기존 코드 유지)
                     Toast.makeText(requireContext(), "지역을 선택해주세요.", Toast.LENGTH_SHORT).show()
                 }
             }
@@ -185,8 +195,10 @@ class VolunteerFragment : Fragment() {
             dialog.show()
         }
 
+
         // 리사이클러뷰 설정
-        recommendVolunteerAdapter = RecommendVolunteerAdapter(getVolunteerList())
+        // 어댑터를 초기화할 때 빈 리스트를 넘겨줌
+        recommendVolunteerAdapter = RecommendVolunteerAdapter(emptyList())
         binding.recyclerViewRecommendVolunteer.apply {
             layoutManager = LinearLayoutManager(requireContext())
             adapter = recommendVolunteerAdapter
@@ -195,36 +207,55 @@ class VolunteerFragment : Fragment() {
             addItemDecoration(dividerItemDecoration)
         }
 
+        // TODO: 로딩 상태 표시 (예: ProgressBar)를 여기에 추가할 수 있습니다.
+        // binding.progressBar.visibility = View.VISIBLE
+
+        // Firebase에서 데이터를 가져오는 함수 호출
+        loadVolunteersFromFirebase()
+
+
         return view
     }
 
-    private fun getVolunteerList(): List<RecommendVolunteer> {
-        return listOf(
-            RecommendVolunteer("[강남구자원봉사센터-공감그린스토리] 같이 함께하는 강남구플로깅로드(오프라인)_쓰레기줍기 환경정화", "강남구자원봉사센터에서는 탄소중립 실천을 위한 일환으로 강남구 플로깅 로드 프로젝트를 진행합니다. " +
-                    "강남구 플로깅 로드는 '이타서울'웹사이트을 활용한 모바일 플로깅(쓰레기줍기) 활동으로 기록된 정보는 강남구 플로깅 로드를 제작하는데에 활용됩니다. ", "강남구", "2025.05.09 ~ 2025.07.11", "https://www.1365.go.kr/vols/1572247904127/partcptn/timeCptn.do?titleNm=%EC%83%81%EC%84%B8%EB%B3%B4%EA%B8%B0&type=show&progrmRegistNo=3281268"),
-            RecommendVolunteer("[강남구자원봉사센터]강남구플로깅로드_강남구 내 모바일 데이터플로깅", "강남구자원봉사센터에서는 탄소중립 실천을 위한 일환으로 강남구 플로깅 로드 프로젝트를 진행합니다. 강남구 플로깅 로드는 모바일 '이타서울' 웹앱을 활용한 비대면 플로깅 활동으로 활동을 통하여 기록된 정보는 강남구 플로깅 로드를 제작하는데에 활용됩니다. ", "강남구", "2025.04.28 ~ 2025.07.27", "https://www.1365.go.kr/vols/1572247904127/partcptn/timeCptn.do?titleNm=%EC%83%81%EC%84%B8%EB%B3%B4%EA%B8%B0&type=show&progrmRegistNo=3280745"),
-            RecommendVolunteer("저탄소생활실천 비대면[플로깅] 자원봉사 모집(※본인활동사진모습 3장 꼭 첨부,하루2시간까지/월2회인정)", "저탄소 생활실천「플로깅(Plogging)」자원봉사자 모집 안내저탄소생활실천[플로깅]자원봉사 모집(※ 첨부파일 예시 꼭!!! 확인 후 활동)", "강북구", "2025.04.01 ~ 2025.06.30", "https://www.1365.go.kr/vols/1572247904127/partcptn/timeCptn.do?titleNm=%EC%83%81%EC%84%B8%EB%B3%B4%EA%B8%B0&type=show&progrmRegistNo=3269955"),
-            RecommendVolunteer("[노원구자원봉사센터] 기후위기 대응 플로깅 자원봉사 (모집중)", "온라인 활동인증 방식이며, 신청하신 봉사 활동 날짜와 관계없이 실제 자료 제출이 완료된 날을 기준으로 실적이 입력됩니다. (매월 1회 참여가능)", "노원구", "2025.04.01 ~ 2025.06.30", "https://www.1365.go.kr/vols/1572247904127/partcptn/timeCptn.do?titleNm=%EC%83%81%EC%84%B8%EB%B3%B4%EA%B8%B0&type=show&progrmRegistNo=3258239"),
-            RecommendVolunteer("서초구립주간이용센터 수플로(숲+플로깅) 프로그램 자원봉사", "저희 서초구립주간이용센터는 성인 중증장애인의 의미있는 낮 활동과 가족의 쉼을 지원하고자\n" +
-                    "서초구청이 설립하고 사회복지법인 서울가톨릭사회복지회가 운영하고 있는\n" +
-                    "중증장애인 주간이용시설입니다.\n" +
-                    "저희 센터에서는 다음과 같이 자원봉사자를 모집합니다.", "서초구", "2025.05.12 ~ 2025.08.11", "https://www.1365.go.kr/vols/1572247904127/partcptn/timeCptn.do?titleNm=%EC%83%81%EC%84%B8%EB%B3%B4%EA%B8%B0&type=show&progrmRegistNo=3279629"),
-            RecommendVolunteer("★5월 구석구석 플로깅(지구를 살리는 작은 실천-비대면 환경정화", "구석 구석 플로깅(우리들의 작은 실천 플로깅-비대면 환경정화)\n" +
-                    "경기도교육청 학생봉사활동 운영계획에 따라 학생봉사활동의 최종 봉사시간\n" +
-                    "인정여부는 학교장이 승인해야 합니다. 인정기관 및 인정활동 여부에 대해 반드시\n" +
-                    "해당교에 사전 상담하세요.", "이천시", "2025.05.01 ~ 2025.05.31", "https://www.1365.go.kr/vols/1572247904127/partcptn/timeCptn.do?titleNm=%EC%83%81%EC%84%B8%EB%B3%B4%EA%B8%B0&type=show&progrmRegistNo=3284381"),
-            RecommendVolunteer("기흥호수공원 플로깅 및 신재생에너지 알아보기", "태양열조리기 설치를 통해 신재생에너지에 대해 알아보고, 플로깅을 통해 하천의 수생태계를 보호한다.", "용인시", "2025.06.15", "https://www.1365.go.kr/vols/1572247904127/partcptn/timeCptn.do?titleNm=%EC%83%81%EC%84%B8%EB%B3%B4%EA%B8%B0&type=show&progrmRegistNo=3286629"),
-            RecommendVolunteer("★꽃길만 걸을 고양_플로깅★", "우리 동네 공원 및 인도 등 산책하며 쓰레기 줍깅 활동\n" +
-                    "           *** 활동 전 사진촬영->활동 중 사진촬영->활동 후 사진활영 (각각 한장 이상씩 사진찍기!)\n" +
-                    "             ** 반드시 인물과 장소가 나오게 찍어주세요!\n" +
-                    "              * 타임스탬프 어플로 사진찍어서 구글폼 링크를 통해 제출해주세요!", "고양시", "2025.04.01 ~ 2025.06.30", "https://www.1365.go.kr/vols/1572247904127/partcptn/timeCptn.do?titleNm=%EC%83%81%EC%84%B8%EB%B3%B4%EA%B8%B0&type=show&progrmRegistNo=3260318"),
-            RecommendVolunteer("2025 우리같이 플로깅 활동", "1인 이상 신청한 장소에서 해당 시간에 플로깅(산책+쓰레기줍기) 활동\n" +
-                    "            1시간30분 이상 활동 시  인정", "계양구", "2025.05.01 ~ 2025.07.31", "https://www.1365.go.kr/vols/1572247904127/partcptn/timeCptn.do?titleNm=%EC%83%81%EC%84%B8%EB%B3%B4%EA%B8%B0&type=show&progrmRegistNo=3277307")
-        )
+    // Firebase Firestore에서 봉사활동 데이터를 가져오는 함수
+    private fun loadVolunteersFromFirebase() {
+        volunteersCollection
+            .get() // get() 메서드로 컬렉션의 모든 문서를 한 번 가져옵니다.
+            .addOnSuccessListener { querySnapshot: QuerySnapshot? ->
+                val volunteers = mutableListOf<RecommendVolunteer>()
+                if (querySnapshot != null) {
+                    for (document in querySnapshot.documents) {
+                        try {
+                            val volunteer = document.toObject(RecommendVolunteer::class.java)
+                            if (volunteer != null) {
+                                // Log.d("LinkConvertDebug", "Document ID: ${document.id}, Converted link: '${volunteer.link}'") // 로그 삭제
+                                volunteers.add(volunteer)
+                            } else {
+                                // Log.w("LinkConvertDebug", "Document ${document.id} converted to null.") // 로그 삭제
+                            }
+                        } catch (e: Exception) {
+                            // Log.e("Firebase", "Error converting document to RecommendVolunteer: ${document.id}", e) // 로그 삭제
+                            // 데이터 변환 오류 시 로그 출력 (Firestore 필드 이름/타입 불일치 가능성)
+                        }
+                    }
+                }
+
+                // 가져온 데이터로 리사이클러뷰 어댑터 업데이트
+                recommendVolunteerAdapter.updateData(volunteers) // 어댑터 업데이트 함수 호출
+
+                // TODO: 로딩 상태 표시를 숨깁니다.
+                // binding.progressBar.visibility = View.GONE
+            }
+            .addOnFailureListener { exception: Exception ->
+                Toast.makeText(requireContext(), "데이터 로드 실패: ${exception.message}", Toast.LENGTH_SHORT).show()
+                // TODO: 로딩 상태 표시를 숨깁니다.
+                // binding.progressBar.visibility = View.GONE
+            }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+        // TODO: 만약 addSnapshotListener를 사용했다면 여기서 리스너를 제거해야 메모리 누수를 방지할 수 있습니다.
     }
 }
