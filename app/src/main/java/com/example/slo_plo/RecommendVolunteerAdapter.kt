@@ -1,12 +1,15 @@
 package com.example.slo_plo
 
+import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.example.slo_plo.databinding.ItemRecomendVolunteerBinding
 import com.example.slo_plo.model.RecommendVolunteer // 데이터 클래스 임포트 확인
@@ -61,9 +64,28 @@ class RecommendVolunteerAdapter(initialList: List<RecommendVolunteer>) :
 
         // 네 버튼 클릭 시 링크로 이동
         confirmButton.setOnClickListener {
-            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(link))
-            context.startActivity(intent)
-            dialog.dismiss()
+            // 링크가 비어있거나 null인지, 또는 유효한 URL 형식인지 간단히 확인
+            if (link.isNullOrEmpty() || !android.util.Patterns.WEB_URL.matcher(link).matches()) {
+                Toast.makeText(context, "유효한 링크 정보가 없습니다.", Toast.LENGTH_SHORT).show()
+                dialog.dismiss()
+            } else {
+                try {
+                    // 유효한 경우에만 Intent 실행
+                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(link))
+                    context.startActivity(intent)
+                    dialog.dismiss()
+                } catch (e: ActivityNotFoundException) {
+                    // 혹시 Intent를 처리할 앱이 정말 없을 경우를 대비 (드문 경우)
+                    Toast.makeText(context, "링크를 열 앱을 찾을 수 없습니다.", Toast.LENGTH_SHORT).show()
+                    dialog.dismiss()
+                    Log.e("Adapter", "Activity not found for URL: $link", e)
+                } catch (e: Exception) {
+                    // 그 외 다른 오류 처리
+                    Toast.makeText(context, "링크 열기 중 오류 발생.", Toast.LENGTH_SHORT).show()
+                    dialog.dismiss()
+                    Log.e("Adapter", "Error opening URL: $link", e)
+                }
+            }
         }
 
         // 아니오 버튼 클릭 시 다이얼로그 닫기
