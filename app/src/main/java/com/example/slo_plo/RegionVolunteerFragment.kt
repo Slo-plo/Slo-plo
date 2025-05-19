@@ -32,6 +32,9 @@ class RegionVolunteerFragment : Fragment() {
     private var _binding: FragmentRegionVolunteerBinding? = null
     private val binding get() = _binding!!
 
+    private var subAdapter: SubregionAdapter? = null
+    private var selectedPosition: Int = -1
+
     private lateinit var recommendVolunteerAdapter: RecommendVolunteerAdapter
 
     // Firebase Firestore 인스턴스 선언
@@ -141,33 +144,44 @@ class RegionVolunteerFragment : Fragment() {
                 "제주특별자치도" to listOf("제주", "서귀포")
             )
 
+            // 선택된 지역 및 세부 지역 저장용 변수
             var selectedRegion: String? = null
             var selectedSubRegion: String? = null
-            // var selectedPosition: Int? = null // 사용되지 않는 변수 제거
 
-            // 첫 번째 리스트뷰 (지역) 설정
-            val regionAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, regions)
+            // 첫 번째 리스트뷰에 지역 데이터 연결
+            val regionAdapter = RegionAdapter(requireContext(), regions)
             sheetBinding.listRegion.adapter = regionAdapter
 
-            // 지역을 선택했을 때 서브 지역 리스트뷰 갱신 리스너
             sheetBinding.listRegion.setOnItemClickListener { _, _, position, _ ->
                 selectedRegion = regions[position]
+                selectedPosition = position
                 val subRegions = regionMap[selectedRegion] ?: emptyList()
-                val subAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, subRegions)
+
+                subAdapter = SubregionAdapter(requireContext(), subRegions)
                 sheetBinding.listSubregion.adapter = subAdapter
+
+                // 서브 지역 클릭 리스너는 한 번만 설정
+                sheetBinding.listSubregion.setOnItemClickListener { _, _, position, _ ->
+                    subAdapter?.selectedPosition = position
+                    subAdapter?.notifyDataSetChanged()
+                    selectedSubRegion = subAdapter?.getItem(position)
+                }
             }
 
-            // 서브 지역 선택 처리 리스너
+            // 서브 지역 선택 처리
             sheetBinding.listSubregion.setOnItemClickListener { _, view, position, _ ->
-                // 이전 선택 항목 배경 리셋 및 현재 선택 항목 배경 변경
-                val previousSelectedSubPosition = sheetBinding.listSubregion.getTag(R.id.selected_position) as? Int
-                if (previousSelectedSubPosition != null && previousSelectedSubPosition != position) {
-                    val previousSelectedView = sheetBinding.listSubregion.getChildAt(previousSelectedSubPosition)
+                // 선택된 아이템의 배경색을 어두운 색으로 변경
+                view.setBackgroundResource(R.color.main_color)
+
+                // 이전 선택된 항목의 배경을 리셋
+                val previousSelectedPosition = sheetBinding.listSubregion.getTag(R.id.selected_position) as? Int
+                if (previousSelectedPosition != null) {
+                    val previousSelectedView = sheetBinding.listSubregion.getChildAt(previousSelectedPosition)
                     previousSelectedView?.setBackgroundColor(Color.WHITE)
                 }
-                view.setBackgroundColor(Color.parseColor("#F0F0F0")) // 현재 선택된 항목 배경 변경
-                sheetBinding.listSubregion.setTag(R.id.selected_position, position) // 현재 선택 위치 저장
 
+                // 현재 선택된 항목의 배경을 어두운 색으로 설정
+                sheetBinding.listSubregion.setTag(R.id.selected_position, position)
                 selectedSubRegion = sheetBinding.listSubregion.adapter.getItem(position) as? String
             }
 
@@ -202,9 +216,10 @@ class RegionVolunteerFragment : Fragment() {
             dialog.show()
         }
 
-        // === 바텀시트 관련 코드 끝 ===
-
-        // 나머지 초기화 및 데이터 로드는 onViewCreated 시작 부분에서 이미 호출되었습니다.
+        val navView = requireActivity().findViewById<com.google.android.material.bottomnavigation.BottomNavigationView>(
+            R.id.bottomNavigationView
+        )
+        navView.menu.findItem(R.id.volunteerFragment)?.isChecked = true
 
     }
 
