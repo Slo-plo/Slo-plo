@@ -4,9 +4,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/main_color"
+    android:background="@color/white"
     tools:context=".VolunteerFragment"
     android:id="@+id/fragment_container_view" >
+
+    <ImageView
+        android:id="@+id/iv_volunteer_background"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:src="@drawable/bg_square_main_color_bottom_20"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/btn_find_location"
+        android:layout_marginBottom="-105dp" />
 
     <!-- 앱 아이콘 -->
     <ImageView
@@ -46,37 +55,19 @@
             android:includeFontPadding="false"/>
     </FrameLayout>
 
-    <!-- 3) 추천 봉사목록 타이틀 -->
-    <TextView
-        android:id="@+id/tv_recommend_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="추천 봉사 목록"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.06"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/btn_find_location"
-        android:fontFamily="@font/noto_sans_kr_semi_bold"
-        android:includeFontPadding="false"/>
-
-    <!-- 4) RecyclerView -->
-
     <!-- 5) 아이콘 -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView_recommend_volunteer"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="8dp"
         android:layout_marginBottom="80dp"
+        android:paddingHorizontal="20dp"
         android:background="@android:color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_recommend_title"
+        app:layout_constraintTop_toBottomOf="@id/iv_volunteer_background"
         app:layout_constraintVertical_bias="0.0" />
 
     <ImageView
@@ -89,6 +80,5 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5" />
 
-    <!-- 인스타 공유 버튼 나중에 삭제해야 함 -->
 
 </androidx.constraintlayout.widget.ConstraintLayout>
