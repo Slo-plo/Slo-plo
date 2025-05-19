@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:paddingHorizontal="16dp"
     android:background="@color/main_color"
     tools:context=".LogListFragment">
 
@@ -19,16 +20,6 @@
         app:layout_constraintTop_toTopOf="parent"
         android:includeFontPadding="false"/>
 
-    <!-- 뒤로가기 버튼 -->
-    <ImageView
-        android:id="@+id/btn_back"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/ic_arrow_back"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_margin="20dp"/>
-
     <!-- 캘린더 이동 버튼 -->
     <ImageView
         android:id="@+id/btn_calendar"
@@ -36,7 +27,7 @@
         android:layout_height="40dp"
         android:gravity="center"
         android:src="@drawable/btn_list_to_journal"
-        android:layout_marginEnd="35dp"
+        android:layout_marginEnd="19dp"
         android:layout_marginBottom="15dp"
         app:layout_constraintBottom_toTopOf="@id/logListBox"
         app:layout_constraintEnd_toEndOf="parent" />
@@ -75,10 +66,7 @@
         android:id="@+id/logListBox"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
         android:layout_marginTop="15dp"
-        android:layout_marginBottom="100dp"
         app:cardCornerRadius="16dp"
         app:cardElevation="0dp"
         android:background="#9ECDEE"
@@ -117,37 +105,19 @@
 <!--                    android:fontFamily="@font/noto_sans_kr_medium" />-->
 <!--            </LinearLayout>-->
 
-            <!-- RecyclerView -->
-            <TextView
-                android:id="@+id/textLogListTitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="20dp"
-                android:layout_marginTop="20dp"
-                android:background="@drawable/bg_loglist_title_box"
-                android:fontFamily="@font/noto_sans_kr_medium"
-                android:includeFontPadding="false"
-                android:paddingVertical="3dp"
-                android:paddingHorizontal="15dp"
-                android:text="일지 List"
-                android:textColor="@android:color/black"
-                android:textSize="14sp"
-                android:textStyle="bold" />
-
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/log_list_recycler"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
-                android:layout_marginTop="8dp"
                 android:background="#9ECDEE"
                 android:padding="8dp"
+                android:paddingHorizontal="16dp"
+                android:layout_marginBottom="75dp"
                 android:clipToPadding="false"
-                android:overScrollMode="never" />
+                android:overScrollMode="never"/>
         </LinearLayout>
     </androidx.cardview.widget.CardView>
-
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

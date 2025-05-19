@@ -30,7 +30,18 @@
     <fragment
         android:id="@+id/volunteerFragment"
         android:name="com.example.slo_plo.VolunteerFragment"
-        android:label="외부봉사" />
+        android:label="외부봉사">
+        <action
+            android:id="@+id/action_volunteerFragment_to_regionVolunteerFragment"
+            app:destination="@id/regionVolunteerFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/regionVolunteerFragment"
+        android:name="com.example.slo_plo.RegionVolunteerFragment"
+        android:label="선택 지역 봉사활동"
+        tools:layout="@layout/fragment_region_volunteer">
+    </fragment>
 
     <fragment
       android:id="@+id/ploggingFragment"
@@ -57,6 +68,9 @@
         <argument
             android:name="logRecord"
             app:argType="com.example.slo_plo.model.LogRecord" />
+        <action
+            android:id="@+id/action_logDetail_to_imageFullScreen"
+            app:destination="@id/imageFullScreenFragment" />
     </fragment>
 
 
@@ -101,5 +115,15 @@
             android:id="@+id/action_logList_to_home"
             app:destination="@id/homeFragment"/>
     </fragment>
+
+    <fragment
+        android:id="@+id/imageFullScreenFragment"
+        android:name="com.example.slo_plo.ImageFullScreenFragment"
+        android:label="사진 전체 화면" >
+        <argument
+            android:name="imageUrl"
+            app:argType="string" />
+    </fragment>
+
 
 </navigation>

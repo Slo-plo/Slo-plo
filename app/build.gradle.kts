@@ -21,8 +21,8 @@ android {
         applicationId = "com.example.slo_plo"
         minSdk = 24
         targetSdk = 34
-        versionCode = 2
-        versionName = "1.1.0"
+        versionCode = 3
+        versionName = "1.2.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -72,6 +72,7 @@ dependencies {
     implementation(libs.androidx.core.i18n)
     implementation(libs.androidx.ui.text.android)
     implementation(libs.androidx.navigation.fragment.ktx)
+    implementation (libs.relex.circleindicator)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -82,6 +83,8 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:33.13.0"))
     implementation("com.google.firebase:firebase-auth")
     implementation ("com.google.firebase:firebase-storage")
+    implementation ("com.github.chrisbanes:PhotoView:2.3.0")
+
 
 
 
