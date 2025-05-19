@@ -216,9 +216,10 @@ class RegionVolunteerFragment : Fragment() {
             dialog.show()
         }
 
-        // === 바텀시트 관련 코드 끝 ===
-
-        // 나머지 초기화 및 데이터 로드는 onViewCreated 시작 부분에서 이미 호출되었습니다.
+        val navView = requireActivity().findViewById<com.google.android.material.bottomnavigation.BottomNavigationView>(
+            R.id.bottomNavigationView
+        )
+        navView.menu.findItem(R.id.volunteerFragment)?.isChecked = true
 
     }
 
