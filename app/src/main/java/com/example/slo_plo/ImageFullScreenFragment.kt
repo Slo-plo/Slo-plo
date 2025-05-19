@@ -8,30 +8,34 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
+import com.example.slo_plo.databinding.FragmentImageFullScreenBinding
 import com.github.chrisbanes.photoview.PhotoView
 
 
 class ImageFullScreenFragment : Fragment() {
 
+    private var _binding: FragmentImageFullScreenBinding? = null
+    private val binding get() = _binding!!
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_image_full_screen, container, false)
+    ): View {
+        _binding = FragmentImageFullScreenBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        val imageView = view.findViewById<PhotoView>(R.id.imageViewPreview)
         val imageUrl = arguments?.getString("imageUrl")
 
         if (!imageUrl.isNullOrEmpty()) {
             Glide.with(requireContext())
                 .load(imageUrl)
-                .into(imageView)
+                .into(binding.imageViewPreview)
         }
 
         // 클릭 시 뒤로가기
-        imageView.setOnClickListener {
+        binding.imageViewPreview.setOnClickListener {
             findNavController().popBackStack()
         }
     }
