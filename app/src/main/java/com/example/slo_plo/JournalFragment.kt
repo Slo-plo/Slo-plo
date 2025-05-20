@@ -28,6 +28,7 @@ import java.time.format.TextStyle
 import java.util.Locale
 import com.example.slo_plo.model.LogRecord
 import androidx.navigation.fragment.findNavController
+import com.example.slo_plo.databinding.MonthHeaderViewBinding
 import com.example.slo_plo.utils.FirestoreRepository
 import com.google.firebase.auth.FirebaseAuth
 
@@ -204,9 +205,12 @@ class JournalFragment : Fragment() {
 
     // 요일 헤더 ViewHolder
     inner class MonthViewContainer(view: View) : ViewContainer(view) {
-        val titlesContainer: LinearLayout = view.findViewById(R.id.dayOfWeekRow)
-        val monthTitle: TextView = view.findViewById(R.id.textMonthTitle)
+        val binding = MonthHeaderViewBinding.bind(view)
+
+        val titlesContainer = binding.dayOfWeekRow
+        val monthTitle = binding.textMonthTitle
     }
+
 
     override fun onDestroyView() {
         super.onDestroyView()
